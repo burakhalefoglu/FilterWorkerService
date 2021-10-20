@@ -14,21 +14,35 @@ var rdb = redis.NewClient(&redis.Options{
 	DB:       0,
 })
 
-func (r RedisCache) Get (key string)(interface{}, error){
+var CacheForRedis = RedisCache{
+	client: rdb,
+}
 
-	return r.client.HGetAll(key), nil
+func (r RedisCache) Get (key string)(map[string]string, error){
+
+	result := r.client.HGetAll(key)
+	if result.Err() != nil {
+		return nil, result.Err()
+	}
+	return r.client.HGetAll(key).Val(), nil
 
 }
 
 func (r RedisCache) Add(key string, value map[string]interface{})(interface{}, error){
 	result := r.client.HMSet(key, value)
-	return result, nil
+	if result.Err() != nil{
+		return nil, result.Err()
+	}
+	return result.Val(), nil
 }
 
 
 func (r RedisCache) Delete(key string)(interface{}, error){
 	result := r.client.HDel(key)
-	return result, nil
+	if result.Err() !=nil{
+		return nil, result.Err()
+	}
+	return result.Val(), nil
 }
 
 

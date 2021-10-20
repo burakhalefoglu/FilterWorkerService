@@ -5,17 +5,14 @@ import (
 )
 
 
-type CacheMap map[string]map[string]interface{}
-
-
 type cacheInterface interface{
-	Get(key string)(interface{}, error)
-	Add(key string, value interface{})(interface{}, error)
+	Get(key string)(map[string]string, error)
+	Add(key string, value map[string]interface{})(interface{}, error)
 	Delete(key string)(interface{}, error)
 }
 
 
-func GetFromCache(key string, c cacheInterface) (interface{}, error) {
+func GetFromCache(key string, c cacheInterface) (value map[string]string, err error) {
 	v, err := c.Get(key)
 	if(err != nil) {
 		return nil, errors.New("veri bulunamadı!")

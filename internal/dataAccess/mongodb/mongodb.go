@@ -34,25 +34,48 @@ func DeleteCollection(collectionName string, filter interface{}){
 
 	res, err := collection.DeleteOne(ctx, filter)
 
-	if(err != nil) {
+	if err != nil {
 		log.Println(err)
 	}
 	log.Println(res)
 }
 
-func GetCollection(collectionName string, filter interface{}){
+
+func GetCollectionCount(collectionName string, filter interface{}) (int64, error) {
+
+	collection = mongoClient.Database("Client").Collection(collectionName)
+
+	result, err := collection.CountDocuments(ctx, filter)
+
+	if err != nil {
+		log.Println(err)
+		return 0, err
+	}
+	log.Println(result)
+	return result, nil
+}
+
+
+func GetCollection(collectionName string, filter interface{}, v interface{}) error {
 	
 	collection = mongoClient.Database("Client").Collection(collectionName)
 
 	result := collection.FindOne(ctx, filter)
 
-	if(result.Err() != nil) {
+	if result.Err() != nil {
 		log.Println(result.Err())
+		return result.Err()
 	}
 	log.Println(result)
+	err := result.Decode(&v)
+	if err!= nil {
+		return err
+	}
+
+	return nil
 }
 
-func AddCollection(collectionName string, data interface{}) ( m *mongo.InsertOneResult, errors error){
+func AddCollection(collectionName string, data interface{}) ( interface{}, error){
 	
 	collection = mongoClient.Database("Client").Collection(collectionName)
 
@@ -63,10 +86,10 @@ func AddCollection(collectionName string, data interface{}) ( m *mongo.InsertOne
 		return nil, err
 	}
 	log.Println(res)
-	return res, nil
+	return res.InsertedID, nil
 }
 
-func UpdateCollection(collectionName string, filter interface{}, data interface{}) ( m *mongo.UpdateResult, errors error){
+func UpdateCollection(collectionName string, filter interface{}, data interface{}) ( interface{}, error){
 	
 	collection = mongoClient.Database("Client").Collection(collectionName)
 
@@ -77,5 +100,5 @@ func UpdateCollection(collectionName string, filter interface{}, data interface{
 		return nil, err
 	}
 	log.Println(res)
-	return res, nil
+	return res.UpsertedID, nil
 }

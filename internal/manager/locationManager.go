@@ -1,27 +1,53 @@
 package locationManager
 
 import (
-	"FilterWorkerService/internal/jsonParser"
+	"FilterWorkerService/internal/dataAccess/mongodb"
 	baseManager "FilterWorkerService/internal/manager/base"
-	"log"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 type Location struct{
-	Continent string 
+	ProjectId string
+	ClientId string
+	Continent string
 }
 
-var loc = Location{}
+type Client struct{
+	ProjectId string
+	ClientId string
+	Continent int
+}
 
-func AddOrUpdateContinent( topic string, message []byte) {
+func AddOrUpdateParameter( topic string, collection string, key string, loc *Location) error {
 
-	jsonParser.DecodeJson(message,loc)
+	value, err := baseManager.ManageCache(collection,loc.Continent)
 
-	_, err := baseManager.ManageCache(topic,loc.Continent)
+	if err != nil {
+		return err
+	}
+	resultId, err := mongodb.GetCollectionCount(topic, bson.D{
+		{"ClientId",loc.ClientId},
+		{ "ProjectId", loc.ClientId},})
 
-	if(err != nil) {
-		log.Fatal("err: ", err)
+	if err != nil {
+		return err
+	}
+	if resultId>0 {
+		_, err := mongodb.UpdateCollection(topic, bson.D{
+			{"ClientId",loc.ClientId},
+		{ "ProjectId", loc.ClientId},},
+		bson.D{{"Continent",value}})
+		if err != nil{
+			return err
+		}
+		return nil
 	}
 
-	//Todo: Bu id'yi kullanarak kullanının bilgilerini güncelle!
-
+	_, err = mongodb.AddCollection(topic, Client{ProjectId: loc.ProjectId,
+		ClientId:  loc.ClientId,
+		Continent: value})
+	if err != nil {
+		return err
+	}
+	return  nil
 }

@@ -1,6 +1,7 @@
 package kafka
 
 import (
+	"FilterWorkerService/pkg/jsonParser"
 	"context"
 	"log"
 	"time"
@@ -55,7 +56,8 @@ func Produce(parent context.Context, key, value []byte, topic string) (err error
 	return err
 }
 
-func Consume(topic string, groupId string, callback func(m []byte)(error)){
+func Consume(topic string, groupId string, messageType interface{}, callback func(message interface{})(error)){
+
 
 	reader, _:= readerConfigure([]string{"192.168.43.178:9092"}, groupId, topic)
 		defer reader.Close()
@@ -70,7 +72,9 @@ func Consume(topic string, groupId string, callback func(m []byte)(error)){
 				log.Fatalf("error while receiving message: %s", err.Error())
 				continue
 			}
-			callErr := callback(m.Value)
+			jsonParser.DecodeJson(m.Value, &messageType)
+			callErr := callback(messageType)
+
 			if callErr == nil{
 				if err := reader.CommitMessages(context.Background(), m); err != nil {
 					log.Fatal("failed to commit messages:", err)
