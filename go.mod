@@ -19,6 +19,7 @@ require (
 	github.com/onsi/gomega v1.16.0 // indirect
 	github.com/pierrec/lz4 v2.6.0+incompatible // indirect
 	github.com/pkg/errors v0.9.1 // indirect
+	github.com/stretchr/testify v1.7.0
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
 	github.com/xdg-go/scram v1.0.2 // indirect
 	github.com/xdg-go/stringprep v1.0.2 // indirect
@@ -27,4 +28,10 @@ require (
 	golang.org/x/net v0.0.0-20210428140749-89ef3d95e781 // indirect
 	golang.org/x/sync v0.0.0-20201020160332-67f06af15bc9 // indirect
 	golang.org/x/text v0.3.6 // indirect
+)
+
+require (
+	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
+	gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c // indirect
 )

@@ -55,7 +55,7 @@ func Produce(parent context.Context, key, value []byte, topic string) (err error
 	return err
 }
 
-func Consume(topic string, groupId string, callback func(reader *kafka.Reader, m kafka.Message)){
+func Consume(topic string, groupId string, callback func(m []byte)(error)){
 
 	reader, _:= readerConfigure([]string{"192.168.43.178:9092"}, groupId, topic)
 		defer reader.Close()
@@ -70,7 +70,12 @@ func Consume(topic string, groupId string, callback func(reader *kafka.Reader, m
 				log.Fatalf("error while receiving message: %s", err.Error())
 				continue
 			}
-			callback(reader, m)
+			callErr := callback(m.Value)
+			if callErr == nil{
+				if err := reader.CommitMessages(context.Background(), m); err != nil {
+					log.Fatal("failed to commit messages:", err)
+				}
+			}
 		}
 	}
 
