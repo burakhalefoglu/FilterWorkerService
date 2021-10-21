@@ -1,7 +1,6 @@
 package kafka
 
 import (
-	"FilterWorkerService/pkg/jsonParser"
 	"context"
 	"log"
 	"time"
@@ -30,7 +29,7 @@ func writerConfigure(kafkaBrokerUrls []string, clientId string, topic string) (w
 	return w, nil
 }
 
-func readerConfigure(kafkaBrokerUrls []string, groupID string, topic string) (r *kafka.Reader, err error){
+func readerConfigure(kafkaBrokerUrls []string, groupID string, topic string) (r *kafka.Reader, err error) {
 	config := kafka.ReaderConfig{
 		Brokers:         kafkaBrokerUrls,
 		GroupID:         groupID,
@@ -46,7 +45,7 @@ func readerConfigure(kafkaBrokerUrls []string, groupID string, topic string) (r 
 }
 
 func Produce(parent context.Context, key, value []byte, topic string) (err error) {
-	writer, _:= writerConfigure([]string{"192.168.43.178:9092"}, uuid.New().String(), topic)
+	writer, _ := writerConfigure([]string{"192.168.1.34:9092"}, uuid.New().String(), topic)
 	message := kafka.Message{
 		Key:   key,
 		Value: value,
@@ -56,32 +55,28 @@ func Produce(parent context.Context, key, value []byte, topic string) (err error
 	return err
 }
 
-func Consume(topic string, groupId string, messageType interface{}, callback func(message interface{})(error)){
+func Consume(parent context.Context, topic string, groupId string, callback func(topic string, data []byte) error) {
 
+	reader, _ := readerConfigure([]string{"192.168.1.34:9092"}, groupId, topic)
+	defer reader.Close()
+	log.Println(reader.Stats().ClientID)
+	for {
+		m, err := reader.FetchMessage(context.Background())
+		if err != nil {
+			log.Fatalf("error while receiving message: %s", err.Error())
+			continue
+		}
+		if err != nil {
+			log.Fatalf("error while receiving message: %s", err.Error())
+			continue
+		}
+		// fmt.Println("topic: ", topic, " groupId: ", groupId, m.Value)
+		callErr := callback(topic, m.Value)
 
-	reader, _:= readerConfigure([]string{"192.168.43.178:9092"}, groupId, topic)
-		defer reader.Close()
-	
-		for {
-			m, err := reader.FetchMessage(context.Background())
-			if err != nil {
-				log.Fatalf("error while receiving message: %s", err.Error())
-				continue
-			}
-				if err != nil {
-				log.Fatalf("error while receiving message: %s", err.Error())
-				continue
-			}
-			jsonParser.DecodeJson(m.Value, &messageType)
-			callErr := callback(messageType)
-
-			if callErr == nil{
-				if err := reader.CommitMessages(context.Background(), m); err != nil {
-					log.Fatal("failed to commit messages:", err)
-				}
+		if callErr == nil {
+			if err := reader.CommitMessages(parent, m); err != nil {
+				log.Fatal("failed to commit messages:", err)
 			}
 		}
 	}
-
-	
-	
+}
