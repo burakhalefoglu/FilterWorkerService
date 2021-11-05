@@ -17,8 +17,10 @@ func (m *MdbLocationDal) Add(data *model.LocationResponseModel) error{
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	collection := m.Client.Database("Client").Collection("LocationModel")
+	collection := m.Client.Database("MLDatabase").Collection("LocationModel")
 	var _, err = collection.InsertOne(ctx, bson.D{
+		{"ClientId", data.ClientId},
+		{"ProjectId",data.ProjectId},
 		{"City", data.City},
 		{"Country", data.Country},
 		{"Org", data.Org},

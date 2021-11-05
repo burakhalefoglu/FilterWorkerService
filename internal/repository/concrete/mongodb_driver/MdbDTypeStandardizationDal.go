@@ -15,7 +15,7 @@ type MdbDTypeStandardizationDal struct {
 func (m *MdbDTypeStandardizationDal) Add(tableName string, data *model.TypeStandardizationModel) error{
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	collection := m.Client.Database("Client").Collection(tableName)
+	collection := m.Client.Database("MLDatabase").Collection(tableName)
 	var _, err = collection.InsertOne(ctx, bson.D{
 		{"Key", data.Key},
 		{"Value", data.Value},
@@ -29,7 +29,7 @@ func (m *MdbDTypeStandardizationDal) Add(tableName string, data *model.TypeStand
 func (m *MdbDTypeStandardizationDal) GetByKey(tableName string, key string) (*model.TypeStandardizationModel, error){
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	collection := m.Client.Database("Client").Collection(tableName)
+	collection := m.Client.Database("MLDatabase").Collection(tableName)
 	var result = collection.FindOne(ctx, bson.D{{
 		"Key",key,
 	}})
@@ -49,7 +49,7 @@ func (m *MdbDTypeStandardizationDal) GetAll(tableName string)(*[]model.TypeStand
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	collection := m.Client.Database("Client").Collection(tableName)
+	collection := m.Client.Database("MLDatabase").Collection(tableName)
 	var cur, err = collection.Find(ctx, bson.M{})
 
 	var models []model.TypeStandardizationModel
@@ -63,7 +63,7 @@ func (m *MdbDTypeStandardizationDal) GetAll(tableName string)(*[]model.TypeStand
 func (m *MdbDTypeStandardizationDal) GetMaxByValue(tableName string)(int64, error){
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	collection := m.Client.Database("Client").Collection(tableName)
+	collection := m.Client.Database("MLDatabase").Collection(tableName)
 
 	filter := []bson.M{{
 		"$group": bson.M{
