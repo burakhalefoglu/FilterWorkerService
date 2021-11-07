@@ -25,6 +25,7 @@ func (h *HardwareInformationManager) AddHardwareInformation(data *[]byte) (s boo
 	modelResponse := model2.HardwareInformationResponseModel{}
 	modelResponse.ClientId = model.ClientId
 	modelResponse.ProjectId = model.ProjectId
+	modelResponse.CustomerId = model.CustomerId
 	modelResponse.DeviceType = int64(model.DeviceType)
 	modelResponse.GraphicsDeviceType = int64(model.GraphicsDeviceType)
 	modelResponse.GraphicsMemorySize = int64(model.GraphicsMemorySize)

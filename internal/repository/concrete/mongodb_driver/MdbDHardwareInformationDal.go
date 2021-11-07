@@ -19,6 +19,7 @@ func (m *MdbDHardwareInformationDal) Add(data *model.HardwareInformationResponse
 	var _, err := collection.InsertOne(ctx, bson.D{
 		{"ClientId",data.ClientId},
 		{"ProjectId", data.ProjectId},
+		{"CustomerId",data.CustomerId},
 		{"DeviceType", data.DeviceType},
 		{"GraphicsDeviceType", data.GraphicsDeviceType},
 		{"GraphicsMemorySize",data.GraphicsMemorySize},

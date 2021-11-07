@@ -21,15 +21,17 @@ func (l *LocationManager) AddLocation(data *[]byte) (s bool, m string){
 	if err != nil {
 		return false, err.Error()
 	}
-
+	
 	modelResponse := model2.LocationResponseModel{}
+	modelResponse.ProjectId = model.ProjectId
+	modelResponse.ClientId = model.ClientId
+	modelResponse.CustomerId = model.CustomerId
 	modelResponse.Region , s, m = l.ICacheService.ManageCache("Region", model.Region)
 	modelResponse.Country , s, m = l.ICacheService.ManageCache("Country", model.Country)
 	modelResponse.Org , s, m = l.ICacheService.ManageCache("Org", model.Org)
 	modelResponse.City , s, m = l.ICacheService.ManageCache("City", model.City)
 	modelResponse.Continent , s, m = l.ICacheService.ManageCache("Continent", model.Continent)
-	modelResponse.ProjectId = model.ProjectId
-	modelResponse.ClientId = model.ClientId
+
 	locerr := l.ILocationDal.Add(&modelResponse)
 	if locerr != nil {
 		return false, locerr.Error()

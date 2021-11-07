@@ -3,6 +3,7 @@ package model
 type LocationResponseModel struct {
 	ProjectId string
 	ClientId string
+	CustomerId string
 	Continent int64
 	Country int64
 	City int64
@@ -13,6 +14,7 @@ type LocationResponseModel struct {
 type LocationModel struct {
 	ProjectId string
 	ClientId string
+	CustomerId string
 	Continent string
 	Country string
 	City string

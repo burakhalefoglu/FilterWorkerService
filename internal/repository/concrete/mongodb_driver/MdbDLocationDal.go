@@ -21,6 +21,7 @@ func (m *MdbLocationDal) Add(data *model.LocationResponseModel) error{
 	var _, err = collection.InsertOne(ctx, bson.D{
 		{"ClientId", data.ClientId},
 		{"ProjectId",data.ProjectId},
+		{"CustomerId",data.CustomerId},
 		{"City", data.City},
 		{"Country", data.Country},
 		{"Org", data.Org},
