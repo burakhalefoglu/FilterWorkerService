@@ -8,7 +8,6 @@ import (
 	IJsonParser "FilterWorkerService/pkg/jsonParser"
 )
 
-
 type BuyingEventManager struct {
 	IBuyingEventDal IBuyingEventDal.IBuyingEventDal
 	IJsonParser     IJsonParser.IJsonParser
@@ -33,24 +32,24 @@ func (b *BuyingEventManager) AddBuyingEvent(data *[]byte) (s bool, m string) {
 	modelResponse.CustomerId = firstModel.CustomerId
 	modelResponse.LevelIndex = int64(firstModel.LevelIndex)
 	modelResponse.TotalBuyingCount = 1
-	modelResponse.TotalBuyingDay = calculateTotalDay(&modelResponse)
+	modelResponse.TotalBuyingDay = calculateBuyingTotalDay(&modelResponse)
 	modelResponse.TotalBuyingSession = 1
 	//modelResponse.TotalSession
 	//modelResponse.TotalDay
 	//modelResponse.FirstSessionDay
-	determineFirstTimeNew(&firstModel, &modelResponse)
-	determineLastTimeNew(&firstModel, &modelResponse)
+	determineBuyingFirstTimeNew(&firstModel, &modelResponse)
+	determineBuyingLastTimeNew(&firstModel, &modelResponse)
 	modelResponse.FirstDayBuyingCount = 1
 	modelResponse.PenultimateDayBuyingCount = modelResponse.FirstDayBuyingCount
 	modelResponse.LastDayBuyingCount = 1
 	modelResponse.LastMinusPenultimateDayBuyingCount = modelResponse.LastDayBuyingCount - modelResponse.PenultimateDayBuyingCount
 	modelResponse.LastMinusFirstDayBuyingCount = modelResponse.LastDayBuyingCount - modelResponse.FirstDayBuyingCount
-	determineDay(&firstModel, &modelResponse, day)
-	determineHour(&firstModel, &modelResponse, hour)
-	determineAmPm(&firstModel, &modelResponse, hour)
+	determineBuyingDay(&firstModel, &modelResponse, day)
+	determineBuyingHour(&firstModel, &modelResponse, hour)
+	determineBuyingAmPm(&firstModel, &modelResponse, hour)
 	//modelResponse.DailyAverageBuyingCount
 	modelResponse.BuyingDayAverageBuyingCount = float64(modelResponse.TotalBuyingCount) / float64(modelResponse.TotalBuyingDay)
-	modelResponse.LevelBasedAverageBuyingCount = calculateLevelBasedAvgBuyingCount(&firstModel, &modelResponse)
+	modelResponse.LevelBasedAverageBuyingCount = calculateBuyingLevelBasedAvgBuyingCount(&firstModel, &modelResponse)
 
 	//modelResponse.SessionBasedAverageBuyingCount = modelResponse.TotalBuyingCount/modelResponse.TotalSession
 	//modelResponse.FirstBuyingDayMinusFirstSessionDay = modelResponse.FirstBuyingDay -
@@ -66,7 +65,7 @@ func (b *BuyingEventManager) AddBuyingEvent(data *[]byte) (s bool, m string) {
 	return true, ""
 }
 
-func determineDay(firstModel *model.BuyingEventModel, modelResponse *model.BuyingEventRespondModel, day int64) {
+func determineBuyingDay(firstModel *model.BuyingEventModel, modelResponse *model.BuyingEventRespondModel, day int64) {
 	if day == 0 {
 		modelResponse.SundayBuyingCount = 1
 	} else if day == 1 {
@@ -84,7 +83,7 @@ func determineDay(firstModel *model.BuyingEventModel, modelResponse *model.Buyin
 	}
 }
 
-func determineHour(firstModel *model.BuyingEventModel, modelResponse *model.BuyingEventRespondModel, hour int64) {
+func determineBuyingHour(firstModel *model.BuyingEventModel, modelResponse *model.BuyingEventRespondModel, hour int64) {
 	if hour <= 5 {
 		modelResponse.Buying0To5HourCount = 1
 	} else if (hour > 5) && (hour <= 11) {
@@ -96,7 +95,7 @@ func determineHour(firstModel *model.BuyingEventModel, modelResponse *model.Buyi
 	}
 }
 
-func determineAmPm(firstModel *model.BuyingEventModel, modelResponse *model.BuyingEventRespondModel, hour int64) {
+func determineBuyingAmPm(firstModel *model.BuyingEventModel, modelResponse *model.BuyingEventRespondModel, hour int64) {
 	if hour <= 12 {
 		modelResponse.AmBuyingCount = 1
 	} else if hour > 12 {
@@ -104,26 +103,26 @@ func determineAmPm(firstModel *model.BuyingEventModel, modelResponse *model.Buyi
 	}
 }
 
-func calculateTotalDay(modelResponse *model.BuyingEventRespondModel) int64 {
+func calculateBuyingTotalDay(modelResponse *model.BuyingEventRespondModel) int64 {
 	modelResponse.TotalBuyingDay = (modelResponse.LastBuyingDay - modelResponse.FirstBuyingDay) + 30*(modelResponse.LastBuyingMonth-modelResponse.FirstBuyingMonth)
 	return modelResponse.TotalBuyingDay
 }
 
-func determineFirstTimeNew(firstModel *model.BuyingEventModel, modelResponse *model.BuyingEventRespondModel) {
+func determineBuyingFirstTimeNew(firstModel *model.BuyingEventModel, modelResponse *model.BuyingEventRespondModel) {
 	modelResponse.FirstBuyingMonth = int64(firstModel.TrigerdTime.Month())
 	modelResponse.FirstBuyingWeek = int64(firstModel.TrigerdTime.Weekday())
 	modelResponse.FirstBuyingDay = int64(firstModel.TrigerdTime.Day())
 	modelResponse.FirstBuyingHour = int64(firstModel.TrigerdTime.Hour())
 }
 
-func determineLastTimeNew(firstModel *model.BuyingEventModel, modelResponse *model.BuyingEventRespondModel) {
+func determineBuyingLastTimeNew(firstModel *model.BuyingEventModel, modelResponse *model.BuyingEventRespondModel) {
 	modelResponse.LastBuyingMonth = int64(firstModel.TrigerdTime.Month())
 	modelResponse.LastBuyingWeek = int64(firstModel.TrigerdTime.Weekday())
 	modelResponse.LastBuyingDay = int64(firstModel.TrigerdTime.Day())
 	modelResponse.LastBuyingHour = int64(firstModel.TrigerdTime.Hour())
 }
 
-func calculateLevelBasedAvgBuyingCount(firstModel *model.BuyingEventModel, modelResponse *model.BuyingEventRespondModel) float64 {
+func calculateBuyingLevelBasedAvgBuyingCount(firstModel *model.BuyingEventModel, modelResponse *model.BuyingEventRespondModel) float64 {
 	if modelResponse.LevelIndex == 0 {
 		modelResponse.LevelBasedAverageBuyingCount = float64(modelResponse.TotalBuyingCount)
 		return modelResponse.LevelBasedAverageBuyingCount

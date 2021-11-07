@@ -15,6 +15,7 @@ type MdbDAdvEventDal struct {
 func (m *MdbDAdvEventDal) Add(data *model.AdvEventRespondModel) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
+	
 	collection := m.Client.Database("MLDatabase").Collection("AdvEventModel")
 	var _, err = collection.InsertOne(ctx, bson.D{
 		{"ClientId",data.ClientId},
@@ -22,22 +23,22 @@ func (m *MdbDAdvEventDal) Add(data *model.AdvEventRespondModel) error {
 		{"CustomerId",data.CustomerId},
 		{"LevelIndex", data.LevelIndex},
 		{"TotalAdvDay",data.TotalAdvDay},
+		{"TotalAdvCount",data.TotalAdvCount},
 		{"TotalVideoAdvCount", data.TotalVideoAdvCount},
 		{"TotalInterstitialAdvCount",data.TotalInterstitialAdvCount},
 		{"LevelBasedAverageInterstitialAdvCount",data.LevelBasedAverageInterstitialAdvCount},
 		{"LevelBasedAverageVideoAdvCount",data.LevelBasedAverageVideoAdvCount},
 		{"AverageDailyVideoAdvClickCount",data.AverageDailyVideoAdvClickCount},
-		{"VideoClickMonth",data.FirstVideoClickMonth},
-		{"VideoClickWeek",data.FirstVideoClickWeek},
-		{"VideoClickDay",data.FirstVideoClickDay},
-		{"VideoClickHour",data.FirstVideoClickHour},
+		{"FirstAdvYearOfDay",data.FirstAdvYearOfDay},
+		{"FirstAdvClickHour",data.FirstAdvClickHour},
+		{"FirstVideoClickYearOfDay",data.FirstVideoClickYearOfDay},
+		{"LastAdvYearOfDay",data.LastAdvYearOfDay},
+		{"LastVideoClickYearOfDay",data.LastVideoClickYearOfDay},
+		{"LastVideoClickHour",data.LastAdvClickHour},
 		{"FirstDayVideoClickCount",data.FirstDayVideoClickCount},
-		{"PenultimateDayVdeoClickCount",data.PenultimateDayVdeoClickCount},
-		{"LastDayVideoClickCount", data.LastDayVideoClickCount},
-		{"LastMinusPenultimateDayVideoClickCount",data.LastMinusPenultimateDayVideoClickCount},
+		{"LastDayVideoClickCount",data.LastDayVideoClickCount},
 		{"LastMinusFirstDayVideoClickCount",data.LastMinusFirstDayVideoClickCount},
 		{"LastDayVideoClickCountMinusAverageDailyVideoAdvClickCount",data.LastDayVideoClickCountMinusAverageDailyVideoAdvClickCount},
-		//{"IsdeadAndVideoClickCount",data.IsdeadAndVideoClickCount},
 		{"SundayVideoAdvClickCount",data.SundayVideoAdvClickCount},
 		{"MondayVideoAdvClickCount", data.MondayVideoAdvClickCount},
 		{"TuesdayVideoAdvClickCount",data.TuesdayVideoAdvClickCount},
@@ -57,12 +58,13 @@ func (m *MdbDAdvEventDal) Add(data *model.AdvEventRespondModel) error {
 		}
 		return nil
 }
+//{"IsdeadAndVideoClickCount",data.IsdeadAndVideoClickCount},
 
-func (m *MdbDBuyingEventDal) GetAdvEventByCustomerId(CustomerId string, CollectionName string)(*model.AdvEventRespondModel, error) {
+func (m *MdbDBuyingEventDal) GetAdvEventByCustomerId(CustomerId string)(*model.AdvEventRespondModel, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	//"BuyingEventModel"
-	collection := m.Client.Database("MLDatabase").Collection(CollectionName)
+
+	collection := m.Client.Database("MLDatabase").Collection("AdvEventModel")
 	var result = collection.FindOne(ctx, bson.D{{
 		"CustomerId",CustomerId,
 	}})
@@ -87,23 +89,23 @@ func (m *MdbDBuyingEventDal) UpdateAdvEventByCustomerId(CustomerId string, data 
 		{"ProjectId", data.ProjectId},
 		{"CustomerId",data.CustomerId},
 		{"LevelIndex", data.LevelIndex},
-		{"TotalAdvDay", data.TotalAdvDay},
+		{"TotalAdvDay",data.TotalAdvDay},
+		{"TotalAdvCount",data.TotalAdvCount},
 		{"TotalVideoAdvCount", data.TotalVideoAdvCount},
-		{"TotalInterstitialAdvCount", data.TotalInterstitialAdvCount},
-		{"LevelBasedAverageInterstitialAdvCount", data.LevelBasedAverageInterstitialAdvCount},
-		{"LevelBasedAverageVideoAdvCount", data.LevelBasedAverageVideoAdvCount},
+		{"TotalInterstitialAdvCount",data.TotalInterstitialAdvCount},
+		{"LevelBasedAverageInterstitialAdvCount",data.LevelBasedAverageInterstitialAdvCount},
+		{"LevelBasedAverageVideoAdvCount",data.LevelBasedAverageVideoAdvCount},
 		{"AverageDailyVideoAdvClickCount",data.AverageDailyVideoAdvClickCount},
-		// {"FirstVideoClickMonth", data.FirstVideoClickMonth},
-		// {"FirstVideoClickWeek", data.FirstVideoClickWeek},
-		// {"FirstVideoClickDay", data.FirstVideoClickDay},
-		// {"FirstVideoClickHour", data.FirstVideoClickHour},
-		{"FirstDayVideoClickCount", data.FirstDayVideoClickCount},
-		{"PenultimateDayVdeoClickCount", data.PenultimateDayVdeoClickCount},
-		{"LastDayVideoClickCount", data.LastDayVideoClickCount},
-		{"LastMinusPenultimateDayVideoClickCount", data.LastMinusPenultimateDayVideoClickCount},
-		{"LastMinusFirstDayVideoClickCount", data.LastMinusFirstDayVideoClickCount},
-		{"LastDayVideoClickCountMinusAverageDailyVideoAdvClickCount", data.LastDayVideoClickCountMinusAverageDailyVideoAdvClickCount},
-		//{"IsdeadAndVideoClickCount", data.IsdeadAndVideoClickCount},
+		//{"FirstAdvYearOfDay",data.FirstAdvYearOfDay},
+		//{"FirstAdvClickHour",data.FirstAdvClickHour},
+		//{"FirstVideoClickYearOfDay",data.FirstVideoClickYearOfDay},
+		{"LastAdvYearOfDay",data.LastAdvYearOfDay},
+		{"LastVideoClickYearOfDay",data.LastVideoClickYearOfDay},
+		{"LastVideoClickHour",data.LastAdvClickHour},
+		{"FirstDayVideoClickCount",data.FirstDayVideoClickCount},
+		{"LastDayVideoClickCount",data.LastDayVideoClickCount},
+		{"LastMinusFirstDayVideoClickCount",data.LastMinusFirstDayVideoClickCount},
+		{"LastDayVideoClickCountMinusAverageDailyVideoAdvClickCount",data.LastDayVideoClickCountMinusAverageDailyVideoAdvClickCount},
 		{"SundayVideoAdvClickCount",data.SundayVideoAdvClickCount},
 		{"MondayVideoAdvClickCount", data.MondayVideoAdvClickCount},
 		{"TuesdayVideoAdvClickCount",data.TuesdayVideoAdvClickCount},
@@ -117,7 +119,6 @@ func (m *MdbDBuyingEventDal) UpdateAdvEventByCustomerId(CustomerId string, data 
 		{"VideoAdvClick6To11HourCount", data.VideoAdvClick6To11HourCount},
 		{"VideoAdvClick12To17HourCount",data.VideoAdvClick12To17HourCount},
 		{"VideoAdvClick18To23HourCount", data.VideoAdvClick18To23HourCount},
-
 		
 	}}}
 
@@ -130,3 +131,4 @@ func (m *MdbDBuyingEventDal) UpdateAdvEventByCustomerId(CustomerId string, data 
 	}
 	return nil
 }
+//{"IsdeadAndVideoClickCount", data.IsdeadAndVideoClickCount},

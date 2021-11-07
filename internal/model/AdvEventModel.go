@@ -8,22 +8,22 @@ type AdvEventRespondModel struct {
 	CustomerId                                                string
 	LevelIndex                                                int64
 	TotalAdvDay                                               int64
+	TotalAdvCount                                             int64
 	TotalVideoAdvCount                                        int64
 	TotalInterstitialAdvCount                                 int64
 	LevelBasedAverageInterstitialAdvCount                     float64
 	LevelBasedAverageVideoAdvCount                            float64
 	AverageDailyVideoAdvClickCount                            float64
-	FirstVideoClickMonth                                      int64
-	FirstVideoClickWeek                                       int64
-	FirstVideoClickDay                                        int64
-	FirstVideoClickHour                                       int64
+	FirstAdvYearOfDay                                         int64
+	FirstAdvClickHour                                         int64
+	FirstVideoClickYearOfDay                                  int64
+	LastAdvYearOfDay                                          int64
+	LastVideoClickYearOfDay                                   int64
+	LastAdvClickHour                                          int64
 	FirstDayVideoClickCount                                   int64
-	PenultimateDayVdeoClickCount                              int64
 	LastDayVideoClickCount                                    int64
-	LastMinusPenultimateDayVideoClickCount                    int64
 	LastMinusFirstDayVideoClickCount                          int64
 	LastDayVideoClickCountMinusAverageDailyVideoAdvClickCount int64
-	//IsdeadAndVideoClickCount                                  int64
 	SundayVideoAdvClickCount                                  int64
 	MondayVideoAdvClickCount                                  int64
 	TuesdayVideoAdvClickCount                                 int64
@@ -38,6 +38,8 @@ type AdvEventRespondModel struct {
 	VideoAdvClick12To17HourCount                              int64
 	VideoAdvClick18To23HourCount                              int64
 }
+
+//IsdeadAndVideoClickCount                                  int64
 
 type AdvEventModel struct {
 	ProjectId   string
