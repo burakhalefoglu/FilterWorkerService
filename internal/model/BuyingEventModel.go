@@ -12,6 +12,7 @@ type BuyingEventRespondModel struct {
 	TotalBuyingSession                                     int64
 	TotalSession                                           int64
 	TotalDay                                               int64
+	FirstSessionDay                                        int64
 	FirstBuyingMonth                                       int64
 	FirstBuyingWeek                                        int64
 	FirstBuyingDay                                         int64
@@ -38,10 +39,10 @@ type BuyingEventRespondModel struct {
 	Buying6To11HourCount                                   int64
 	Buying12To17HourCount                                  int64
 	Buying18To23HourCount                                  int64
-	DailyAverageBuyingCount                                int64
-	BuyingDayAverageBuyingCount                            int64
-	LevelBasedAverageBuyingCount                           int64
-	SessionBasedAverageBuyingCount                         int64
+	DailyAverageBuyingCount                                float64
+	BuyingDayAverageBuyingCount                            float64
+	LevelBasedAverageBuyingCount                           float64
+	SessionBasedAverageBuyingCount                         float64
 	FirstBuyingDayMinusFirstSessionDay                     int64
 	FirstBuyingMonthMinusFirstSessionMonth                 int64
 	TotalDifferenceBetweenFirstBuyingDayAndFirstSessionDay int64

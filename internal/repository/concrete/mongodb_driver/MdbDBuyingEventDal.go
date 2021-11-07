@@ -69,11 +69,11 @@ func (m *MdbDBuyingEventDal) Add(data *model.BuyingEventRespondModel) error{
 		return nil
 }
 
-func (m *MdbDBuyingEventDal) GetByCustomerId(CustomerId string)(*model.BuyingEventRespondModel, error) {
+func (m *MdbDBuyingEventDal) GetByCustomerId(CustomerId string, CollectionName string)(*model.BuyingEventRespondModel, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-
-	collection := m.Client.Database("MLDatabase").Collection("BuyingEventModel")
+	//"BuyingEventModel"
+	collection := m.Client.Database("MLDatabase").Collection(CollectionName)
 	var result = collection.FindOne(ctx, bson.D{{
 		"CustomerId",CustomerId,
 	}})
