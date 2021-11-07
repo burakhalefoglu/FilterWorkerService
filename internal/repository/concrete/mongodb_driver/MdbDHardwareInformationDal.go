@@ -16,7 +16,7 @@ func (m *MdbDHardwareInformationDal) Add(data *model.HardwareInformationResponse
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	collection := m.Client.Database("MLDatabase").Collection("HardwareInformationModel")
-	var _, err := collection.InsertOne(ctx, bson.D{
+	var _, err = collection.InsertOne(ctx, bson.D{
 		{"ClientId",data.ClientId},
 		{"ProjectId", data.ProjectId},
 		{"CustomerId",data.CustomerId},

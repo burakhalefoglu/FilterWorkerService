@@ -16,7 +16,7 @@ func (m *MdbDBuyingEventDal) Add(data *model.BuyingEventRespondModel) error{
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	collection := m.Client.Database("MLDatabase").Collection("BuyingEventModel")
-	var _, err := collection.InsertOne(ctx, bson.D{
+	var _, err = collection.InsertOne(ctx, bson.D{
 		{"ClientId",data.ClientId},
 		{"ProjectId", data.ProjectId},
 		{"CustomerId",data.CustomerId},
@@ -56,7 +56,6 @@ func (m *MdbDBuyingEventDal) Add(data *model.BuyingEventRespondModel) error{
 		{"BuyingDayAverageBuyingCount", data.BuyingDayAverageBuyingCount},
 		{"LevelBasedAverageBuyingCount", data.LevelBasedAverageBuyingCount},
 		{"SessionBasedAverageBuyingCount", data.SessionBasedAverageBuyingCount},
-		{"BuyingSessionBasedAverageBuyingCount", data.BuyingSessionBasedAverageBuyingCount},
 		{"FirstBuyingDayMinusFirstSessionDay", data.FirstBuyingDayMinusFirstSessionDay},
 		{"FirstBuyingMonthMinusFirstSessionMonth", data.FirstBuyingMonthMinusFirstSessionMonth},
 		{"TotalDifferenceBetweenFirstBuyingDayAndFirstSessionDay", data.TotalDifferenceBetweenFirstBuyingDayAndFirstSessionDay},
@@ -69,7 +68,7 @@ func (m *MdbDBuyingEventDal) Add(data *model.BuyingEventRespondModel) error{
 		return nil
 }
 
-func (m *MdbDBuyingEventDal) GetByCustomerId(CustomerId string, CollectionName string)(*model.BuyingEventRespondModel, error) {
+func (m *MdbDBuyingEventDal) GetBuyingEventByCustomerId(CustomerId string, CollectionName string)(*model.BuyingEventRespondModel, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	//"BuyingEventModel"
@@ -89,9 +88,10 @@ func (m *MdbDBuyingEventDal) GetByCustomerId(CustomerId string, CollectionName s
 	return &model, nil
 }
 
-func (m *MdbDBuyingEventDal) UpdateByCustomerId(CustomerId string, data *model.BuyingEventRespondModel) error {
+func (m *MdbDBuyingEventDal) UpdateBuyingEventByCustomerId(CustomerId string, data *model.BuyingEventRespondModel) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
+	
 
 	update := bson.D{{"$set", bson.D{
 		{"ClientId",data.ClientId},
@@ -103,6 +103,7 @@ func (m *MdbDBuyingEventDal) UpdateByCustomerId(CustomerId string, data *model.B
 		{"TotalBuyingSession", data.TotalBuyingSession},
 		{"TotalSession", data.TotalSession},
 		{"TotalDay", data.TotalDay},
+		{"FirstSessionDay",data.FirstSessionDay},
 		// {"FirstBuyingMonth", data.FirstBuyingMonth},
 		// {"FirstBuyingWeek", data.FirstBuyingWeek},
 		// {"FirstBuyingDay", data.FirstBuyingDay},
@@ -133,7 +134,6 @@ func (m *MdbDBuyingEventDal) UpdateByCustomerId(CustomerId string, data *model.B
 		{"BuyingDayAverageBuyingCount", data.BuyingDayAverageBuyingCount},
 		{"LevelBasedAverageBuyingCount", data.LevelBasedAverageBuyingCount},
 		{"SessionBasedAverageBuyingCount", data.SessionBasedAverageBuyingCount},
-		{"BuyingSessionBasedAverageBuyingCount", data.BuyingSessionBasedAverageBuyingCount},
 		{"FirstBuyingDayMinusFirstSessionDay", data.FirstBuyingDayMinusFirstSessionDay},
 		{"FirstBuyingMonthMinusFirstSessionMonth", data.FirstBuyingMonthMinusFirstSessionMonth},
 		{"TotalDifferenceBetweenFirstBuyingDayAndFirstSessionDay", data.TotalDifferenceBetweenFirstBuyingDayAndFirstSessionDay},

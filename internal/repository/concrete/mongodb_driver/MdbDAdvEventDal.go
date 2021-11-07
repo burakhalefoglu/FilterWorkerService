@@ -16,7 +16,7 @@ func (m *MdbDAdvEventDal) Add(data *model.AdvEventRespondModel) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	collection := m.Client.Database("MLDatabase").Collection("AdvEventModel")
-	var _, err := collection.InsertOne(ctx, bson.D{
+	var _, err = collection.InsertOne(ctx, bson.D{
 		{"ClientId",data.ClientId},
 		{"ProjectId", data.ProjectId},
 		{"CustomerId",data.CustomerId},
@@ -37,7 +37,7 @@ func (m *MdbDAdvEventDal) Add(data *model.AdvEventRespondModel) error {
 		{"LastMinusPenultimateDayVideoClickCount",data.LastMinusPenultimateDayVideoClickCount},
 		{"LastMinusFirstDayVideoClickCount",data.LastMinusFirstDayVideoClickCount},
 		{"LastDayVideoClickCountMinusAverageDailyVideoAdvClickCount",data.LastDayVideoClickCountMinusAverageDailyVideoAdvClickCount},
-		{"IsdeadAndVideoClickCount",data.IsdeadAndVideoClickCount},
+		//{"IsdeadAndVideoClickCount",data.IsdeadAndVideoClickCount},
 		{"SundayVideoAdvClickCount",data.SundayVideoAdvClickCount},
 		{"MondayVideoAdvClickCount", data.MondayVideoAdvClickCount},
 		{"TuesdayVideoAdvClickCount",data.TuesdayVideoAdvClickCount},
@@ -58,7 +58,7 @@ func (m *MdbDAdvEventDal) Add(data *model.AdvEventRespondModel) error {
 		return nil
 }
 
-func (m *MdbDBuyingEventDal) GetByCustomerId(CustomerId string, CollectionName string)(*model.AdvEventRespondModel, error) {
+func (m *MdbDBuyingEventDal) GetAdvEventByCustomerId(CustomerId string, CollectionName string)(*model.AdvEventRespondModel, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	//"BuyingEventModel"
@@ -78,7 +78,7 @@ func (m *MdbDBuyingEventDal) GetByCustomerId(CustomerId string, CollectionName s
 	return &model, nil
 }
 
-func (m *MdbDBuyingEventDal) UpdateByCustomerId(CustomerId string, data *model.AdvEventRespondModel) error {
+func (m *MdbDBuyingEventDal) UpdateAdvEventByCustomerId(CustomerId string, data *model.AdvEventRespondModel) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -103,7 +103,7 @@ func (m *MdbDBuyingEventDal) UpdateByCustomerId(CustomerId string, data *model.A
 		{"LastMinusPenultimateDayVideoClickCount", data.LastMinusPenultimateDayVideoClickCount},
 		{"LastMinusFirstDayVideoClickCount", data.LastMinusFirstDayVideoClickCount},
 		{"LastDayVideoClickCountMinusAverageDailyVideoAdvClickCount", data.LastDayVideoClickCountMinusAverageDailyVideoAdvClickCount},
-		{"IsdeadAndVideoClickCount", data.IsdeadAndVideoClickCount},
+		//{"IsdeadAndVideoClickCount", data.IsdeadAndVideoClickCount},
 		{"SundayVideoAdvClickCount",data.SundayVideoAdvClickCount},
 		{"MondayVideoAdvClickCount", data.MondayVideoAdvClickCount},
 		{"TuesdayVideoAdvClickCount",data.TuesdayVideoAdvClickCount},

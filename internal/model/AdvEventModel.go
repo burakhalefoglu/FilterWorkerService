@@ -23,7 +23,7 @@ type AdvEventRespondModel struct {
 	LastMinusPenultimateDayVideoClickCount                    int64
 	LastMinusFirstDayVideoClickCount                          int64
 	LastDayVideoClickCountMinusAverageDailyVideoAdvClickCount int64
-	IsdeadAndVideoClickCount                                  int64
+	//IsdeadAndVideoClickCount                                  int64
 	SundayVideoAdvClickCount                                  int64
 	MondayVideoAdvClickCount                                  int64
 	TuesdayVideoAdvClickCount                                 int64
