@@ -13,6 +13,8 @@ type BuyingEventManager struct {
 	IJsonParser     IJsonParser.IJsonParser
 }
 
+
+
 func (b *BuyingEventManager) ConvertRawModelToResponseModel(data *[]byte) (respondModel *model.BuyingEventRespondModel, s bool, m string){
 	firstModel := model.BuyingEventModel{}
 	err := b.IJsonParser.DecodeJson(data, &firstModel)
@@ -22,6 +24,7 @@ func (b *BuyingEventManager) ConvertRawModelToResponseModel(data *[]byte) (respo
 	hour := int64(firstModel.TrigerdTime.Hour())
 	day := int64(firstModel.TrigerdTime.Weekday())
 	yearOfDay := int64(firstModel.TrigerdTime.YearDay())
+	
 	modelResponse := model.BuyingEventRespondModel{}
 	modelResponse.ProjectId = firstModel.ProjectId
 	modelResponse.ClientId = firstModel.ClientId
