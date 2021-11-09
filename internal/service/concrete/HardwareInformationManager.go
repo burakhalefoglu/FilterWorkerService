@@ -20,7 +20,7 @@ func (h *HardwareInformationManager) AddHardwareInformation(data *[]byte) (s boo
 	if err != nil {
 		return false, err.Error()
 	}
-	
+
 	// Todo: 2 Filtreler Buraya Yazılacak
 	modelResponse := model2.HardwareInformationResponseModel{}
 	modelResponse.ClientId = model.ClientId
@@ -29,7 +29,7 @@ func (h *HardwareInformationManager) AddHardwareInformation(data *[]byte) (s boo
 	modelResponse.DeviceType = int64(model.DeviceType)
 	modelResponse.GraphicsDeviceType = int64(model.GraphicsDeviceType)
 	modelResponse.GraphicsMemorySize = int64(model.GraphicsMemorySize)
-	modelResponse.OperatingSystem, s, m = h.ICacheService.ManageCache("OperatingSystem", model.OperatingSystem)
+	modelResponse.OperatingSystem, _, _ = h.ICacheService.ManageCache("OperatingSystem", model.OperatingSystem)
 	modelResponse.ProcessorCount = int64(model.ProcessorCount)
 	modelResponse.SystemMemorySize = int64(model.SystemMemorySize)
 	// Todo : 3 Model burada kayıt edilecek
