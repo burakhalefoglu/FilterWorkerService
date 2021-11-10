@@ -3,31 +3,34 @@ package mongodb_driver
 import (
 	"FilterWorkerService/internal/model"
 	"context"
+	"time"
+
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-	"time"
 )
 
 type MdbDBuyingEventDal struct {
 	Client *mongo.Client
 }
 
-func (m *MdbDBuyingEventDal) Add(data *model.BuyingEventRespondModel) error{
+func (m *MdbDBuyingEventDal) Add(data *model.BuyingEventRespondModel) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	collection := m.Client.Database("MLDatabase").Collection("BuyingEventModel")
 	var _, err = collection.InsertOne(ctx, bson.D{
-		{"ClientId",data.ClientId},
+		{"ClientId", data.ClientId},
 		{"ProjectId", data.ProjectId},
-		{"CustomerId",data.CustomerId},
+		{"CustomerId", data.CustomerId},
 		{"LevelIndex", data.LevelIndex},
-		{"TotalBuyingCount", data.TotalBuyingCount},		
+		{"TotalBuyingCount", data.TotalBuyingCount},
 		{"TotalBuyingDay", data.TotalBuyingDay},
 		{"FirstBuyingHour", data.FirstBuyingYearOfDay},
+		{"FirstBuyingYear", data.FirstBuyingYear},
 		{"LastBuyingMonth", data.FirstBuyingHour},
 		{"LastBuyingWeek", data.LastBuyingYearOfDay},
+		{"LastBuyingYear", data.LastBuyingYear},
 		{"LastBuyingDay", data.LastBuyingHour},
-		{"FirstDayBuyingCount", data.FirstDayBuyingCount},		
+		{"FirstDayBuyingCount", data.FirstDayBuyingCount},
 		{"LastDayBuyingCount", data.LastDayBuyingCount},
 		{"LastMinusFirstDayBuyingCount", data.LastMinusFirstDayBuyingCount},
 		{"SundayBuyingCount", data.SundayBuyingCount},
@@ -42,23 +45,23 @@ func (m *MdbDBuyingEventDal) Add(data *model.BuyingEventRespondModel) error{
 		{"Buying0To5HourCount", data.Buying0To5HourCount},
 		{"Buying6To11HourCount", data.Buying6To11HourCount},
 		{"Buying12To17HourCount", data.Buying12To17HourCount},
-		{"Buying18To23HourCount", data.Buying18To23HourCount},		
+		{"Buying18To23HourCount", data.Buying18To23HourCount},
 		{"BuyingDayAverageBuyingCount", data.BuyingDayAverageBuyingCount},
 		{"LevelBasedAverageBuyingCount", data.LevelBasedAverageBuyingCount},
 	})
 	if err != nil {
-			return err
-		}
-		return nil
+		return err
+	}
+	return nil
 }
 
-func (m *MdbDBuyingEventDal) GetBuyingEventByCustomerId(CustomerId string)(*model.BuyingEventRespondModel, error) {
+func (m *MdbDBuyingEventDal) GetBuyingEventByCustomerId(CustomerId string) (*model.BuyingEventRespondModel, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	//"BuyingEventModel"
 	collection := m.Client.Database("MLDatabase").Collection("BuyingEventModel")
 	var result = collection.FindOne(ctx, bson.D{{
-		"CustomerId",CustomerId,
+		"CustomerId", CustomerId,
 	}})
 
 	var model = model.BuyingEventRespondModel{}
@@ -66,7 +69,7 @@ func (m *MdbDBuyingEventDal) GetBuyingEventByCustomerId(CustomerId string)(*mode
 		return &model, result.Err()
 	}
 	var err = result.Decode(&model)
-	if err != nil{
+	if err != nil {
 		return &model, err
 	}
 	return &model, nil
@@ -75,20 +78,21 @@ func (m *MdbDBuyingEventDal) GetBuyingEventByCustomerId(CustomerId string)(*mode
 func (m *MdbDBuyingEventDal) UpdateBuyingEventByCustomerId(CustomerId string, data *model.BuyingEventRespondModel) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	
 
 	update := bson.D{{"$set", bson.D{
-			{"ClientId",data.ClientId},
+		{"ClientId", data.ClientId},
 		{"ProjectId", data.ProjectId},
-		{"CustomerId",data.CustomerId},
+		{"CustomerId", data.CustomerId},
 		{"LevelIndex", data.LevelIndex},
-		{"TotalBuyingCount", data.TotalBuyingCount},		
+		{"TotalBuyingCount", data.TotalBuyingCount},
 		{"TotalBuyingDay", data.TotalBuyingDay},
 		//{"FirstBuyingHour", data.FirstBuyingYearOfDay},
+		//{"FirstBuyingYear",data.FirstBuyingYear},
 		//{"LastBuyingMonth", data.FirstBuyingHour},
 		{"LastBuyingWeek", data.LastBuyingYearOfDay},
+		{"LastBuyingYear", data.LastBuyingYear},
 		{"LastBuyingDay", data.LastBuyingHour},
-		{"FirstDayBuyingCount", data.FirstDayBuyingCount},		
+		{"FirstDayBuyingCount", data.FirstDayBuyingCount},
 		{"LastDayBuyingCount", data.LastDayBuyingCount},
 		{"LastMinusFirstDayBuyingCount", data.LastMinusFirstDayBuyingCount},
 		{"SundayBuyingCount", data.SundayBuyingCount},
@@ -103,16 +107,16 @@ func (m *MdbDBuyingEventDal) UpdateBuyingEventByCustomerId(CustomerId string, da
 		{"Buying0To5HourCount", data.Buying0To5HourCount},
 		{"Buying6To11HourCount", data.Buying6To11HourCount},
 		{"Buying12To17HourCount", data.Buying12To17HourCount},
-		{"Buying18To23HourCount", data.Buying18To23HourCount},		
+		{"Buying18To23HourCount", data.Buying18To23HourCount},
 		{"BuyingDayAverageBuyingCount", data.BuyingDayAverageBuyingCount},
 		{"LevelBasedAverageBuyingCount", data.LevelBasedAverageBuyingCount},
 	}}}
 
 	collection := m.Client.Database("MLDatabase").Collection("BuyingEventModel")
 	updateResult := collection.FindOneAndUpdate(ctx, bson.D{{
-		"CustomerId",CustomerId,
+		"CustomerId", CustomerId,
 	}}, update)
-	if updateResult.Err() != nil{
+	if updateResult.Err() != nil {
 		return updateResult.Err()
 	}
 	return nil

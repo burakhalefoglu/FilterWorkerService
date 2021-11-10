@@ -13,9 +13,7 @@ type BuyingEventManager struct {
 	IJsonParser     IJsonParser.IJsonParser
 }
 
-
-
-func (b *BuyingEventManager) ConvertRawModelToResponseModel(data *[]byte) (respondModel *model.BuyingEventRespondModel, s bool, m string){
+func (b *BuyingEventManager) ConvertRawModelToResponseModel(data *[]byte) (respondModel *model.BuyingEventRespondModel, s bool, m string) {
 	firstModel := model.BuyingEventModel{}
 	err := b.IJsonParser.DecodeJson(data, &firstModel)
 	if err != nil {
@@ -24,17 +22,19 @@ func (b *BuyingEventManager) ConvertRawModelToResponseModel(data *[]byte) (respo
 	hour := int64(firstModel.TrigerdTime.Hour())
 	day := int64(firstModel.TrigerdTime.Weekday())
 	yearOfDay := int64(firstModel.TrigerdTime.YearDay())
-	
+	year := int64(firstModel.TrigerdTime.Year())
 	modelResponse := model.BuyingEventRespondModel{}
 	modelResponse.ProjectId = firstModel.ProjectId
 	modelResponse.ClientId = firstModel.ClientId
 	modelResponse.CustomerId = firstModel.CustomerId
-	modelResponse.LevelIndex = 	int64(firstModel.LevelIndex)
+	modelResponse.LevelIndex = int64(firstModel.LevelIndex)
 	modelResponse.TotalBuyingCount = 1
 	modelResponse.TotalBuyingDay = 1
 	modelResponse.FirstBuyingYearOfDay = yearOfDay
+	modelResponse.FirstBuyingYear = year
 	modelResponse.FirstBuyingHour = hour
 	modelResponse.LastBuyingYearOfDay = yearOfDay
+	modelResponse.LastBuyingYear = year
 	modelResponse.LastBuyingHour = hour
 	modelResponse.FirstDayBuyingCount = 1
 	modelResponse.LastDayBuyingCount = 1
@@ -55,7 +55,7 @@ func (b *BuyingEventManager) AddBuyingEvent(data *model.BuyingEventRespondModel)
 	return true, ""
 }
 
-func (b *BuyingEventManager) UpdateBuyingEventByCustomerId(modelResponse *model.BuyingEventRespondModel) (s bool, m string){
+func (b *BuyingEventManager) UpdateBuyingEventByCustomerId(modelResponse *model.BuyingEventRespondModel) (s bool, m string) {
 	oldModel, err := b.IBuyingEventDal.GetBuyingEventByCustomerId(modelResponse.CustomerId)
 	if err != nil {
 		return false, err.Error()
@@ -65,8 +65,12 @@ func (b *BuyingEventManager) UpdateBuyingEventByCustomerId(modelResponse *model.
 	oldModel.CustomerId = modelResponse.CustomerId
 	oldModel.LevelIndex = modelResponse.LevelIndex
 	oldModel.TotalBuyingCount = oldModel.TotalBuyingCount + modelResponse.TotalBuyingCount
-	oldModel.TotalBuyingDay = calculateTotalBuyingDay(modelResponse, oldModel)
+	oldModel.TotalBuyingDay = (modelResponse.LastBuyingYearOfDay - oldModel.FirstBuyingYearOfDay) + 365*(modelResponse.LastBuyingYear-oldModel.FirstBuyingYear)
+	//oldModel.FirstBuyingYearOfDay
+	//oldModel.FirstBuyingYear
+	//oldModel.FirstBuyingHour
 	oldModel.LastBuyingYearOfDay = modelResponse.LastBuyingYearOfDay
+	oldModel.LastBuyingYear = modelResponse.LastBuyingYear
 	oldModel.LastBuyingHour = modelResponse.LastBuyingHour
 	oldModel.FirstDayBuyingCount = calculateFirstDayBuyingCount(modelResponse, oldModel)
 	oldModel.LastDayBuyingCount = calculateLastDayBuyingCount(modelResponse, oldModel)
@@ -84,7 +88,7 @@ func (b *BuyingEventManager) UpdateBuyingEventByCustomerId(modelResponse *model.
 	oldModel.Buying6To11HourCount = oldModel.Buying6To11HourCount + modelResponse.Buying6To11HourCount
 	oldModel.Buying12To17HourCount = oldModel.Buying12To17HourCount + modelResponse.Buying12To17HourCount
 	oldModel.Buying18To23HourCount = oldModel.Buying18To23HourCount + modelResponse.Buying18To23HourCount
-	oldModel.BuyingDayAverageBuyingCount = float64(oldModel.TotalBuyingCount)/ float64(oldModel.TotalBuyingDay)
+	oldModel.BuyingDayAverageBuyingCount = float64(oldModel.TotalBuyingCount) / float64(oldModel.TotalBuyingDay)
 	oldModel.LevelBasedAverageBuyingCount = calculateBuyingLevelBasedAvgBuyingCount(oldModel)
 	logErr := b.IBuyingEventDal.UpdateBuyingEventByCustomerId(oldModel.CustomerId, oldModel)
 	if logErr != nil {
@@ -94,7 +98,7 @@ func (b *BuyingEventManager) UpdateBuyingEventByCustomerId(modelResponse *model.
 }
 
 func calculateFirstDayBuyingCount(modelResponse *model.BuyingEventRespondModel, oldModel *model.BuyingEventRespondModel) int64 {
-	if (oldModel.FirstBuyingYearOfDay == modelResponse.FirstBuyingYearOfDay){
+	if (oldModel.FirstBuyingYearOfDay == modelResponse.FirstBuyingYearOfDay) && (oldModel.FirstBuyingYear == modelResponse.FirstBuyingYear) {
 		oldModel.FirstDayBuyingCount = oldModel.FirstDayBuyingCount + modelResponse.FirstDayBuyingCount
 		return oldModel.FirstDayBuyingCount
 	}
@@ -102,19 +106,11 @@ func calculateFirstDayBuyingCount(modelResponse *model.BuyingEventRespondModel, 
 }
 
 func calculateLastDayBuyingCount(modelResponse *model.BuyingEventRespondModel, oldModel *model.BuyingEventRespondModel) int64 {
-	if (oldModel.LastBuyingYearOfDay == modelResponse.LastBuyingYearOfDay) && (oldModel.FirstBuyingYearOfDay != modelResponse.FirstBuyingYearOfDay){
+	if (oldModel.LastBuyingYearOfDay == modelResponse.LastBuyingYearOfDay) && (oldModel.FirstBuyingYearOfDay != modelResponse.FirstBuyingYearOfDay) {
 		oldModel.LastDayBuyingCount = oldModel.LastDayBuyingCount + modelResponse.LastDayBuyingCount
 		return oldModel.LastDayBuyingCount
-	}	
-	return oldModel.LastDayBuyingCount
-}
-
-func calculateTotalBuyingDay(modelResponse *model.BuyingEventRespondModel, oldModel *model.BuyingEventRespondModel) int64 {
-	if modelResponse.LastBuyingYearOfDay != oldModel.LastBuyingYearOfDay {
-		oldModel.TotalBuyingDay = oldModel.TotalBuyingDay + modelResponse.TotalBuyingDay
-		return oldModel.TotalBuyingDay
 	}
-	return oldModel.TotalBuyingDay
+	return modelResponse.LastDayBuyingCount
 }
 
 func determineBuyingDay(modelResponse *model.BuyingEventRespondModel, day int64) {
@@ -150,7 +146,7 @@ func determineBuyingHour(modelResponse *model.BuyingEventRespondModel, hour int6
 func determineBuyingAmPm(modelResponse *model.BuyingEventRespondModel, hour int64) {
 	if hour <= 12 {
 		modelResponse.AmBuyingCount = 1
-	} 
+	}
 	modelResponse.PmBuyingCount = 1
 }
 

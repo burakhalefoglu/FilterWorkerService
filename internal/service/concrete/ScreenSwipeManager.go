@@ -61,12 +61,25 @@ func (sc *ScreenSwipeManager) UpdateScreenSwipe(modelResponse *model.ScreenSwipe
 	oldModel.ClientId = modelResponse.ClientId
 	oldModel.CustomerId = modelResponse.CustomerId
 	oldModel.LevelIndex = modelResponse.LevelIndex
-
-
-	
-
-
-
+	// oldModel.FistSwipeDirection 
+	// oldModel.FirstSwipeStartXCor
+	// oldModel.FirstSwipeStartYCor
+	// oldModel.FirstSwipeFinishXCor
+	// oldModel.FirstSwipeFinishYCor
+	oldModel.LastSwipeDirection = modelResponse.LastSwipeDirection
+	oldModel.LastSwipeStartXCor = modelResponse.LastSwipeStartXCor
+	oldModel.LastSwipeStartYCor = modelResponse.LastSwipeStartYCor
+	oldModel.LastSwipeFinishXCor = modelResponse.LastSwipeFinishXCor
+	oldModel.LastSwipeFinishYCor = modelResponse.LastSwipeFinishYCor
+	oldModel.TotalSwipeUpCount = modelResponse.TotalSwipeUpCount +oldModel.TotalSwipeUpCount
+	oldModel.TotalSwipeDownCount = modelResponse.TotalSwipeDownCount + oldModel.TotalSwipeDownCount
+	oldModel.TotalSwipeRightCount = modelResponse.TotalSwipeRightCount + oldModel.TotalSwipeRightCount
+	oldModel.TotalSwipeLeftCount = modelResponse.TotalSwipeLeftCount + oldModel.TotalSwipeLeftCount
+	oldModel.TotalSwipeStartXCor = modelResponse.TotalSwipeStartXCor + oldModel.TotalSwipeStartXCor
+	oldModel.TotalSwipeStartYCor = modelResponse.TotalSwipeStartYCor + oldModel.TotalSwipeStartYCor
+	oldModel.TotalSwipeFinishXCor = modelResponse.TotalSwipeFinishXCor + oldModel.TotalSwipeFinishXCor
+	oldModel.TotalSwipeFinishYCor = modelResponse.TotalSwipeFinishYCor + oldModel.TotalSwipeFinishYCor
+	oldModel.TotalSwipeSessionCount = modelResponse.TotalSwipeSessionCount + oldModel.TotalSwipeSessionCount
 	logErr := sc.IScreenSwipeDal.UpdateScreenSwipeByCustomerId(oldModel.CustomerId, oldModel)
 	if logErr != nil {
 		return false, logErr.Error()

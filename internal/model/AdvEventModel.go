@@ -15,12 +15,16 @@ type AdvEventRespondModel struct {
 	LevelBasedAverageVideoAdvCount                            float64
 	AverageAdvDailyVideoClickCount                            float64
 	FirstAdvYearOfDay                                         int64
+	FirstAdvYear                                              int64
 	FirstAdvClickHour                                         int64
 	FirstVideoClickYearOfDay                                  int64
 	FirstVideoClickHour                                       int64
+	FirstAdvType                                              int64
 	LastAdvYearOfDay                                          int64
+	LastAdvYear                                               int64
 	LastVideoClickYearOfDay                                   int64
 	LastAdvClickHour                                          int64
+	LastAdvType                                               int64
 	FirstDayVideoClickCount                                   int64
 	LastDayVideoClickCount                                    int64
 	LastMinusFirstDayVideoClickCount                          int64
