@@ -135,39 +135,42 @@ func calculateLastDayVideoClickCount(modelResponse *model.AdvEventRespondModel, 
 }
 
 func determineAdvDay(modelResponse *model.AdvEventRespondModel, day int64) {
-	if day == 0 {
+	switch day {
+	case 0:
 		modelResponse.SundayVideoAdvClickCount = 1
-	} else if day == 1 {
+	case 1:
 		modelResponse.MondayVideoAdvClickCount = 1
-	} else if day == 2 {
+	case 2:
 		modelResponse.TuesdayVideoAdvClickCount = 1
-	} else if day == 3 {
+	case 3:
 		modelResponse.WednesdayVideoAdvClickCount = 1
-	} else if day == 4 {
+	case 4:
 		modelResponse.ThursdayVideoAdvClickCount = 1
-	} else if day == 5 {
+	case 5:
 		modelResponse.FridayVideoAdvClickCount = 1
-	} else if day == 6 {
+	case 6:
 		modelResponse.SaturdayVideoAdvClickCount = 1
 	}
 }
 
 func determineAdvHour(modelResponse *model.AdvEventRespondModel, hour int64) {
-	if hour <= 5 {
+	switch {
+	case hour <= 5:
 		modelResponse.VideoAdvClick0To5HourCount = 1
-	} else if (hour > 5) && (hour <= 11) {
+	case (hour > 5) && (hour <= 11):
 		modelResponse.VideoAdvClick6To11HourCount = 1
-	} else if (hour > 11) && (hour <= 17) {
+	case (hour > 11) && (hour <= 17):
 		modelResponse.VideoAdvClick12To17HourCount = 1
-	} else if (hour > 17) && (hour <= 23) {
+	case (hour > 17) && (hour <= 23):
 		modelResponse.VideoAdvClick18To23HourCount = 1
 	}
 }
 
 func determineAdvAmPm(modelResponse *model.AdvEventRespondModel, hour int64) {
-	if hour <= 12 {
+	switch {
+	case hour <= 12:
 		modelResponse.AmVideoAdvClickCount = 1
-	} else if hour > 12 {
+	default:
 		modelResponse.PmVideoAdvClickCount = 1
 	}
 }

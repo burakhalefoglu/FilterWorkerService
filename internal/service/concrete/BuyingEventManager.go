@@ -114,40 +114,44 @@ func calculateLastDayBuyingCount(modelResponse *model.BuyingEventRespondModel, o
 }
 
 func determineBuyingDay(modelResponse *model.BuyingEventRespondModel, day int64) {
-	if day == 0 {
+	switch day {
+	case 0:
 		modelResponse.SundayBuyingCount = 1
-	} else if day == 1 {
+	case 1:
 		modelResponse.MondayBuyingCount = 1
-	} else if day == 2 {
+	case 2:
 		modelResponse.TuesdayBuyingCount = 1
-	} else if day == 3 {
+	case 3:
 		modelResponse.WednesdayBuyingCount = 1
-	} else if day == 4 {
+	case 4:
 		modelResponse.ThursdayBuyingCount = 1
-	} else if day == 5 {
+	case 5:
 		modelResponse.FridayBuyingCount = 1
-	} else if day == 6 {
+	case 6:
 		modelResponse.SaturdayBuyingCount = 1
 	}
 }
 
 func determineBuyingHour(modelResponse *model.BuyingEventRespondModel, hour int64) {
-	if hour <= 5 {
+	switch {
+	case hour <= 5:
 		modelResponse.Buying0To5HourCount = 1
-	} else if (hour > 5) && (hour <= 11) {
+	case (hour > 5) && (hour <= 11):
 		modelResponse.Buying6To11HourCount = 1
-	} else if (hour > 11) && (hour <= 17) {
+	case (hour > 11) && (hour <= 17):
 		modelResponse.Buying12To17HourCount = 1
-	} else if (hour > 17) && (hour <= 23) {
+	case (hour > 17) && (hour <= 23):
 		modelResponse.Buying18To23HourCount = 1
 	}
 }
 
 func determineBuyingAmPm(modelResponse *model.BuyingEventRespondModel, hour int64) {
-	if hour <= 12 {
+	switch {
+	case hour <= 12:
 		modelResponse.AmBuyingCount = 1
-	}
-	modelResponse.PmBuyingCount = 1
+	default:
+		modelResponse.PmBuyingCount = 1
+	}	
 }
 
 func calculateBuyingLevelBasedAvgBuyingCount(modelResponse *model.BuyingEventRespondModel) float64 {
