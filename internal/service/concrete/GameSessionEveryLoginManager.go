@@ -21,6 +21,7 @@ func (g *GameSessionEveryLoginManager) ConvertRawModelToResponseModel(data *[]by
 	yearOfDay := int64(firstModel.SessionFinishTime.YearDay())
 	year := int64(firstModel.SessionFinishTime.Year())
 	weekDay := int64(firstModel.SessionFinishTime.Weekday())
+	minute := int64(firstModel.SessionFinishTime.Minute())
 	modelResponse := model.GameSessionEveryLoginRespondModel{}
 	modelResponse.ProjectId = firstModel.ProjectId
 	modelResponse.ClientId = firstModel.ClientId
@@ -30,32 +31,43 @@ func (g *GameSessionEveryLoginManager) ConvertRawModelToResponseModel(data *[]by
 	modelResponse.FirstSessionWeekDay = weekDay
 	modelResponse.FirstSessionHour = hour
 	modelResponse.FirstSessionDuration = int64(firstModel.SessionTimeMinute)
-	modelResponse.PenultimateSessionHour = hour
-	modelResponse.PenultimateSessionDuration = int64(firstModel.SessionTimeMinute)
+	modelResponse.FirstSessionMinute = minute
+	modelResponse.SecondSessionHour = 0
+	modelResponse.SecondSessionDuration = 0
+	modelResponse.SecondSessionMinute = 0
+	modelResponse.ThirdSessionHour = 0
+	modelResponse.ThirdSessionDuration = 0
+	modelResponse.ThirdSessinMinute = 0
+	modelResponse.PenultimateSessionHour = 0
+	modelResponse.PenultimateSessionDuration = 0
+	modelResponse.PenultimateSessionMinute = 0
+	modelResponse.PenultimateSessionHour = 0
+	modelResponse.PenultimateSessionDuration = 0
+	modelResponse.PenultimateSessionMinute = 0
 	modelResponse.LastSessionYearOfDay = yearOfDay
 	modelResponse.LastSessionYear = year
 	modelResponse.LastSessionHour = hour
 	modelResponse.LastSessionDuration = int64(firstModel.SessionTimeMinute)
-	modelResponse.LastHourMinusPenultimateHour = modelResponse.LastSessionHour - modelResponse.PenultimateSessionHour
-	modelResponse.LastDurationMinusPenultimateDuration = int64(modelResponse.LastSessionDuration - modelResponse.PenultimateSessionDuration)
+	modelResponse.LastSessionMinute = minute
+	modelResponse.LastDurationMinusPenultimateDuration = int64(modelResponse.LastSessionDuration)
 	modelResponse.TotalSessionDay = 1
 	modelResponse.TotalSessionDuration = int64(firstModel.SessionTimeMinute)
 	modelResponse.TotalSessionCount = 1
-	modelResponse.FirstDaySessionCount = 1
+	modelResponse.FirstDayTotalSessionCount = 1
 	modelResponse.FirstDayTotalSessionDuration = int64(firstModel.SessionTimeMinute)
-	modelResponse.PenultimateDayTotalSessionDuration = int64(firstModel.SessionTimeMinute)
-	modelResponse.PenultimateDayTotalSessionCount = 1
+	modelResponse.PenultimateDayTotalSessionDuration = 0
+	modelResponse.PenultimateDayTotalSessionCount = 0
 	modelResponse.LastDayTotalSessionCount = 1
 	modelResponse.LastDayTotalSessionDuration = int64(firstModel.SessionTimeMinute)
 	modelResponse.MinSessionDuration = int64(firstModel.SessionTimeMinute)
 	modelResponse.MaxSessionDuration = int64(firstModel.SessionTimeMinute)
-	modelResponse.DailyAvegareSessionCount = float64(modelResponse.TotalSessionCount) / float64(modelResponse.TotalSessionDay)
-	modelResponse.DailyAverageSessionDuration = float64(modelResponse.TotalSessionDuration) / float64(modelResponse.TotalSessionDay)
-	modelResponse.SessionBasedAvegareSessionDuration = float64(modelResponse.TotalSessionDuration) / float64(modelResponse.TotalSessionCount)
-	modelResponse.DailyAvegareSessionCountMinusFirstDaySessionCount = modelResponse.DailyAvegareSessionCount - float64(modelResponse.FirstDaySessionCount)
-	modelResponse.DailyAvegareSessionDurationMinusFirstDaySessionDuration = modelResponse.DailyAverageSessionDuration - float64(modelResponse.FirstDayTotalSessionDuration)
-	modelResponse.SessionBasedAvegareSessionDurationMinusFirstSessionDuration = modelResponse.SessionBasedAvegareSessionDuration - float64(modelResponse.FirstSessionDuration)
-	modelResponse.SessionBasedAvegareSessionDurationMinusLastSessionDuration = modelResponse.SessionBasedAvegareSessionDuration - float64(modelResponse.LastSessionDuration)
+	modelResponse.DailyAvegareSessionCount = 1
+	modelResponse.DailyAverageSessionDuration = float64(firstModel.SessionTimeMinute)
+	modelResponse.SessionBasedAvegareSessionDuration = float64(firstModel.SessionTimeMinute)
+	modelResponse.DailyAvegareSessionCountMinusFirstDaySessionCount = 0
+	modelResponse.DailyAvegareSessionDurationMinusFirstDaySessionDuration = 0
+	modelResponse.SessionBasedAvegareSessionDurationMinusFirstSessionDuration = 0
+	modelResponse.SessionBasedAvegareSessionDurationMinusLastSessionDuration = 0
 	determineGameSessionDay(&modelResponse, weekDay)
 	determineGameSessionHour(&modelResponse, hour)
 	determineGameSessionAmPm(&modelResponse, hour)
@@ -83,18 +95,21 @@ func (g *GameSessionEveryLoginManager) UpdateGameSession(modelResponse *model.Ga
 	//oldModel.FirstSessionWeekDay
 	//oldModel.FirstSessionHour
 	//oldModel.FirstSessionDuration
+	//oldModel.FirstSessionMinute
+	oldModel.SecondSessionHour, oldModel.SecondSessionDuration, oldModel.SecondSessionMinute = calculateSecondGameSession(modelResponse, oldModel)
+	modelResponse.ThirdSessionHour, modelResponse.ThirdSessionDuration, modelResponse.ThirdSessinMinute = calculateThirdGameSession(modelResponse, oldModel)
 	oldModel.PenultimateSessionDuration = oldModel.LastSessionDuration
 	oldModel.PenultimateSessionHour = oldModel.LastSessionHour
+	oldModel.PenultimateSessionMinute = oldModel.LastSessionMinute
 	oldModel.LastSessionYearOfDay = modelResponse.LastSessionYearOfDay
 	oldModel.LastSessionYear = modelResponse.LastSessionYear
 	oldModel.LastSessionHour = modelResponse.LastSessionHour
 	oldModel.LastSessionDuration = modelResponse.LastSessionDuration
-	oldModel.LastHourMinusPenultimateHour = oldModel.LastSessionHour - oldModel.PenultimateSessionHour
 	oldModel.LastDurationMinusPenultimateDuration = oldModel.LastSessionDuration - oldModel.PenultimateSessionDuration
 	oldModel.TotalSessionDay = oldModel.LastSessionYearOfDay - oldModel.FirstSessionYearOfDay + 365*(oldModel.LastSessionYear-oldModel.FirstSessionYear)
 	oldModel.TotalSessionDuration = oldModel.TotalSessionDuration + modelResponse.TotalSessionDuration
 	oldModel.TotalSessionCount = oldModel.TotalSessionCount + modelResponse.TotalSessionCount
-	oldModel.FirstDaySessionCount, oldModel.FirstDayTotalSessionDuration = calculateFirstDayGameSessionCountAndDuration(modelResponse, oldModel)
+	oldModel.FirstDayTotalSessionCount, oldModel.FirstDayTotalSessionDuration = calculateFirstDayGameSessionCountAndDuration(modelResponse, oldModel)
 	oldModel.PenultimateDayTotalSessionCount, oldModel.PenultimateDayTotalSessionDuration = calculatePenultimateDay(modelResponse, oldModel)
 	oldModel.LastDayTotalSessionCount, oldModel.LastDayTotalSessionDuration = calculateLastDaySessionCountAndDuration(modelResponse, oldModel)
 	oldModel.MinSessionDuration = calculateMinDuration(modelResponse, oldModel)
@@ -102,7 +117,7 @@ func (g *GameSessionEveryLoginManager) UpdateGameSession(modelResponse *model.Ga
 	oldModel.DailyAvegareSessionCount = float64(oldModel.TotalSessionCount) / float64(oldModel.TotalSessionDay)
 	oldModel.DailyAverageSessionDuration = float64(oldModel.TotalSessionDuration) / float64(oldModel.TotalSessionDay)
 	oldModel.SessionBasedAvegareSessionDuration = float64(oldModel.TotalSessionDuration) / float64(oldModel.TotalSessionCount)
-	oldModel.DailyAvegareSessionCountMinusFirstDaySessionCount = oldModel.DailyAvegareSessionCount - float64(oldModel.FirstDaySessionCount)
+	oldModel.DailyAvegareSessionCountMinusFirstDaySessionCount = oldModel.DailyAvegareSessionCount - float64(oldModel.FirstDayTotalSessionCount)
 	oldModel.DailyAvegareSessionDurationMinusFirstDaySessionDuration = oldModel.DailyAverageSessionDuration - float64(oldModel.FirstDayTotalSessionDuration)
 	oldModel.SessionBasedAvegareSessionDurationMinusFirstSessionDuration = oldModel.SessionBasedAvegareSessionDuration - float64(oldModel.FirstSessionDuration)
 	oldModel.SessionBasedAvegareSessionDurationMinusLastSessionDuration = oldModel.SessionBasedAvegareSessionDuration - float64(oldModel.LastSessionDuration)
@@ -127,6 +142,26 @@ func (g *GameSessionEveryLoginManager) UpdateGameSession(modelResponse *model.Ga
 	return true, ""
 }
 
+func calculateSecondGameSession(modelResponse *model.GameSessionEveryLoginRespondModel, oldModel *model.GameSessionEveryLoginRespondModel) (hour int64, duration int64, minute int64) {
+	if oldModel.TotalSessionCount == 1 {
+		oldModel.SecondSessionHour = modelResponse.FirstSessionHour
+		oldModel.SecondSessionDuration = modelResponse.FirstSessionDuration
+		oldModel.SecondSessionMinute = modelResponse.FirstSessionMinute
+		return oldModel.SecondSessionHour, oldModel.SecondSessionDuration, oldModel.SecondSessionMinute
+	}
+	return oldModel.SecondSessionHour, oldModel.SecondSessionDuration, oldModel.SecondSessionMinute
+}
+
+func calculateThirdGameSession(modelResponse *model.GameSessionEveryLoginRespondModel, oldModel *model.GameSessionEveryLoginRespondModel) (hour int64, duration int64, minute int64) {
+	if oldModel.TotalSessionCount == 2 {
+		oldModel.ThirdSessionHour = modelResponse.FirstSessionHour
+		oldModel.ThirdSessionDuration = modelResponse.FirstSessionDuration
+		oldModel.ThirdSessinMinute = modelResponse.FirstSessionMinute
+		return oldModel.ThirdSessionHour, oldModel.ThirdSessionDuration, oldModel.ThirdSessinMinute
+	}
+	return oldModel.ThirdSessionHour, oldModel.ThirdSessionDuration, oldModel.ThirdSessinMinute
+}
+
 func calculatePenultimateDay(modelResponse *model.GameSessionEveryLoginRespondModel, oldModel *model.GameSessionEveryLoginRespondModel) (count int64, duration int64) {
 	if oldModel.LastSessionYearOfDay != modelResponse.LastSessionYearOfDay {
 		oldModel.PenultimateDayTotalSessionCount = oldModel.LastDayTotalSessionCount
@@ -138,11 +173,11 @@ func calculatePenultimateDay(modelResponse *model.GameSessionEveryLoginRespondMo
 
 func calculateFirstDayGameSessionCountAndDuration(modelResponse *model.GameSessionEveryLoginRespondModel, oldModel *model.GameSessionEveryLoginRespondModel) (count int64, duration int64) {
 	if (oldModel.FirstSessionYearOfDay == modelResponse.FirstSessionYearOfDay) && (oldModel.FirstSessionYear == modelResponse.FirstSessionYear) {
-		oldModel.FirstDaySessionCount = oldModel.FirstDaySessionCount + modelResponse.FirstDaySessionCount
+		oldModel.FirstDayTotalSessionCount = oldModel.FirstDayTotalSessionCount + modelResponse.FirstDayTotalSessionCount
 		oldModel.FirstDayTotalSessionDuration = oldModel.FirstDayTotalSessionDuration + modelResponse.FirstDayTotalSessionDuration
-		return oldModel.FirstDaySessionCount, oldModel.FirstDayTotalSessionDuration
+		return oldModel.FirstDayTotalSessionCount, oldModel.FirstDayTotalSessionDuration
 	}
-	return oldModel.FirstDaySessionCount, oldModel.FirstDayTotalSessionDuration
+	return oldModel.FirstDayTotalSessionCount, oldModel.FirstDayTotalSessionDuration
 }
 
 func calculateMinDuration(modelResponse *model.GameSessionEveryLoginRespondModel, oldModel *model.GameSessionEveryLoginRespondModel) (duration int64) {
@@ -169,13 +204,9 @@ func calculateLastDaySessionCountAndDuration(modelResponse *model.GameSessionEve
 
 	} else if (oldModel.LastSessionYearOfDay != modelResponse.LastSessionYearOfDay) && (oldModel.FirstSessionYearOfDay != modelResponse.FirstSessionYearOfDay) {
 		return modelResponse.LastDayTotalSessionCount, modelResponse.LastDayTotalSessionDuration
-
-	} else if (oldModel.LastSessionYearOfDay != modelResponse.LastSessionYearOfDay) && (oldModel.FirstSessionYearOfDay == modelResponse.FirstSessionYearOfDay) {
-		return oldModel.LastDayTotalSessionCount, oldModel.LastDayTotalSessionDuration
-
-	} else {
-		return oldModel.LastDayTotalSessionCount, oldModel.LastDayTotalSessionDuration
 	}
+
+	return oldModel.LastDayTotalSessionCount, oldModel.LastDayTotalSessionDuration
 }
 
 func determineGameSessionDay(modelResponse *model.GameSessionEveryLoginRespondModel, day int64) {

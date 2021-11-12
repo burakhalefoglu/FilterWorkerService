@@ -25,6 +25,7 @@ func (a *AdvEventManager) ConvertRawModelToResponseModel(data *[]byte) (respondM
 	day := int64(firstModel.TrigerdTime.Weekday())
 	yearOfDay := int64(firstModel.TrigerdTime.YearDay())
 	year := int64(firstModel.TrigerdTime.Year())
+	minute := int64(firstModel.TrigerdTime.Minute())
 	modelResponse := model.AdvEventRespondModel{}
 	modelResponse.ClientId = firstModel.ClientId
 	modelResponse.ProjectId = firstModel.ProjectId
@@ -32,26 +33,34 @@ func (a *AdvEventManager) ConvertRawModelToResponseModel(data *[]byte) (respondM
 	modelResponse.LevelIndex = int64(firstModel.LevelIndex)
 	modelResponse.TotalAdvDay = 1
 	modelResponse.TotalAdvCount = 1
-	//modelResponse.TotalVideoAdvCount   ------> 1 video veya geçiş reklamı çıkmaasına göre belirlenecek
-	//modelResponse.TotalInterstitialAdvCount
-	modelResponse.LevelBasedAverageInterstitialAdvCount = calculateAdvLevelBasedAvgInterstitialCount(&modelResponse)
-	modelResponse.LevelBasedAverageVideoAdvCount = calculateAdvLevelBasedAvgVideoCount(&modelResponse)
-	modelResponse.AverageAdvDailyVideoClickCount = float64(modelResponse.TotalVideoAdvCount) / float64(modelResponse.TotalAdvDay)
+	modelResponse.LevelBasedAverageAdvCount = calculateAdvLevelBasedAvgClickCount(&modelResponse)
+	modelResponse.AverageAdvDailyClickCount = 1
 	modelResponse.FirstAdvYearOfDay = yearOfDay
 	modelResponse.FirstAdvYear = year
 	modelResponse.FirstAdvClickHour = hour
-	//modelResponse.FirstVideoClickYearOfDay
-	//modelResponse.FirstVideoClickHour
+	modelResponse.FirstADvClickMinute = minute
 	modelResponse.FirstAdvType, _, _ = a.ICacheService.ManageCache("AdvType", firstModel.AdvType)
+	modelResponse.SecondAdvYearOfDay = 0
+	modelResponse.SecondAdvHour = 0
+	modelResponse.SecondAdvMinute = 0
+	modelResponse.ThirdAdvYearOfDay = 0
+	modelResponse.ThirdAdvHour = 0
+	modelResponse.ThirdAdvMinute = 0
+	modelResponse.PenultimateAdvYearOfDay = 0
+	modelResponse.PenultimateAdvHour = 0
+	modelResponse.PenultimateAdvMinute = 0
 	modelResponse.LastAdvYearOfDay = yearOfDay
 	modelResponse.LastAdvYear = year
-	//modelResponse.LastVideoClickYearOfDay
 	modelResponse.LastAdvClickHour = hour
-	//modelResponse.FirstDayVideoClickCount
-	//modelResponse.LastDayVideoClickCount
+	modelResponse.LastAdvClickMinute = minute
 	modelResponse.LastAdvType, _, _ = a.ICacheService.ManageCache("AdvType", firstModel.AdvType)
-	modelResponse.LastMinusFirstDayVideoClickCount = modelResponse.LastDayVideoClickCount - modelResponse.FirstDayVideoClickCount
-	modelResponse.LastDayVideoClickCountMinusAverageDailyVideoAdvClickCount = modelResponse.LastDayVideoClickCount - int64(modelResponse.AverageAdvDailyVideoClickCount)
+	modelResponse.FirstDayAdvClickCount = 1
+	modelResponse.PenultimateDayAdvClickCount = 0
+	modelResponse.LastDayAdvClickCount = 1
+	modelResponse.LastMinusFirstDayAdvClickCount = 0
+	modelResponse.LastMinusPenultimateDayAdvClickCount = 0
+	modelResponse.LastDayAdvClickCountMinusAverageDailyAdvClickCount = 0
+
 	determineAdvDay(&modelResponse, day)
 	determineAdvHour(&modelResponse, hour)
 	determineAdvAmPm(&modelResponse, hour)
@@ -72,46 +81,50 @@ func (a *AdvEventManager) UpdateAdvEvent(modelResponse *model.AdvEventRespondMod
 	if err != nil {
 		return false, err.Error()
 	}
+
 	oldModel.ProjectId = modelResponse.ProjectId
 	oldModel.ClientId = modelResponse.ClientId
 	oldModel.CustomerId = modelResponse.CustomerId
 	oldModel.LevelIndex = modelResponse.LevelIndex
 	oldModel.TotalAdvDay = (modelResponse.LastAdvYearOfDay - oldModel.FirstAdvYearOfDay) + 365*(modelResponse.LastAdvYear-oldModel.FirstAdvYear)
 	oldModel.TotalAdvCount = oldModel.TotalAdvCount + modelResponse.TotalAdvCount
-	oldModel.TotalVideoAdvCount = oldModel.TotalVideoAdvCount + modelResponse.TotalVideoAdvCount
-	oldModel.TotalInterstitialAdvCount = oldModel.TotalInterstitialAdvCount + modelResponse.TotalInterstitialAdvCount
-	oldModel.LevelBasedAverageInterstitialAdvCount = calculateAdvLevelBasedAvgInterstitialCount(oldModel)
-	oldModel.LevelBasedAverageVideoAdvCount = calculateAdvLevelBasedAvgVideoCount(oldModel)
-	oldModel.AverageAdvDailyVideoClickCount = float64(oldModel.TotalVideoAdvCount) / float64(oldModel.TotalAdvDay)
+	oldModel.LevelBasedAverageAdvCount = calculateAdvLevelBasedAvgClickCount(oldModel)
+	oldModel.AverageAdvDailyClickCount = float64(oldModel.TotalAdvCount) / float64(oldModel.TotalAdvDay)
 	//oldModel.FirstAdvYearOfDay = oldModel.FirstAdvYearOfDay
 	//oldModel.FirstAdvYear
 	//oldModel.FirstAdvClickHour = oldModel.FirstAdvClickHour
-	//oldModel.FirstVideoClickYearOfDay
-	//oldModel.FirstVideoClickHour
+	//oldModel.FirstADvClickMinute
 	//oldModel.FirstAdvType
+	oldModel.SecondAdvYearOfDay, oldModel.SecondAdvHour, oldModel.SecondAdvMinute = calculateSecondAdv(modelResponse, oldModel)
+	oldModel.ThirdAdvYearOfDay, oldModel.ThirdAdvHour, oldModel.ThirdAdvMinute = calculateThirdAdv(modelResponse, oldModel)
+	oldModel.PenultimateAdvYearOfDay = oldModel.LastAdvYearOfDay
+	oldModel.PenultimateAdvHour = oldModel.LastAdvClickHour
+	oldModel.PenultimateAdvMinute = oldModel.LastAdvClickMinute
 	oldModel.LastAdvYearOfDay = modelResponse.LastAdvYearOfDay
 	oldModel.LastAdvYear = modelResponse.LastAdvYear
-	//modelResponse.LastVideoClickYearOfDay
-	//modelResponse.LastAdvClickHour = hour
+	oldModel.LastAdvClickHour = modelResponse.LastAdvClickHour
+	oldModel.LastAdvClickMinute = modelResponse.LastAdvClickMinute
 	oldModel.LastAdvType = modelResponse.LastAdvType
-	oldModel.FirstDayVideoClickCount = calculateFirstDayVideoClickCount(modelResponse, oldModel)
-	oldModel.LastDayVideoClickCount = calculateLastDayVideoClickCount(modelResponse, oldModel)
-	oldModel.LastMinusFirstDayVideoClickCount = oldModel.LastDayVideoClickCount - oldModel.FirstDayVideoClickCount
-	oldModel.LastDayVideoClickCountMinusAverageDailyVideoAdvClickCount = oldModel.LastDayVideoClickCount - int64(oldModel.AverageAdvDailyVideoClickCount)
-	oldModel.SundayVideoAdvClickCount = oldModel.SundayVideoAdvClickCount + modelResponse.SundayVideoAdvClickCount
-	oldModel.MondayVideoAdvClickCount = oldModel.MondayVideoAdvClickCount + modelResponse.MondayVideoAdvClickCount
-	oldModel.TuesdayVideoAdvClickCount = oldModel.TuesdayVideoAdvClickCount + modelResponse.TuesdayVideoAdvClickCount
-	oldModel.WednesdayVideoAdvClickCount = oldModel.WednesdayVideoAdvClickCount + modelResponse.WednesdayVideoAdvClickCount
-	oldModel.ThursdayVideoAdvClickCount = oldModel.ThursdayVideoAdvClickCount + modelResponse.ThursdayVideoAdvClickCount
-	oldModel.FridayVideoAdvClickCount = oldModel.FridayVideoAdvClickCount + modelResponse.FridayVideoAdvClickCount
-	oldModel.SaturdayVideoAdvClickCount = oldModel.SaturdayVideoAdvClickCount + modelResponse.SaturdayVideoAdvClickCount
-	oldModel.VideoAdvClick0To5HourCount = oldModel.VideoAdvClick0To5HourCount + modelResponse.VideoAdvClick0To5HourCount
-	oldModel.VideoAdvClick6To11HourCount = oldModel.VideoAdvClick6To11HourCount + modelResponse.VideoAdvClick6To11HourCount
-	oldModel.VideoAdvClick12To17HourCount = oldModel.VideoAdvClick12To17HourCount + modelResponse.VideoAdvClick12To17HourCount
-	oldModel.VideoAdvClick18To23HourCount = oldModel.VideoAdvClick18To23HourCount + modelResponse.VideoAdvClick18To23HourCount
-	oldModel.AmVideoAdvClickCount = oldModel.AmVideoAdvClickCount + modelResponse.AmVideoAdvClickCount
-	oldModel.PmVideoAdvClickCount = oldModel.PmVideoAdvClickCount + modelResponse.PmVideoAdvClickCount
-	oldModel.LastDayVideoClickCountMinusAverageDailyVideoAdvClickCount = oldModel.LastDayVideoClickCount - int64(oldModel.AverageAdvDailyVideoClickCount)
+	oldModel.FirstDayAdvClickCount = calculateFirstDayAdvClickCount(modelResponse, oldModel)
+	oldModel.PenultimateDayAdvClickCount = calculatePenultimateDayAdvDay(modelResponse, oldModel)
+	oldModel.LastDayAdvClickCount = calculateLastDayAdvClickCount(modelResponse, oldModel)
+	oldModel.LastMinusFirstDayAdvClickCount = oldModel.LastDayAdvClickCount - oldModel.FirstDayAdvClickCount
+	oldModel.LastMinusPenultimateDayAdvClickCount = oldModel.LastDayAdvClickCount - oldModel.PenultimateDayAdvClickCount
+	oldModel.LastDayAdvClickCountMinusAverageDailyAdvClickCount = oldModel.LastDayAdvClickCount - int64(oldModel.AverageAdvDailyClickCount)
+	oldModel.SundayAdvClickCount = oldModel.SundayAdvClickCount + modelResponse.SundayAdvClickCount
+	oldModel.MondayAdvClickCount = oldModel.MondayAdvClickCount + modelResponse.MondayAdvClickCount
+	oldModel.TuesdayAdvClickCount = oldModel.TuesdayAdvClickCount + modelResponse.TuesdayAdvClickCount
+	oldModel.WednesdayAdvClickCount = oldModel.WednesdayAdvClickCount + modelResponse.WednesdayAdvClickCount
+	oldModel.ThursdayAdvClickCount = oldModel.ThursdayAdvClickCount + modelResponse.ThursdayAdvClickCount
+	oldModel.FridayAdvClickCount = oldModel.FridayAdvClickCount + modelResponse.FridayAdvClickCount
+	oldModel.SaturdayAdvClickCount = oldModel.SaturdayAdvClickCount + modelResponse.SaturdayAdvClickCount
+	oldModel.AdvClick0To5HourCount = oldModel.AdvClick0To5HourCount + modelResponse.AdvClick0To5HourCount
+	oldModel.AdvClick6To11HourCount = oldModel.AdvClick6To11HourCount + modelResponse.AdvClick6To11HourCount
+	oldModel.AdvClick12To17HourCount = oldModel.AdvClick12To17HourCount + modelResponse.AdvClick12To17HourCount
+	oldModel.AdvClick18To23HourCount = oldModel.AdvClick18To23HourCount + modelResponse.AdvClick18To23HourCount
+	oldModel.AmAdvClickCount = oldModel.AmAdvClickCount + modelResponse.AmAdvClickCount
+	oldModel.PmAdvClickCount = oldModel.PmAdvClickCount + modelResponse.PmAdvClickCount
+
 	logErr := a.IAdvEventDal.UpdateAdvEventByCustomerId(oldModel.CustomerId, oldModel)
 	if logErr != nil {
 		return false, logErr.Error()
@@ -119,76 +132,100 @@ func (a *AdvEventManager) UpdateAdvEvent(modelResponse *model.AdvEventRespondMod
 	return true, ""
 }
 
-func calculateFirstDayVideoClickCount(modelResponse *model.AdvEventRespondModel, oldmodel *model.AdvEventRespondModel) int64 {
-	if (oldmodel.FirstVideoClickYearOfDay == modelResponse.FirstVideoClickYearOfDay) && (oldmodel.FirstAdvYear == modelResponse.FirstAdvYear) {
-		oldmodel.FirstDayVideoClickCount = oldmodel.FirstDayVideoClickCount + modelResponse.FirstDayVideoClickCount
-		return oldmodel.FirstDayVideoClickCount
+func calculateSecondAdv(modelResponse *model.AdvEventRespondModel, oldModel *model.AdvEventRespondModel) (day int64, hour int64, minute int64) {
+	if oldModel.TotalAdvCount == 2 {
+		oldModel.SecondAdvYearOfDay = modelResponse.FirstAdvYearOfDay
+		oldModel.SecondAdvHour = modelResponse.FirstAdvClickHour
+		oldModel.SecondAdvMinute = modelResponse.FirstADvClickMinute
+		return oldModel.SecondAdvYearOfDay, oldModel.SecondAdvHour, oldModel.SecondAdvMinute
 	}
-	return oldmodel.FirstDayVideoClickCount
+	return oldModel.SecondAdvYearOfDay, oldModel.SecondAdvHour, oldModel.SecondAdvMinute
 }
-func calculateLastDayVideoClickCount(modelResponse *model.AdvEventRespondModel, oldmodel *model.AdvEventRespondModel) int64 {
-	if (oldmodel.LastVideoClickYearOfDay == modelResponse.LastVideoClickYearOfDay) && (oldmodel.FirstVideoClickYearOfDay != modelResponse.FirstVideoClickYearOfDay) {
-		oldmodel.LastDayVideoClickCount = oldmodel.LastDayVideoClickCount + modelResponse.LastDayVideoClickCount
-		return oldmodel.LastDayVideoClickCount
+
+func calculateThirdAdv(modelResponse *model.AdvEventRespondModel, oldModel *model.AdvEventRespondModel) (day int64, hour int64, minute int64) {
+	if oldModel.TotalAdvCount == 3 {
+		oldModel.ThirdAdvYearOfDay = modelResponse.FirstAdvYearOfDay
+		oldModel.ThirdAdvHour = modelResponse.FirstAdvClickHour
+		oldModel.ThirdAdvMinute = modelResponse.FirstADvClickMinute
+		return oldModel.ThirdAdvYearOfDay, oldModel.ThirdAdvHour, oldModel.ThirdAdvMinute
 	}
-	return modelResponse.LastDayVideoClickCount
+	return oldModel.ThirdAdvYearOfDay, oldModel.ThirdAdvHour, oldModel.ThirdAdvMinute
+}
+
+func calculateFirstDayAdvClickCount(modelResponse *model.AdvEventRespondModel, oldmodel *model.AdvEventRespondModel) int64 {
+	if (oldmodel.FirstAdvYearOfDay == modelResponse.FirstAdvYearOfDay) && (oldmodel.FirstAdvYear == modelResponse.FirstAdvYear) {
+		oldmodel.FirstDayAdvClickCount = oldmodel.FirstDayAdvClickCount + modelResponse.FirstDayAdvClickCount
+		return oldmodel.FirstDayAdvClickCount
+	}
+	return oldmodel.FirstDayAdvClickCount
+}
+
+func calculatePenultimateDayAdvDay(modelResponse *model.AdvEventRespondModel, oldModel *model.AdvEventRespondModel) (count int64) {
+	if (oldModel.LastAdvYearOfDay != modelResponse.LastAdvYearOfDay) && (oldModel.FirstAdvYearOfDay != modelResponse.FirstAdvYearOfDay) {
+		oldModel.PenultimateDayAdvClickCount = oldModel.LastDayAdvClickCount
+		return oldModel.PenultimateDayAdvClickCount
+	}
+	return oldModel.PenultimateDayAdvClickCount
+}
+
+func calculateLastDayAdvClickCount(modelResponse *model.AdvEventRespondModel, oldmodel *model.AdvEventRespondModel) int64 {
+	if (oldmodel.LastAdvYearOfDay == modelResponse.LastAdvYearOfDay) && (oldmodel.FirstAdvYearOfDay != modelResponse.FirstAdvYearOfDay) {
+		oldmodel.LastDayAdvClickCount = oldmodel.LastDayAdvClickCount + modelResponse.LastDayAdvClickCount
+		return oldmodel.LastDayAdvClickCount
+
+	} else if (oldmodel.LastDayAdvClickCount != modelResponse.LastDayAdvClickCount) && (oldmodel.FirstAdvYearOfDay != modelResponse.FirstAdvYearOfDay) {
+		return modelResponse.LastDayAdvClickCount
+	}
+
+	return oldmodel.LastDayAdvClickCount
 }
 
 func determineAdvDay(modelResponse *model.AdvEventRespondModel, day int64) {
 	switch day {
 	case 0:
-		modelResponse.SundayVideoAdvClickCount = 1
+		modelResponse.SundayAdvClickCount = 1
 	case 1:
-		modelResponse.MondayVideoAdvClickCount = 1
+		modelResponse.MondayAdvClickCount = 1
 	case 2:
-		modelResponse.TuesdayVideoAdvClickCount = 1
+		modelResponse.TuesdayAdvClickCount = 1
 	case 3:
-		modelResponse.WednesdayVideoAdvClickCount = 1
+		modelResponse.WednesdayAdvClickCount = 1
 	case 4:
-		modelResponse.ThursdayVideoAdvClickCount = 1
+		modelResponse.ThursdayAdvClickCount = 1
 	case 5:
-		modelResponse.FridayVideoAdvClickCount = 1
+		modelResponse.FridayAdvClickCount = 1
 	case 6:
-		modelResponse.SaturdayVideoAdvClickCount = 1
+		modelResponse.SaturdayAdvClickCount = 1
 	}
 }
 
 func determineAdvHour(modelResponse *model.AdvEventRespondModel, hour int64) {
 	switch {
 	case hour <= 5:
-		modelResponse.VideoAdvClick0To5HourCount = 1
+		modelResponse.AdvClick0To5HourCount = 1
 	case (hour > 5) && (hour <= 11):
-		modelResponse.VideoAdvClick6To11HourCount = 1
+		modelResponse.AdvClick6To11HourCount = 1
 	case (hour > 11) && (hour <= 17):
-		modelResponse.VideoAdvClick12To17HourCount = 1
+		modelResponse.AdvClick12To17HourCount = 1
 	case (hour > 17) && (hour <= 23):
-		modelResponse.VideoAdvClick18To23HourCount = 1
+		modelResponse.AdvClick18To23HourCount = 1
 	}
 }
 
 func determineAdvAmPm(modelResponse *model.AdvEventRespondModel, hour int64) {
 	switch {
 	case hour <= 12:
-		modelResponse.AmVideoAdvClickCount = 1
+		modelResponse.AmAdvClickCount = 1
 	default:
-		modelResponse.PmVideoAdvClickCount = 1
+		modelResponse.PmAdvClickCount = 1
 	}
 }
 
-func calculateAdvLevelBasedAvgInterstitialCount(modelResponse *model.AdvEventRespondModel) float64 {
+func calculateAdvLevelBasedAvgClickCount(modelResponse *model.AdvEventRespondModel) float64 {
 	if modelResponse.LevelIndex == 0 {
-		modelResponse.LevelBasedAverageInterstitialAdvCount = float64(modelResponse.TotalInterstitialAdvCount)
-		return modelResponse.LevelBasedAverageInterstitialAdvCount
+		modelResponse.LevelBasedAverageAdvCount = float64(modelResponse.TotalAdvCount)
+		return modelResponse.LevelBasedAverageAdvCount
 	}
-	modelResponse.LevelBasedAverageInterstitialAdvCount = float64(modelResponse.TotalInterstitialAdvCount) / float64(modelResponse.LevelIndex)
-	return modelResponse.LevelBasedAverageInterstitialAdvCount
-}
-
-func calculateAdvLevelBasedAvgVideoCount(modelResponse *model.AdvEventRespondModel) float64 {
-	if modelResponse.LevelIndex == 0 {
-		modelResponse.LevelBasedAverageVideoAdvCount = float64(modelResponse.TotalVideoAdvCount)
-		return modelResponse.LevelBasedAverageVideoAdvCount
-	}
-	modelResponse.LevelBasedAverageVideoAdvCount = float64(modelResponse.TotalVideoAdvCount) / float64(modelResponse.LevelIndex)
-	return modelResponse.LevelBasedAverageVideoAdvCount
+	modelResponse.LevelBasedAverageAdvCount = float64(modelResponse.TotalAdvCount) / float64(modelResponse.LevelIndex)
+	return modelResponse.LevelBasedAverageAdvCount
 }

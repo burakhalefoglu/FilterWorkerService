@@ -20,7 +20,6 @@ func (h *HardwareInformationManager) AddHardwareInformation(data *[]byte) (s boo
 	if err != nil {
 		return false, err.Error()
 	}
-
 	// Todo: 2 Filtreler Buraya Yazılacak
 	modelResponse := model2.HardwareInformationResponseModel{}
 	modelResponse.ClientId = model.ClientId
@@ -31,6 +30,7 @@ func (h *HardwareInformationManager) AddHardwareInformation(data *[]byte) (s boo
 	modelResponse.GraphicsMemorySize = int64(model.GraphicsMemorySize)
 	modelResponse.OperatingSystem, _, _ = h.ICacheService.ManageCache("OperatingSystem", model.OperatingSystem)
 	modelResponse.ProcessorCount = int64(model.ProcessorCount)
+	modelResponse.ProcessorType, _, _ = h.ICacheService.ManageCache("ProcessorType", model.ProcessorType)
 	modelResponse.SystemMemorySize = int64(model.SystemMemorySize)
 	// Todo : 3 Model burada kayıt edilecek
 	logErr := h.IHardwareInformationDal.Add(&modelResponse)

@@ -11,18 +11,26 @@ type GameSessionEveryLoginRespondModel struct {
 	FirstSessionWeekDay                                         int64
 	FirstSessionHour                                            int64
 	FirstSessionDuration                                        int64
+	FirstSessionMinute                                          int64
+	SecondSessionHour                                           int64
+	SecondSessionDuration                                       int64
+	SecondSessionMinute                                         int64
+	ThirdSessionHour                                            int64
+	ThirdSessionDuration                                        int64
+	ThirdSessinMinute                                           int64
 	PenultimateSessionHour                                      int64
 	PenultimateSessionDuration                                  int64
+	PenultimateSessionMinute                                    int64
 	LastSessionYearOfDay                                        int64
 	LastSessionYear                                             int64
 	LastSessionHour                                             int64
 	LastSessionDuration                                         int64
-	LastHourMinusPenultimateHour                                int64
+	LastSessionMinute                                           int64
 	LastDurationMinusPenultimateDuration                        int64
 	TotalSessionDay                                             int64
 	TotalSessionDuration                                        int64
 	TotalSessionCount                                           int64
-	FirstDaySessionCount                                        int64
+	FirstDayTotalSessionCount                                   int64
 	FirstDayTotalSessionDuration                                int64
 	PenultimateDayTotalSessionDuration                          int64
 	PenultimateDayTotalSessionCount                             int64

@@ -10,23 +10,49 @@ type ScreenClickRespondModel struct {
 	FirstClickSessionYearOfDay                       int64
 	FirstClickSessionYear                            int64
 	FirstClickSessionHour                            int64
+	FirstClickSessionMinute                          int64
+	FirstTouchCount                                  int64
+	SecondClickSessionHour                           int64
+	SecondClickSessionMinute                         int64
+	SecondTouchCount                                 int64
+	ThirdClickSessionHour                            int64
+	ThirdClickSessionMinute                          int64
+	ThirdTouchCount                                  int64
+	PenultimateClickSessionHour                      int64
+	PenultimateClickSessionMinute                    int64
+	PenultimateTouchCount                            int64
 	LastClickSessionYearOfDay                        int64
 	LastClickSessionYear                             int64
 	LastClickSessionHour                             int64
+	LastClickSessionMinute                           int64
+	LastTouchCount                                   int64
 	FirstStartXCor                                   float64
 	FirstStartYCor                                   float64
 	FirstFinishXCor                                  float64
 	FirstFinishYCor                                  float64
+	SecondStartXCor                                  float64
+	SecondStartYCor                                  float64
+	SecondFinishXCor                                 float64
+	SecondFinishYCor                                 float64
+	ThirdStartXCor                                   float64
+	ThirdStartYCor                                   float64
+	ThirdFinishXCor                                  float64
+	ThirdFinishYCor                                  float64
+	PenultimateStartXCor                             float64
+	PenultimateStartYCor                             float64
+	PenultimateFinishXCor                            float64
+	PenultimateFinishYCor                            float64
 	LastStartXCor                                    float64
 	LastStartYCor                                    float64
 	LastFinishXCor                                   float64
 	LastFinishYCor                                   float64
-	FirstTouchCount                                  int64
-	LastTouchCount                                   int64
 	FirstMinusLastTouchCount                         int64
 	FirstFingerId                                    int64
+	PenultimateFingerId                              int64
 	LastFingerId                                     int64
 	FirstDayClickCount                               int64
+	PenultimateDayClickCount                         int64
+	LastDayClickCount                                int64
 	TotalClickDay                                    int64
 	TotalClickCount                                  int64
 	TotalClickSessionCount                           int64
