@@ -11,11 +11,11 @@ type ScreenSwipeManager struct {
 	IJsonParser     IJsonParser.IJsonParser
 }
 
-func (sc *ScreenSwipeManager) ConvertRawModelToResponseModel(data *[]byte) (respondModel *model.ScreenSwipeRespondModel, s bool, m string) {
+func (sc *ScreenSwipeManager) ConvertRawModelToResponseModel(data *[]byte) (s bool, m string) {
 	firstModel := model.ScreenSwipeModel{}
 	err := sc.IJsonParser.DecodeJson(data, &firstModel)
 	if err != nil {
-		return &model.ScreenSwipeRespondModel{}, false, err.Error()
+		return false, err.Error()
 	}
 	hour := int64(firstModel.CreationAt.Hour())
 	yearOfDay := int64(firstModel.CreationAt.YearDay())
@@ -72,22 +72,44 @@ func (sc *ScreenSwipeManager) ConvertRawModelToResponseModel(data *[]byte) (resp
 	modelResponse.TotalSwipeStartYCor = firstModel.SwipeStartYCor
 	modelResponse.TotalSwipeFinishXCor = firstModel.SwipeFinishXCor
 	modelResponse.TotalSwipeFinishYCor = firstModel.SwipeFinishYCor
-	return &modelResponse, true, ""
-}
 
-func (sc *ScreenSwipeManager) AddScreenSwipe(data *model.ScreenSwipeRespondModel) (s bool, m string) {
-	logErr := sc.IScreenSwipeDal.Add(data)
-	if logErr != nil {
-		return false, logErr.Error()
-	}
-	return true, ""
-}
-
-func (sc *ScreenSwipeManager) UpdateScreenSwipe(modelResponse *model.ScreenSwipeRespondModel) (s bool, m string) {
 	oldModel, err := sc.IScreenSwipeDal.GetScreenSwipeByCustomerId(modelResponse.CustomerId)
-	if err != nil {
+	switch {
+	case err.Error() == "mongo: no documents in result":
+
+		logErr := sc.IScreenSwipeDal.Add(&modelResponse)
+		if logErr != nil {
+			return false, logErr.Error()
+		}
+		return true, ""
+
+	case err == nil:
+		updateResult, updateErr := sc.updateScreenSwipe(&modelResponse, oldModel)
+		if updateErr != nil {
+			return updateResult, updateErr.Error()
+		}
+		return updateResult, ""
+
+	default:
+
 		return false, err.Error()
+
 	}
+}
+
+// func (sc *ScreenSwipeManager) AddScreenSwipe(data *model.ScreenSwipeRespondModel) (s bool, m string) {
+// 	logErr := sc.IScreenSwipeDal.Add(data)
+// 	if logErr != nil {
+// 		return false, logErr.Error()
+// 	}
+// 	return true, ""
+// }
+
+func (sc *ScreenSwipeManager) updateScreenSwipe(modelResponse *model.ScreenSwipeRespondModel, oldModel *model.ScreenSwipeRespondModel) (s bool, m error) {
+	// oldModel, err := sc.IScreenSwipeDal.GetScreenSwipeByCustomerId(modelResponse.CustomerId)
+	// if err != nil {
+	// 	return false, err.Error()
+	// }
 
 	oldModel.ProjectId = modelResponse.ProjectId
 	oldModel.ClientId = modelResponse.ClientId
@@ -126,9 +148,9 @@ func (sc *ScreenSwipeManager) UpdateScreenSwipe(modelResponse *model.ScreenSwipe
 	oldModel.TotalSwipeFinishYCor = modelResponse.TotalSwipeFinishYCor + oldModel.TotalSwipeFinishYCor
 	logErr := sc.IScreenSwipeDal.UpdateScreenSwipeByCustomerId(oldModel.CustomerId, oldModel)
 	if logErr != nil {
-		return false, logErr.Error()
+		return false, logErr
 	}
-	return true, ""
+	return true, nil
 }
 
 func determineSwipeDirection(modelResponse *model.ScreenSwipeRespondModel, swipeDirection int64) {

@@ -13,11 +13,11 @@ type ScreenClickManager struct {
 	IJsonParser     IJsonParser.IJsonParser
 }
 
-func (sc *ScreenClickManager) ConvertRawModelToResponseModel(data *[]byte) (respondModel *model.ScreenClickRespondModel, s bool, m string) {
+func (sc *ScreenClickManager) ConvertRawModelToResponseModel(data *[]byte) ( s bool, m string) {
 	firstModel := model.ScreenClickModel{}
 	err := sc.IJsonParser.DecodeJson(data, &firstModel)
 	if err != nil {
-		return &model.ScreenClickRespondModel{}, false, err.Error()
+		return false, err.Error()
 	}
 	hour := int64(firstModel.CreationAt.Hour())
 	yearOfDay := int64(firstModel.CreationAt.YearDay())
@@ -88,22 +88,44 @@ func (sc *ScreenClickManager) ConvertRawModelToResponseModel(data *[]byte) (resp
 	modelResponse.SessionBasedAvegareClickCount = float64(firstModel.TouchCount)
 	modelResponse.DailyAvegareClickCount = float64(firstModel.TouchCount)
 	modelResponse.LastTouchCountMinusSessionBasedAvegareClickCount = 0
-	return &modelResponse, true, ""
-}
 
-func (sc *ScreenClickManager) AddScreenClick(data *model.ScreenClickRespondModel) (s bool, m string) {
-	logErr := sc.IScreenClickDal.Add(data)
-	if logErr != nil {
-		return false, logErr.Error()
-	}
-	return true, ""
-}
-
-func (sc *ScreenClickManager) UpdateScreenClick(modelResponse *model.ScreenClickRespondModel) (s bool, m string) {
 	oldModel, err := sc.IScreenClickDal.GetScreenClickByCustomerId(modelResponse.CustomerId)
-	if err != nil {
+	switch {
+	case err.Error() == "mongo: no documents in result":
+
+		logErr := sc.IScreenClickDal.Add(&modelResponse)
+		if logErr != nil {
+			return false, logErr.Error()
+		}
+		return true, ""
+
+	case err == nil:
+		updateResult, updateErr := sc.updateScreenClick(&modelResponse, oldModel)
+		if updateErr != nil {
+			return updateResult, updateErr.Error()
+		}
+		return updateResult, ""
+
+	default:
+
 		return false, err.Error()
+
 	}
+}
+
+// func (sc *ScreenClickManager) AddScreenClick(data *model.ScreenClickRespondModel) (s bool, m string) {
+// 	logErr := sc.IScreenClickDal.Add(data)
+// 	if logErr != nil {
+// 		return false, logErr.Error()
+// 	}
+// 	return true, ""
+// }
+
+func (sc *ScreenClickManager) updateScreenClick(modelResponse *model.ScreenClickRespondModel, oldModel *model.ScreenClickRespondModel) (s bool, m error) {
+	// oldModel, err := sc.IScreenClickDal.GetScreenClickByCustomerId(modelResponse.CustomerId)
+	// if err != nil {
+	// 	return false, err.Error()
+	// }
 	oldModel.ProjectId = modelResponse.ProjectId
 	oldModel.ClientId = modelResponse.ClientId
 	oldModel.CustomerId = modelResponse.CustomerId
@@ -160,9 +182,9 @@ func (sc *ScreenClickManager) UpdateScreenClick(modelResponse *model.ScreenClick
 	oldModel.LastTouchCountMinusSessionBasedAvegareClickCount = float64(oldModel.LastTouchCount) - float64(oldModel.SessionBasedAvegareClickCount)
 	logErr := sc.IScreenClickDal.UpdateScreenClickByCustomerId(oldModel.CustomerId, oldModel)
 	if logErr != nil {
-		return false, logErr.Error()
+		return false, logErr
 	}
-	return true, ""
+	return true, nil
 }
 
 func calculateSecondRotate(modelResponse *model.ScreenClickRespondModel, oldModel *model.ScreenClickRespondModel) (startx float64, starty float64, finishx float64, finishy float64) {

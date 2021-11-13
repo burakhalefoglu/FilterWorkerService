@@ -13,11 +13,11 @@ type BuyingEventManager struct {
 	IJsonParser     IJsonParser.IJsonParser
 }
 
-func (b *BuyingEventManager) ConvertRawModelToResponseModel(data *[]byte) (respondModel *model.BuyingEventRespondModel, s bool, m string) {
+func (b *BuyingEventManager) ConvertRawModelToResponseModel(data *[]byte) (s bool, m string) {
 	firstModel := model.BuyingEventModel{}
 	err := b.IJsonParser.DecodeJson(data, &firstModel)
 	if err != nil {
-		return &model.BuyingEventRespondModel{}, false, err.Error()
+		return false, err.Error()
 	}
 	hour := int64(firstModel.TrigerdTime.Hour())
 	day := int64(firstModel.TrigerdTime.Weekday())
@@ -51,22 +51,46 @@ func (b *BuyingEventManager) ConvertRawModelToResponseModel(data *[]byte) (respo
 	determineBuyingAmPm(&modelResponse, hour)
 	modelResponse.BuyingDayAverageBuyingCount = float64(modelResponse.TotalBuyingCount) / float64(modelResponse.TotalBuyingDay)
 	modelResponse.LevelBasedAverageBuyingCount = calculateBuyingLevelBasedAvgBuyingCount(&modelResponse)
-	return &modelResponse, true, ""
-}
 
-func (b *BuyingEventManager) AddBuyingEvent(data *model.BuyingEventRespondModel) (s bool, m string) {
-	logErr := b.IBuyingEventDal.Add(data)
-	if logErr != nil {
-		return false, logErr.Error()
-	}
-	return true, ""
-}
 
-func (b *BuyingEventManager) UpdateBuyingEventByCustomerId(modelResponse *model.BuyingEventRespondModel) (s bool, m string) {
 	oldModel, err := b.IBuyingEventDal.GetBuyingEventByCustomerId(modelResponse.CustomerId)
-	if err != nil {
-		return false, err.Error()
+	switch {
+	case err.Error() == "mongo: no documents in result":
+
+		logErr := b.IBuyingEventDal.Add(&modelResponse)
+		if logErr != nil {
+			return false, logErr.Error()
+		}
+		return true, ""
+
+	case err == nil:
+		updateResult, updateErr := b.updateBuyingEventByCustomerId(&modelResponse, oldModel)
+		if updateErr != nil {
+		return updateResult, updateErr.Error()
 	}
+		return updateResult, ""
+
+	default:
+
+		return false, err.Error()
+
+	}
+	
+}
+
+// func (b *BuyingEventManager) AddBuyingEvent(data *model.BuyingEventRespondModel) (s bool, m string) {
+// 	logErr := b.IBuyingEventDal.Add(data)
+// 	if logErr != nil {
+// 		return false, logErr.Error()
+// 	}
+// 	return true, ""
+// }
+
+func (b *BuyingEventManager) updateBuyingEventByCustomerId(modelResponse *model.BuyingEventRespondModel, oldModel *model.BuyingEventRespondModel) (s bool, m error) {
+	// oldModel, err := b.IBuyingEventDal.GetBuyingEventByCustomerId(modelResponse.CustomerId)
+	// if err != nil {
+	// 	return false, err.Error()
+	// }
 	oldModel.ProjectId = modelResponse.ProjectId
 	oldModel.ClientId = modelResponse.ClientId
 	oldModel.CustomerId = modelResponse.CustomerId
@@ -104,9 +128,9 @@ func (b *BuyingEventManager) UpdateBuyingEventByCustomerId(modelResponse *model.
 	oldModel.LevelBasedAverageBuyingCount = calculateBuyingLevelBasedAvgBuyingCount(oldModel)
 	logErr := b.IBuyingEventDal.UpdateBuyingEventByCustomerId(oldModel.CustomerId, oldModel)
 	if logErr != nil {
-		return false, logErr.Error()
+		return false, logErr
 	}
-	return true, ""
+	return true, nil
 }
 
 func calculateSecondBuying(modelResponse *model.BuyingEventRespondModel, oldModel *model.BuyingEventRespondModel) (day int64, hour int64) {

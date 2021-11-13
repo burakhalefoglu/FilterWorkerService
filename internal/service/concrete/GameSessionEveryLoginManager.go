@@ -11,11 +11,11 @@ type GameSessionEveryLoginManager struct {
 	IJsonParser               IJsonParser.IJsonParser
 }
 
-func (g *GameSessionEveryLoginManager) ConvertRawModelToResponseModel(data *[]byte) (respondModel *model.GameSessionEveryLoginRespondModel, s bool, m string) {
+func (g *GameSessionEveryLoginManager) ConvertRawModelToResponseModel(data *[]byte) (s bool, m string) {
 	firstModel := model.GameSessionEveryLoginModel{}
 	err := g.IJsonParser.DecodeJson(data, &firstModel)
 	if err != nil {
-		return &model.GameSessionEveryLoginRespondModel{}, false, err.Error()
+		return false, err.Error()
 	}
 	hour := int64(firstModel.SessionFinishTime.Hour())
 	yearOfDay := int64(firstModel.SessionFinishTime.YearDay())
@@ -71,22 +71,44 @@ func (g *GameSessionEveryLoginManager) ConvertRawModelToResponseModel(data *[]by
 	determineGameSessionDay(&modelResponse, weekDay)
 	determineGameSessionHour(&modelResponse, hour)
 	determineGameSessionAmPm(&modelResponse, hour)
-	return &modelResponse, true, ""
-}
 
-func (g *GameSessionEveryLoginManager) AddGameSession(data *model.GameSessionEveryLoginRespondModel) (s bool, m string) {
-	logErr := g.IGameSessionEveryLoginDal.Add(data)
-	if logErr != nil {
-		return false, logErr.Error()
-	}
-	return true, ""
-}
-
-func (g *GameSessionEveryLoginManager) UpdateGameSession(modelResponse *model.GameSessionEveryLoginRespondModel) (s bool, m string) {
 	oldModel, err := g.IGameSessionEveryLoginDal.GetGameSessionEveryLoginByCustomerId(modelResponse.CustomerId)
-	if err != nil {
-		return false, err.Error()
+	switch {
+	case err.Error() == "mongo: no documents in result":
+
+		logErr := g.IGameSessionEveryLoginDal.Add(&modelResponse)
+		if logErr != nil {
+			return false, logErr.Error()
+		}
+		return true, ""
+
+	case err == nil:
+		updateResult, updateErr :=  g.updateGameSession(&modelResponse, oldModel)
+		if updateErr != nil {
+		return updateResult, updateErr.Error()
 	}
+		return updateResult, ""
+
+	default:
+
+		return false, err.Error()
+
+	}
+}
+
+// func (g *GameSessionEveryLoginManager) AddGameSession(data *model.GameSessionEveryLoginRespondModel) (s bool, m string) {
+// 	logErr := g.IGameSessionEveryLoginDal.Add(data)
+// 	if logErr != nil {
+// 		return false, logErr.Error()
+// 	}
+// 	return true, ""
+// }
+
+func (g *GameSessionEveryLoginManager) updateGameSession(modelResponse *model.GameSessionEveryLoginRespondModel, oldModel *model.GameSessionEveryLoginRespondModel) (s bool, m error) {
+	// oldModel, err := g.IGameSessionEveryLoginDal.GetGameSessionEveryLoginByCustomerId(modelResponse.CustomerId)
+	// if err != nil {
+	// 	return false, err.Error()
+	// }
 	oldModel.ProjectId = modelResponse.ProjectId
 	oldModel.ClientId = modelResponse.ClientId
 	oldModel.CustomerId = modelResponse.CustomerId
@@ -137,9 +159,9 @@ func (g *GameSessionEveryLoginManager) UpdateGameSession(modelResponse *model.Ga
 
 	logErr := g.IGameSessionEveryLoginDal.UpdateGameSessionEveryLoginByCustomerId(oldModel.CustomerId, oldModel)
 	if logErr != nil {
-		return false, logErr.Error()
+		return false, logErr
 	}
-	return true, ""
+	return true, nil
 }
 
 func calculateSecondGameSession(modelResponse *model.GameSessionEveryLoginRespondModel, oldModel *model.GameSessionEveryLoginRespondModel) (hour int64, duration int64, minute int64) {

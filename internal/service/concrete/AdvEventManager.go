@@ -15,11 +15,11 @@ type AdvEventManager struct {
 	ICacheService ICacheService.ICacheService
 }
 
-func (a *AdvEventManager) ConvertRawModelToResponseModel(data *[]byte) (respondModel *model.AdvEventRespondModel, s bool, m string) {
+func (a *AdvEventManager) ConvertRawModelToResponseModel(data *[]byte) ( s bool, m string) {
 	firstModel := model.AdvEventModel{}
 	err := a.IJsonParser.DecodeJson(data, &firstModel)
 	if err != nil {
-		return &model.AdvEventRespondModel{}, false, err.Error()
+		return false, err.Error()
 	}
 	hour := int64(firstModel.TrigerdTime.Hour())
 	day := int64(firstModel.TrigerdTime.Weekday())
@@ -60,27 +60,50 @@ func (a *AdvEventManager) ConvertRawModelToResponseModel(data *[]byte) (respondM
 	modelResponse.LastMinusFirstDayAdvClickCount = 0
 	modelResponse.LastMinusPenultimateDayAdvClickCount = 0
 	modelResponse.LastDayAdvClickCountMinusAverageDailyAdvClickCount = 0
-
 	determineAdvDay(&modelResponse, day)
 	determineAdvHour(&modelResponse, hour)
 	determineAdvAmPm(&modelResponse, hour)
-	return &modelResponse, true, ""
-}
 
-func (a *AdvEventManager) AddAdvEvent(data *model.AdvEventRespondModel) (s bool, m string) {
-
-	logErr := a.IAdvEventDal.Add(data)
-	if logErr != nil {
-		return false, logErr.Error()
-	}
-	return true, ""
-}
-
-func (a *AdvEventManager) UpdateAdvEvent(modelResponse *model.AdvEventRespondModel) (s bool, m string) {
 	oldModel, err := a.IAdvEventDal.GetAdvEventByCustomerId(modelResponse.CustomerId)
-	if err != nil {
-		return false, err.Error()
+	switch {
+	case err.Error() == "mongo: no documents in result":
+
+		logErr := a.IAdvEventDal.Add(&modelResponse)
+		if logErr != nil {
+			return false, logErr.Error()
+		}
+		return true, ""
+
+	case err == nil:
+		updateResult, updateErr := a.updateAdvEvent(&modelResponse, oldModel)
+		if updateErr != nil {
+		return updateResult, updateErr.Error()
 	}
+		return updateResult, ""
+
+	default:
+
+		return false, err.Error()
+
+	}
+
+
+}
+
+// func (a *AdvEventManager) addAdvEvent(data *model.AdvEventRespondModel) (s bool, m string) {
+
+// 	logErr := a.IAdvEventDal.Add(data)
+// 	if logErr != nil {
+// 		return false, logErr.Error()
+// 	}
+// 	return true, ""
+// }
+
+func (a *AdvEventManager) updateAdvEvent(modelResponse *model.AdvEventRespondModel, oldModel *model.AdvEventRespondModel) (s bool, m error) {
+	// oldModel, err := a.IAdvEventDal.GetAdvEventByCustomerId(modelResponse.CustomerId)
+	// if err != nil {
+	// 	return false, err.Error()
+	// }
 
 	oldModel.ProjectId = modelResponse.ProjectId
 	oldModel.ClientId = modelResponse.ClientId
@@ -127,9 +150,9 @@ func (a *AdvEventManager) UpdateAdvEvent(modelResponse *model.AdvEventRespondMod
 
 	logErr := a.IAdvEventDal.UpdateAdvEventByCustomerId(oldModel.CustomerId, oldModel)
 	if logErr != nil {
-		return false, logErr.Error()
+		return false, logErr
 	}
-	return true, ""
+	return true, nil
 }
 
 func calculateSecondAdv(modelResponse *model.AdvEventRespondModel, oldModel *model.AdvEventRespondModel) (day int64, hour int64, minute int64) {
