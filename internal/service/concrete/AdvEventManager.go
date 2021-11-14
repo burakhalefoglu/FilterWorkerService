@@ -14,11 +14,11 @@ type AdvEventManager struct {
 	ICacheService ICacheService.ICacheService
 }
 
-func (a *AdvEventManager) ConvertRawModelToResponseModel(data *[]byte) (s bool, m string) {
+func (a *AdvEventManager) ConvertRawModelToResponseModel(data *[]byte) (adv *model.AdvEventRespondModel, s bool, m string) {
 	firstModel := model.AdvEventModel{}
 	err := a.IJsonParser.DecodeJson(data, &firstModel)
 	if err != nil {
-		return false, err.Error()
+		return nil, false, err.Error()
 	}
 	hour := int64(firstModel.TrigerdTime.Hour())
 	day := int64(firstModel.TrigerdTime.Weekday())
@@ -69,26 +69,25 @@ func (a *AdvEventManager) ConvertRawModelToResponseModel(data *[]byte) (s bool, 
 
 		logErr := a.IAdvEventDal.Add(&modelResponse)
 		if logErr != nil {
-			return false, logErr.Error()
+			return nil, false, logErr.Error()
 		}
-		return true, ""
+		return &modelResponse, true, "Added"
 
 	case err == nil:
-		updateResult, updateErr := a.updateAdvEvent(&modelResponse, oldModel)
-		if updateErr != nil {
-			return updateResult, updateErr.Error()
+		updateResult := a.updateAdvEvent(&modelResponse, oldModel)
+		if updateResult == false {
+			return nil, false, "Update went wrong!"
 		}
-		return updateResult, ""
+		return &modelResponse, true, "Updated"
 
 	default:
-
-		return false, err.Error()
-
+		return nil, false, err.Error()
 	}
 
 }
 
-func (a *AdvEventManager) updateAdvEvent(modelResponse *model.AdvEventRespondModel, oldModel *model.AdvEventRespondModel) (s bool, m error) {
+func (a *AdvEventManager) updateAdvEvent(modelResponse *model.AdvEventRespondModel,
+	oldModel *model.AdvEventRespondModel) (s bool) {
 
 	oldModel.ProjectId = modelResponse.ProjectId
 	oldModel.ClientId = modelResponse.ClientId
@@ -135,9 +134,9 @@ func (a *AdvEventManager) updateAdvEvent(modelResponse *model.AdvEventRespondMod
 
 	logErr := a.IAdvEventDal.UpdateAdvEventById(oldModel.ClientId, oldModel)
 	if logErr != nil {
-		return false, logErr
+		return false
 	}
-	return true, nil
+	return true
 }
 
 func CalculateSecondAdv(modelResponse *model.AdvEventRespondModel, oldModel *model.AdvEventRespondModel) (day int64, hour int64, minute int64) {

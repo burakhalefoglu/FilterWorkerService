@@ -3,7 +3,12 @@ package test
 import (
 	"FilterWorkerService/internal/model"
 	"FilterWorkerService/internal/service/concrete"
+	"FilterWorkerService/pkg/jsonParser/gojson"
+	"FilterWorkerService/test/Mock/repository"
+	"FilterWorkerService/test/Mock/service"
+	"errors"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -105,6 +110,89 @@ var oldModel = model.AdvEventRespondModel{
 	AdvClick18To23HourCount: 41,
 }
 
+func Test_ConvertRawModelToResponse_AddedSuccess(t *testing.T){
+
+	//Arrance
+	var testAdv = new(repository.MockAdvEventDal)
+	var testCache = new(service.MockCacheService)
+	var manager = concrete.AdvEventManager{
+		IAdvEventDal:  testAdv,
+		IJsonParser:   &gojson.GoJson{},
+		ICacheService: testCache,
+	}
+	var advModel = model.AdvEventModel{
+		ProjectId:   "1",
+		ClientId:    "11",
+		CustomerId:  "111",
+		LevelName:   "1",
+		LevelIndex:  42,
+		AdvType:     "test",
+		InMinutes:   12,
+		TrigerdTime: time.Now(),
+	}
+	var responseModel = model.AdvEventRespondModel{
+		ProjectId:                            "1",
+		ClientId:                             "11",
+		CustomerId:                           "111",
+		LevelIndex:                           42,
+		TotalAdvDay:                          1,
+		TotalAdvCount:                        1,
+		LevelBasedAverageAdvCount:            0,
+		AverageAdvDailyClickCount:            0,
+		FirstAdvYearOfDay:                    0,
+		FirstAdvYear:                         0,
+		FirstAdvClickHour:                    0,
+		FirstADvClickMinute:                  0,
+		FirstAdvType:                         0,
+		SecondAdvYearOfDay:                   0,
+		SecondAdvHour:                        0,
+		SecondAdvMinute:                      0,
+		ThirdAdvYearOfDay:                    0,
+		ThirdAdvHour:                         0,
+		ThirdAdvMinute:                       0,
+		PenultimateAdvYearOfDay:              0,
+		PenultimateAdvHour:                   0,
+		PenultimateAdvMinute:                 0,
+		LastAdvYearOfDay:                     0,
+		LastAdvYear:                          0,
+		LastAdvClickHour:                     0,
+		LastAdvClickMinute:                   0,
+		LastAdvType:                          0,
+		FirstDayAdvClickCount:                0,
+		PenultimateDayAdvClickCount:          0,
+		LastDayAdvClickCount:                 0,
+		LastMinusFirstDayAdvClickCount:       0,
+		LastMinusPenultimateDayAdvClickCount: 0,
+		LastDayAdvClickCountMinusAverageDailyAdvClickCount: 0,
+		SundayAdvClickCount:     0,
+		MondayAdvClickCount:     0,
+		TuesdayAdvClickCount:    0,
+		WednesdayAdvClickCount:  0,
+		ThursdayAdvClickCount:   0,
+		FridayAdvClickCount:     0,
+		SaturdayAdvClickCount:   0,
+		AmAdvClickCount:         0,
+		PmAdvClickCount:         0,
+		AdvClick0To5HourCount:   0,
+		AdvClick6To11HourCount:  0,
+		AdvClick12To17HourCount: 0,
+		AdvClick18To23HourCount: 0,
+	}
+	var message, _ = manager.IJsonParser.EncodeJson(&advModel)
+
+	testCache.On("ManageCache", "AdvType", advModel.AdvType).Return(int64(8), true, "")
+	testCache.On("ManageCache", "AdvType", advModel.AdvType).Return(int64(22), true, "")
+	testAdv.On("GetAdvEventById", advModel.ClientId).Return(nil,
+		errors.New("mongo: no documents in result"))
+
+	testAdv.On("Add", &oldModel).Return(nil)
+	//Act
+	var _, s, m = manager.ConvertRawModelToResponseModel(message)
+
+	assert.Equal(t, true, s)
+	assert.Equal(t, "Added", m)
+}
+
 
 func TestCalculateSecondAdv(t *testing.T) {
 
@@ -186,7 +274,6 @@ func TestCalculateAdvLevelBasedAvgClickCount(t *testing.T) {
 	concrete.CalculateAdvLevelBasedAvgClickCount(&newModel2)
 	assert.Equal(t, float64(100), newModel2.LevelBasedAverageAdvCount)
 }
-
 
 // func Test_ConvertRawModelToResponseModelTrue(t *testing.T) {
 
