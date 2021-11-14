@@ -110,7 +110,7 @@ var oldModel = model.AdvEventRespondModel{
 	AdvClick18To23HourCount: 41,
 }
 
-func Test_ConvertRawModelToResponse_AddedSuccess(t *testing.T){
+func Test_ConvertRawModelToResponse_AddedSuccess(t *testing.T) {
 
 	//Arrance
 	var testAdv = new(repository.MockAdvEventDal)
@@ -125,7 +125,7 @@ func Test_ConvertRawModelToResponse_AddedSuccess(t *testing.T){
 		ClientId:    "11",
 		CustomerId:  "111",
 		LevelName:   "1",
-		LevelIndex:  42,
+		LevelIndex:  1,
 		AdvType:     "test",
 		InMinutes:   12,
 		TrigerdTime: time.Now(),
@@ -134,16 +134,16 @@ func Test_ConvertRawModelToResponse_AddedSuccess(t *testing.T){
 		ProjectId:                            "1",
 		ClientId:                             "11",
 		CustomerId:                           "111",
-		LevelIndex:                           42,
+		LevelIndex:                           1,
 		TotalAdvDay:                          1,
 		TotalAdvCount:                        1,
-		LevelBasedAverageAdvCount:            0,
-		AverageAdvDailyClickCount:            0,
-		FirstAdvYearOfDay:                    0,
-		FirstAdvYear:                         0,
-		FirstAdvClickHour:                    0,
-		FirstADvClickMinute:                  0,
-		FirstAdvType:                         0,
+		LevelBasedAverageAdvCount:            1,
+		AverageAdvDailyClickCount:            1,
+		FirstAdvYearOfDay:                    318,
+		FirstAdvYear:                         2021,
+		FirstAdvClickHour:                    21,
+		FirstADvClickMinute:                  27,
+		FirstAdvType:                         1,
 		SecondAdvYearOfDay:                   0,
 		SecondAdvHour:                        0,
 		SecondAdvMinute:                      0,
@@ -153,18 +153,18 @@ func Test_ConvertRawModelToResponse_AddedSuccess(t *testing.T){
 		PenultimateAdvYearOfDay:              0,
 		PenultimateAdvHour:                   0,
 		PenultimateAdvMinute:                 0,
-		LastAdvYearOfDay:                     0,
-		LastAdvYear:                          0,
-		LastAdvClickHour:                     0,
-		LastAdvClickMinute:                   0,
-		LastAdvType:                          0,
-		FirstDayAdvClickCount:                0,
+		LastAdvYearOfDay:                     318,
+		LastAdvYear:                          2021,
+		LastAdvClickHour:                     21,
+		LastAdvClickMinute:                   27,
+		LastAdvType:                          1,
+		FirstDayAdvClickCount:                1,
 		PenultimateDayAdvClickCount:          0,
-		LastDayAdvClickCount:                 0,
+		LastDayAdvClickCount:                 1,
 		LastMinusFirstDayAdvClickCount:       0,
 		LastMinusPenultimateDayAdvClickCount: 0,
 		LastDayAdvClickCountMinusAverageDailyAdvClickCount: 0,
-		SundayAdvClickCount:     0,
+		SundayAdvClickCount:     1,
 		MondayAdvClickCount:     0,
 		TuesdayAdvClickCount:    0,
 		WednesdayAdvClickCount:  0,
@@ -172,16 +172,16 @@ func Test_ConvertRawModelToResponse_AddedSuccess(t *testing.T){
 		FridayAdvClickCount:     0,
 		SaturdayAdvClickCount:   0,
 		AmAdvClickCount:         0,
-		PmAdvClickCount:         0,
+		PmAdvClickCount:         1,
 		AdvClick0To5HourCount:   0,
 		AdvClick6To11HourCount:  0,
 		AdvClick12To17HourCount: 0,
-		AdvClick18To23HourCount: 0,
+		AdvClick18To23HourCount: 1,
 	}
 	var message, _ = manager.IJsonParser.EncodeJson(&advModel)
 
-	testCache.On("ManageCache", "AdvType", advModel.AdvType).Return(int64(8), true, "")
-	testCache.On("ManageCache", "AdvType", advModel.AdvType).Return(int64(22), true, "")
+	testCache.On("ManageCache", "AdvType", advModel.AdvType).Return(int64(1), true, "")
+	testCache.On("ManageCache", "AdvType", advModel.AdvType).Return(int64(1), true, "")
 	testAdv.On("GetAdvEventById", advModel.ClientId).Return(nil,
 		errors.New("mongo: no documents in result"))
 
@@ -192,7 +192,6 @@ func Test_ConvertRawModelToResponse_AddedSuccess(t *testing.T){
 	assert.Equal(t, true, s)
 	assert.Equal(t, "Added", m)
 }
-
 
 func TestCalculateSecondAdv(t *testing.T) {
 
@@ -206,7 +205,7 @@ func TestCalculateSecondAdv(t *testing.T) {
 
 }
 
- func TestCalculateThirdAdv(t *testing.T){
+func TestCalculateThirdAdv(t *testing.T) {
 
 	var Expday int64 = 400
 	var Exphour int64 = 600
@@ -217,7 +216,7 @@ func TestCalculateSecondAdv(t *testing.T) {
 
 }
 
-func TestCalculateFirstDayAdvClickCount(t *testing.T){
+func TestCalculateFirstDayAdvClickCount(t *testing.T) {
 
 	var exp int64 = 23
 	num := concrete.CalculateFirstDayAdvClickCount(&newModel2, &oldModel)
@@ -225,7 +224,7 @@ func TestCalculateFirstDayAdvClickCount(t *testing.T){
 	assert.Equal(t, []int64{exp}, []int64{num})
 }
 
-func TestCalculatePenultimateDayAdvDay(t *testing.T){
+func TestCalculatePenultimateDayAdvDay(t *testing.T) {
 
 	var exp int64 = 24
 	num := concrete.CalculatePenultimateDayAdvDay(&newModel2, &oldModel)
@@ -233,7 +232,7 @@ func TestCalculatePenultimateDayAdvDay(t *testing.T){
 	assert.Equal(t, []int64{exp}, []int64{num})
 }
 
-func TestCalculateLastDayAdvClickCount(t *testing.T){
+func TestCalculateLastDayAdvClickCount(t *testing.T) {
 	var exp int64 = 25
 	num := concrete.CalculateLastDayAdvClickCount(&newModel2, &oldModel)
 
