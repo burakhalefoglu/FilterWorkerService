@@ -113,19 +113,9 @@ func (sc *ScreenClickManager) ConvertRawModelToResponseModel(data *[]byte) ( s b
 	}
 }
 
-// func (sc *ScreenClickManager) AddScreenClick(data *model.ScreenClickRespondModel) (s bool, m string) {
-// 	logErr := sc.IScreenClickDal.Add(data)
-// 	if logErr != nil {
-// 		return false, logErr.Error()
-// 	}
-// 	return true, ""
-// }
 
 func (sc *ScreenClickManager) updateScreenClick(modelResponse *model.ScreenClickRespondModel, oldModel *model.ScreenClickRespondModel) (s bool, m error) {
-	// oldModel, err := sc.IScreenClickDal.GetScreenClickByCustomerId(modelResponse.CustomerId)
-	// if err != nil {
-	// 	return false, err.Error()
-	// }
+	
 	oldModel.ProjectId = modelResponse.ProjectId
 	oldModel.ClientId = modelResponse.ClientId
 	oldModel.CustomerId = modelResponse.CustomerId

@@ -5,7 +5,6 @@ import (
 	IAdvEventDal "FilterWorkerService/internal/repository/abstract"
 	ICacheService "FilterWorkerService/internal/service/abstract"
 
-	//ICacheService "FilterWorkerService/internal/service/abstract"
 	IJsonParser "FilterWorkerService/pkg/jsonParser"
 )
 
@@ -15,7 +14,7 @@ type AdvEventManager struct {
 	ICacheService ICacheService.ICacheService
 }
 
-func (a *AdvEventManager) ConvertRawModelToResponseModel(data *[]byte) ( s bool, m string) {
+func (a *AdvEventManager) ConvertRawModelToResponseModel(data *[]byte) (s bool, m string) {
 	firstModel := model.AdvEventModel{}
 	err := a.IJsonParser.DecodeJson(data, &firstModel)
 	if err != nil {
@@ -33,7 +32,7 @@ func (a *AdvEventManager) ConvertRawModelToResponseModel(data *[]byte) ( s bool,
 	modelResponse.LevelIndex = int64(firstModel.LevelIndex)
 	modelResponse.TotalAdvDay = 1
 	modelResponse.TotalAdvCount = 1
-	modelResponse.LevelBasedAverageAdvCount = calculateAdvLevelBasedAvgClickCount(&modelResponse)
+	modelResponse.LevelBasedAverageAdvCount = CalculateAdvLevelBasedAvgClickCount(&modelResponse)
 	modelResponse.AverageAdvDailyClickCount = 1
 	modelResponse.FirstAdvYearOfDay = yearOfDay
 	modelResponse.FirstAdvYear = year
@@ -60,9 +59,9 @@ func (a *AdvEventManager) ConvertRawModelToResponseModel(data *[]byte) ( s bool,
 	modelResponse.LastMinusFirstDayAdvClickCount = 0
 	modelResponse.LastMinusPenultimateDayAdvClickCount = 0
 	modelResponse.LastDayAdvClickCountMinusAverageDailyAdvClickCount = 0
-	determineAdvDay(&modelResponse, day)
-	determineAdvHour(&modelResponse, hour)
-	determineAdvAmPm(&modelResponse, hour)
+	DetermineAdvDay(&modelResponse, day)
+	DetermineAdvHour(&modelResponse, hour)
+	DetermineAdvAmPm(&modelResponse, hour)
 
 	oldModel, err := a.IAdvEventDal.GetAdvEventByCustomerId(modelResponse.CustomerId)
 	switch {
@@ -77,8 +76,8 @@ func (a *AdvEventManager) ConvertRawModelToResponseModel(data *[]byte) ( s bool,
 	case err == nil:
 		updateResult, updateErr := a.updateAdvEvent(&modelResponse, oldModel)
 		if updateErr != nil {
-		return updateResult, updateErr.Error()
-	}
+			return updateResult, updateErr.Error()
+		}
 		return updateResult, ""
 
 	default:
@@ -87,23 +86,10 @@ func (a *AdvEventManager) ConvertRawModelToResponseModel(data *[]byte) ( s bool,
 
 	}
 
-
 }
 
-// func (a *AdvEventManager) addAdvEvent(data *model.AdvEventRespondModel) (s bool, m string) {
-
-// 	logErr := a.IAdvEventDal.Add(data)
-// 	if logErr != nil {
-// 		return false, logErr.Error()
-// 	}
-// 	return true, ""
-// }
 
 func (a *AdvEventManager) updateAdvEvent(modelResponse *model.AdvEventRespondModel, oldModel *model.AdvEventRespondModel) (s bool, m error) {
-	// oldModel, err := a.IAdvEventDal.GetAdvEventByCustomerId(modelResponse.CustomerId)
-	// if err != nil {
-	// 	return false, err.Error()
-	// }
 
 	oldModel.ProjectId = modelResponse.ProjectId
 	oldModel.ClientId = modelResponse.ClientId
@@ -111,15 +97,15 @@ func (a *AdvEventManager) updateAdvEvent(modelResponse *model.AdvEventRespondMod
 	oldModel.LevelIndex = modelResponse.LevelIndex
 	oldModel.TotalAdvDay = (modelResponse.LastAdvYearOfDay - oldModel.FirstAdvYearOfDay) + 365*(modelResponse.LastAdvYear-oldModel.FirstAdvYear)
 	oldModel.TotalAdvCount = oldModel.TotalAdvCount + modelResponse.TotalAdvCount
-	oldModel.LevelBasedAverageAdvCount = calculateAdvLevelBasedAvgClickCount(oldModel)
+	oldModel.LevelBasedAverageAdvCount = CalculateAdvLevelBasedAvgClickCount(oldModel)
 	oldModel.AverageAdvDailyClickCount = float64(oldModel.TotalAdvCount) / float64(oldModel.TotalAdvDay)
 	//oldModel.FirstAdvYearOfDay = oldModel.FirstAdvYearOfDay
 	//oldModel.FirstAdvYear
 	//oldModel.FirstAdvClickHour = oldModel.FirstAdvClickHour
 	//oldModel.FirstADvClickMinute
 	//oldModel.FirstAdvType
-	oldModel.SecondAdvYearOfDay, oldModel.SecondAdvHour, oldModel.SecondAdvMinute = calculateSecondAdv(modelResponse, oldModel)
-	oldModel.ThirdAdvYearOfDay, oldModel.ThirdAdvHour, oldModel.ThirdAdvMinute = calculateThirdAdv(modelResponse, oldModel)
+	oldModel.SecondAdvYearOfDay, oldModel.SecondAdvHour, oldModel.SecondAdvMinute = CalculateSecondAdv(modelResponse, oldModel)
+	oldModel.ThirdAdvYearOfDay, oldModel.ThirdAdvHour, oldModel.ThirdAdvMinute = CalculateThirdAdv(modelResponse, oldModel)
 	oldModel.PenultimateAdvYearOfDay = oldModel.LastAdvYearOfDay
 	oldModel.PenultimateAdvHour = oldModel.LastAdvClickHour
 	oldModel.PenultimateAdvMinute = oldModel.LastAdvClickMinute
@@ -128,9 +114,9 @@ func (a *AdvEventManager) updateAdvEvent(modelResponse *model.AdvEventRespondMod
 	oldModel.LastAdvClickHour = modelResponse.LastAdvClickHour
 	oldModel.LastAdvClickMinute = modelResponse.LastAdvClickMinute
 	oldModel.LastAdvType = modelResponse.LastAdvType
-	oldModel.FirstDayAdvClickCount = calculateFirstDayAdvClickCount(modelResponse, oldModel)
-	oldModel.PenultimateDayAdvClickCount = calculatePenultimateDayAdvDay(modelResponse, oldModel)
-	oldModel.LastDayAdvClickCount = calculateLastDayAdvClickCount(modelResponse, oldModel)
+	oldModel.FirstDayAdvClickCount = CalculateFirstDayAdvClickCount(modelResponse, oldModel)
+	oldModel.PenultimateDayAdvClickCount = CalculatePenultimateDayAdvDay(modelResponse, oldModel)
+	oldModel.LastDayAdvClickCount = CalculateLastDayAdvClickCount(modelResponse, oldModel)
 	oldModel.LastMinusFirstDayAdvClickCount = oldModel.LastDayAdvClickCount - oldModel.FirstDayAdvClickCount
 	oldModel.LastMinusPenultimateDayAdvClickCount = oldModel.LastDayAdvClickCount - oldModel.PenultimateDayAdvClickCount
 	oldModel.LastDayAdvClickCountMinusAverageDailyAdvClickCount = oldModel.LastDayAdvClickCount - int64(oldModel.AverageAdvDailyClickCount)
@@ -155,7 +141,7 @@ func (a *AdvEventManager) updateAdvEvent(modelResponse *model.AdvEventRespondMod
 	return true, nil
 }
 
-func calculateSecondAdv(modelResponse *model.AdvEventRespondModel, oldModel *model.AdvEventRespondModel) (day int64, hour int64, minute int64) {
+func CalculateSecondAdv(modelResponse *model.AdvEventRespondModel, oldModel *model.AdvEventRespondModel) (day int64, hour int64, minute int64) {
 	if oldModel.TotalAdvCount == 2 {
 		oldModel.SecondAdvYearOfDay = modelResponse.FirstAdvYearOfDay
 		oldModel.SecondAdvHour = modelResponse.FirstAdvClickHour
@@ -165,7 +151,7 @@ func calculateSecondAdv(modelResponse *model.AdvEventRespondModel, oldModel *mod
 	return oldModel.SecondAdvYearOfDay, oldModel.SecondAdvHour, oldModel.SecondAdvMinute
 }
 
-func calculateThirdAdv(modelResponse *model.AdvEventRespondModel, oldModel *model.AdvEventRespondModel) (day int64, hour int64, minute int64) {
+func CalculateThirdAdv(modelResponse *model.AdvEventRespondModel, oldModel *model.AdvEventRespondModel) (day int64, hour int64, minute int64) {
 	if oldModel.TotalAdvCount == 3 {
 		oldModel.ThirdAdvYearOfDay = modelResponse.FirstAdvYearOfDay
 		oldModel.ThirdAdvHour = modelResponse.FirstAdvClickHour
@@ -175,7 +161,7 @@ func calculateThirdAdv(modelResponse *model.AdvEventRespondModel, oldModel *mode
 	return oldModel.ThirdAdvYearOfDay, oldModel.ThirdAdvHour, oldModel.ThirdAdvMinute
 }
 
-func calculateFirstDayAdvClickCount(modelResponse *model.AdvEventRespondModel, oldmodel *model.AdvEventRespondModel) int64 {
+func CalculateFirstDayAdvClickCount(modelResponse *model.AdvEventRespondModel, oldmodel *model.AdvEventRespondModel) int64 {
 	if (oldmodel.FirstAdvYearOfDay == modelResponse.FirstAdvYearOfDay) && (oldmodel.FirstAdvYear == modelResponse.FirstAdvYear) {
 		oldmodel.FirstDayAdvClickCount = oldmodel.FirstDayAdvClickCount + modelResponse.FirstDayAdvClickCount
 		return oldmodel.FirstDayAdvClickCount
@@ -183,7 +169,7 @@ func calculateFirstDayAdvClickCount(modelResponse *model.AdvEventRespondModel, o
 	return oldmodel.FirstDayAdvClickCount
 }
 
-func calculatePenultimateDayAdvDay(modelResponse *model.AdvEventRespondModel, oldModel *model.AdvEventRespondModel) (count int64) {
+func CalculatePenultimateDayAdvDay(modelResponse *model.AdvEventRespondModel, oldModel *model.AdvEventRespondModel) (count int64) {
 	if (oldModel.LastAdvYearOfDay != modelResponse.LastAdvYearOfDay) && (oldModel.FirstAdvYearOfDay != modelResponse.FirstAdvYearOfDay) {
 		oldModel.PenultimateDayAdvClickCount = oldModel.LastDayAdvClickCount
 		return oldModel.PenultimateDayAdvClickCount
@@ -191,7 +177,7 @@ func calculatePenultimateDayAdvDay(modelResponse *model.AdvEventRespondModel, ol
 	return oldModel.PenultimateDayAdvClickCount
 }
 
-func calculateLastDayAdvClickCount(modelResponse *model.AdvEventRespondModel, oldmodel *model.AdvEventRespondModel) int64 {
+func CalculateLastDayAdvClickCount(modelResponse *model.AdvEventRespondModel, oldmodel *model.AdvEventRespondModel) int64 {
 	if (oldmodel.LastAdvYearOfDay == modelResponse.LastAdvYearOfDay) && (oldmodel.FirstAdvYearOfDay != modelResponse.FirstAdvYearOfDay) {
 		oldmodel.LastDayAdvClickCount = oldmodel.LastDayAdvClickCount + modelResponse.LastDayAdvClickCount
 		return oldmodel.LastDayAdvClickCount
@@ -203,7 +189,7 @@ func calculateLastDayAdvClickCount(modelResponse *model.AdvEventRespondModel, ol
 	return oldmodel.LastDayAdvClickCount
 }
 
-func determineAdvDay(modelResponse *model.AdvEventRespondModel, day int64) {
+func DetermineAdvDay(modelResponse *model.AdvEventRespondModel, day int64) {
 	switch day {
 	case 0:
 		modelResponse.SundayAdvClickCount = 1
@@ -222,7 +208,7 @@ func determineAdvDay(modelResponse *model.AdvEventRespondModel, day int64) {
 	}
 }
 
-func determineAdvHour(modelResponse *model.AdvEventRespondModel, hour int64) {
+func DetermineAdvHour(modelResponse *model.AdvEventRespondModel, hour int64) {
 	switch {
 	case hour <= 5:
 		modelResponse.AdvClick0To5HourCount = 1
@@ -235,7 +221,7 @@ func determineAdvHour(modelResponse *model.AdvEventRespondModel, hour int64) {
 	}
 }
 
-func determineAdvAmPm(modelResponse *model.AdvEventRespondModel, hour int64) {
+func DetermineAdvAmPm(modelResponse *model.AdvEventRespondModel, hour int64) {
 	switch {
 	case hour <= 12:
 		modelResponse.AmAdvClickCount = 1
@@ -244,7 +230,7 @@ func determineAdvAmPm(modelResponse *model.AdvEventRespondModel, hour int64) {
 	}
 }
 
-func calculateAdvLevelBasedAvgClickCount(modelResponse *model.AdvEventRespondModel) float64 {
+func CalculateAdvLevelBasedAvgClickCount(modelResponse *model.AdvEventRespondModel) float64 {
 	if modelResponse.LevelIndex == 0 {
 		modelResponse.LevelBasedAverageAdvCount = float64(modelResponse.TotalAdvCount)
 		return modelResponse.LevelBasedAverageAdvCount

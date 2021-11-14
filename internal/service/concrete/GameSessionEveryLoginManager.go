@@ -96,19 +96,9 @@ func (g *GameSessionEveryLoginManager) ConvertRawModelToResponseModel(data *[]by
 	}
 }
 
-// func (g *GameSessionEveryLoginManager) AddGameSession(data *model.GameSessionEveryLoginRespondModel) (s bool, m string) {
-// 	logErr := g.IGameSessionEveryLoginDal.Add(data)
-// 	if logErr != nil {
-// 		return false, logErr.Error()
-// 	}
-// 	return true, ""
-// }
 
 func (g *GameSessionEveryLoginManager) updateGameSession(modelResponse *model.GameSessionEveryLoginRespondModel, oldModel *model.GameSessionEveryLoginRespondModel) (s bool, m error) {
-	// oldModel, err := g.IGameSessionEveryLoginDal.GetGameSessionEveryLoginByCustomerId(modelResponse.CustomerId)
-	// if err != nil {
-	// 	return false, err.Error()
-	// }
+	
 	oldModel.ProjectId = modelResponse.ProjectId
 	oldModel.ClientId = modelResponse.ClientId
 	oldModel.CustomerId = modelResponse.CustomerId

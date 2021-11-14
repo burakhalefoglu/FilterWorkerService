@@ -78,19 +78,9 @@ func (b *BuyingEventManager) ConvertRawModelToResponseModel(data *[]byte) (s boo
 	
 }
 
-// func (b *BuyingEventManager) AddBuyingEvent(data *model.BuyingEventRespondModel) (s bool, m string) {
-// 	logErr := b.IBuyingEventDal.Add(data)
-// 	if logErr != nil {
-// 		return false, logErr.Error()
-// 	}
-// 	return true, ""
-// }
 
 func (b *BuyingEventManager) updateBuyingEventByCustomerId(modelResponse *model.BuyingEventRespondModel, oldModel *model.BuyingEventRespondModel) (s bool, m error) {
-	// oldModel, err := b.IBuyingEventDal.GetBuyingEventByCustomerId(modelResponse.CustomerId)
-	// if err != nil {
-	// 	return false, err.Error()
-	// }
+	
 	oldModel.ProjectId = modelResponse.ProjectId
 	oldModel.ClientId = modelResponse.ClientId
 	oldModel.CustomerId = modelResponse.CustomerId

@@ -65,19 +65,9 @@ func (l *LevelBaseSessionManager) ConvertRawModelToResponseModel(data *[]byte) (
 	}
 }
 
-// func (l *LevelBaseSessionManager) AddLevelBaseSession(data *model.LevelBaseSessionRespondModel) (s bool, m string) {
-// 	logErr := l.ILevelBaseSessionDal.Add(data)
-// 	if logErr != nil {
-// 		return false, logErr.Error()
-// 	}
-// 	return true, ""
-// }
 
 func (l *LevelBaseSessionManager) updateLevelBaseSession(modelResponse *model.LevelBaseSessionRespondModel, oldModel *model.LevelBaseSessionRespondModel) (s bool, m error) {
-	// oldModel, err := l.ILevelBaseSessionDal.GetLevelBaseSessionByCustomerId(modelResponse.CustomerId)
-	// if err != nil {
-	// 	return false, err.Error()
-	// }
+	
 	oldModel.ProjectId = modelResponse.ProjectId
 	oldModel.ClientId = modelResponse.ClientId
 	oldModel.CustomerId = modelResponse.CustomerId

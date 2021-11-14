@@ -97,20 +97,9 @@ func (sc *ScreenSwipeManager) ConvertRawModelToResponseModel(data *[]byte) (s bo
 	}
 }
 
-// func (sc *ScreenSwipeManager) AddScreenSwipe(data *model.ScreenSwipeRespondModel) (s bool, m string) {
-// 	logErr := sc.IScreenSwipeDal.Add(data)
-// 	if logErr != nil {
-// 		return false, logErr.Error()
-// 	}
-// 	return true, ""
-// }
 
 func (sc *ScreenSwipeManager) updateScreenSwipe(modelResponse *model.ScreenSwipeRespondModel, oldModel *model.ScreenSwipeRespondModel) (s bool, m error) {
-	// oldModel, err := sc.IScreenSwipeDal.GetScreenSwipeByCustomerId(modelResponse.CustomerId)
-	// if err != nil {
-	// 	return false, err.Error()
-	// }
-
+	
 	oldModel.ProjectId = modelResponse.ProjectId
 	oldModel.ClientId = modelResponse.ClientId
 	oldModel.CustomerId = modelResponse.CustomerId
