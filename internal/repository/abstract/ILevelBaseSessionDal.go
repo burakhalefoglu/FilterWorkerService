@@ -4,6 +4,6 @@ import "FilterWorkerService/internal/model"
 
 type ILevelBaseSessionDal interface {
 	Add(data *model.LevelBaseSessionRespondModel) error
-	GetLevelBaseSessionByCustomerId(CustomerId string) (*model.LevelBaseSessionRespondModel, error)
-	UpdateLevelBaseSessionByCustomerId(CustomerId string, data *model.LevelBaseSessionRespondModel) error
+	GetLevelBaseSessionById(ClientId string) (*model.LevelBaseSessionRespondModel, error)
+	UpdateLevelBaseSessionById(ClientId string, data *model.LevelBaseSessionRespondModel) error
 }

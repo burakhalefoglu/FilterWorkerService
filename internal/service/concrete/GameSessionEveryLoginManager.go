@@ -72,7 +72,7 @@ func (g *GameSessionEveryLoginManager) ConvertRawModelToResponseModel(data *[]by
 	determineGameSessionHour(&modelResponse, hour)
 	determineGameSessionAmPm(&modelResponse, hour)
 
-	oldModel, err := g.IGameSessionEveryLoginDal.GetGameSessionEveryLoginByCustomerId(modelResponse.CustomerId)
+	oldModel, err := g.IGameSessionEveryLoginDal.GetGameSessionEveryLoginById(modelResponse.ClientId)
 	switch {
 	case err.Error() == "mongo: no documents in result":
 
@@ -147,7 +147,7 @@ func (g *GameSessionEveryLoginManager) updateGameSession(modelResponse *model.Ga
 	oldModel.Session12To17HourCount = oldModel.Session12To17HourCount + modelResponse.Session12To17HourCount
 	oldModel.Session18To23HourCount = oldModel.Session18To23HourCount + modelResponse.Session18To23HourCount
 
-	logErr := g.IGameSessionEveryLoginDal.UpdateGameSessionEveryLoginByCustomerId(oldModel.CustomerId, oldModel)
+	logErr := g.IGameSessionEveryLoginDal.UpdateGameSessionEveryLoginById(oldModel.ClientId, oldModel)
 	if logErr != nil {
 		return false, logErr
 	}

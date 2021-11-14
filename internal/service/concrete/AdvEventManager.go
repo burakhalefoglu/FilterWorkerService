@@ -63,7 +63,7 @@ func (a *AdvEventManager) ConvertRawModelToResponseModel(data *[]byte) (s bool, 
 	DetermineAdvHour(&modelResponse, hour)
 	DetermineAdvAmPm(&modelResponse, hour)
 
-	oldModel, err := a.IAdvEventDal.GetAdvEventByCustomerId(modelResponse.CustomerId)
+	oldModel, err := a.IAdvEventDal.GetAdvEventById(modelResponse.ClientId)
 	switch {
 	case err.Error() == "mongo: no documents in result":
 
@@ -87,7 +87,6 @@ func (a *AdvEventManager) ConvertRawModelToResponseModel(data *[]byte) (s bool, 
 	}
 
 }
-
 
 func (a *AdvEventManager) updateAdvEvent(modelResponse *model.AdvEventRespondModel, oldModel *model.AdvEventRespondModel) (s bool, m error) {
 
@@ -134,7 +133,7 @@ func (a *AdvEventManager) updateAdvEvent(modelResponse *model.AdvEventRespondMod
 	oldModel.AmAdvClickCount = oldModel.AmAdvClickCount + modelResponse.AmAdvClickCount
 	oldModel.PmAdvClickCount = oldModel.PmAdvClickCount + modelResponse.PmAdvClickCount
 
-	logErr := a.IAdvEventDal.UpdateAdvEventByCustomerId(oldModel.CustomerId, oldModel)
+	logErr := a.IAdvEventDal.UpdateAdvEventById(oldModel.ClientId, oldModel)
 	if logErr != nil {
 		return false, logErr
 	}

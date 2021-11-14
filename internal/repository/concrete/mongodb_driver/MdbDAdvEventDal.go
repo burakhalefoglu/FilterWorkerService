@@ -30,7 +30,7 @@ func (m *MdbDAdvEventDal) Add(data *model.AdvEventRespondModel) error {
 		{"FirstAdvYearOfDay", data.FirstAdvYearOfDay},
 		{"FirstAdvYear", data.FirstAdvYear},
 		{"FirstAdvClickHour", data.FirstAdvClickHour},
-		{"FirstADvClickMinute",data.FirstADvClickMinute},
+		{"FirstADvClickMinute", data.FirstADvClickMinute},
 		{"FirstAdvType", data.FirstAdvType},
 		{"SecondAdvYearOfDay", data.SecondAdvYearOfDay},
 		{"SecondAdvHour", data.SecondAdvHour},
@@ -72,13 +72,13 @@ func (m *MdbDAdvEventDal) Add(data *model.AdvEventRespondModel) error {
 	return nil
 }
 
-func (m *MdbDBuyingEventDal) GetAdvEventByCustomerId(CustomerId string) (*model.AdvEventRespondModel, error) {
+func (m *MdbDBuyingEventDal) GetAdvEventById(ClientId string) (*model.AdvEventRespondModel, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	collection := m.Client.Database("MLDatabase").Collection("AdvEventModel")
 	var result = collection.FindOne(ctx, bson.D{{
-		"CustomerId", CustomerId,
+		"ClientId", ClientId,
 	}})
 
 	var model = model.AdvEventRespondModel{}
@@ -92,7 +92,7 @@ func (m *MdbDBuyingEventDal) GetAdvEventByCustomerId(CustomerId string) (*model.
 	return &model, nil
 }
 
-func (m *MdbDBuyingEventDal) UpdateAdvEventByCustomerId(CustomerId string, data *model.AdvEventRespondModel) error {
+func (m *MdbDBuyingEventDal) UpdateAdvEventById(ClientId string, data *model.AdvEventRespondModel) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	update := bson.D{{"$set", bson.D{
@@ -107,7 +107,7 @@ func (m *MdbDBuyingEventDal) UpdateAdvEventByCustomerId(CustomerId string, data 
 		{"FirstAdvYearOfDay", data.FirstAdvYearOfDay},
 		{"FirstAdvYear", data.FirstAdvYear},
 		{"FirstAdvClickHour", data.FirstAdvClickHour},
-		{"FirstADvClickMinute",data.FirstADvClickMinute},
+		{"FirstADvClickMinute", data.FirstADvClickMinute},
 		{"FirstAdvType", data.FirstAdvType},
 		{"SecondAdvYearOfDay", data.SecondAdvYearOfDay},
 		{"SecondAdvHour", data.SecondAdvHour},
@@ -145,7 +145,7 @@ func (m *MdbDBuyingEventDal) UpdateAdvEventByCustomerId(CustomerId string, data 
 	}}}
 	collection := m.Client.Database("MLDatabase").Collection("AdvEventModel")
 	updateResult := collection.FindOneAndUpdate(ctx, bson.D{{
-		"CustomerId", CustomerId,
+		"ClientId", ClientId,
 	}}, update)
 	if updateResult.Err() != nil {
 		return updateResult.Err()

@@ -47,13 +47,13 @@ func (m *MdbDLevelBaseSessionDal) Add(data *model.LevelBaseSessionRespondModel) 
 	return nil
 }
 
-func (m *MdbDBuyingEventDal) GetLevelBaseSessionByCustomerId(CustomerId string) (*model.LevelBaseSessionRespondModel, error) {
+func (m *MdbDBuyingEventDal) GetLevelBaseSessionById(ClientId string) (*model.LevelBaseSessionRespondModel, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	collection := m.Client.Database("MLDatabase").Collection("LevelBaseSession")
 	var result = collection.FindOne(ctx, bson.D{{
-		"CustomerId", CustomerId,
+		"ClientId", ClientId,
 	}})
 
 	var model = model.LevelBaseSessionRespondModel{}
@@ -67,7 +67,7 @@ func (m *MdbDBuyingEventDal) GetLevelBaseSessionByCustomerId(CustomerId string) 
 	return &model, nil
 }
 
-func (m *MdbDBuyingEventDal) UpdateLevelBaseSessionByCustomerId(CustomerId string, data *model.LevelBaseSessionRespondModel) error {
+func (m *MdbDBuyingEventDal) UpdateLevelBaseSessionById(ClientId string, data *model.LevelBaseSessionRespondModel) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	update := bson.D{{"$set", bson.D{
@@ -96,7 +96,7 @@ func (m *MdbDBuyingEventDal) UpdateLevelBaseSessionByCustomerId(CustomerId strin
 
 	collection := m.Client.Database("MLDatabase").Collection("LevelBaseSession")
 	updateResult := collection.FindOneAndUpdate(ctx, bson.D{{
-		"CustomerId", CustomerId,
+		"ClientId", ClientId,
 	}}, update)
 	if updateResult.Err() != nil {
 		return updateResult.Err()

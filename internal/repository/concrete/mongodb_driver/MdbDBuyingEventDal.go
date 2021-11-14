@@ -62,13 +62,13 @@ func (m *MdbDBuyingEventDal) Add(data *model.BuyingEventRespondModel) error {
 	return nil
 }
 
-func (m *MdbDBuyingEventDal) GetBuyingEventByCustomerId(CustomerId string) (*model.BuyingEventRespondModel, error) {
+func (m *MdbDBuyingEventDal) GetBuyingEventById(ClientId string) (*model.BuyingEventRespondModel, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	//"BuyingEventModel"
 	collection := m.Client.Database("MLDatabase").Collection("BuyingEventModel")
 	var result = collection.FindOne(ctx, bson.D{{
-		"CustomerId", CustomerId,
+		"ClientId", ClientId,
 	}})
 
 	var model = model.BuyingEventRespondModel{}
@@ -82,7 +82,7 @@ func (m *MdbDBuyingEventDal) GetBuyingEventByCustomerId(CustomerId string) (*mod
 	return &model, nil
 }
 
-func (m *MdbDBuyingEventDal) UpdateBuyingEventByCustomerId(CustomerId string, data *model.BuyingEventRespondModel) error {
+func (m *MdbDBuyingEventDal) UpdateBuyingEventById(ClientId string, data *model.BuyingEventRespondModel) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -127,7 +127,7 @@ func (m *MdbDBuyingEventDal) UpdateBuyingEventByCustomerId(CustomerId string, da
 	}}}
 	collection := m.Client.Database("MLDatabase").Collection("BuyingEventModel")
 	updateResult := collection.FindOneAndUpdate(ctx, bson.D{{
-		"CustomerId", CustomerId,
+		"ClientId", ClientId,
 	}}, update)
 	if updateResult.Err() != nil {
 		return updateResult.Err()

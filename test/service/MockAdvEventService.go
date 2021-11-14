@@ -7,5 +7,6 @@ type MockAdvEventService struct {
 }
 
 func (m *MockAdvEventService) ConvertRawModelToResponseModel(data *[]byte) (s bool, m string) {
-
+	args := m.Called(data)
+	return  args.Bool(0), args.String(1)
 }

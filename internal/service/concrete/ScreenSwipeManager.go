@@ -73,7 +73,7 @@ func (sc *ScreenSwipeManager) ConvertRawModelToResponseModel(data *[]byte) (s bo
 	modelResponse.TotalSwipeFinishXCor = firstModel.SwipeFinishXCor
 	modelResponse.TotalSwipeFinishYCor = firstModel.SwipeFinishYCor
 
-	oldModel, err := sc.IScreenSwipeDal.GetScreenSwipeByCustomerId(modelResponse.CustomerId)
+	oldModel, err := sc.IScreenSwipeDal.GetScreenSwipeById(modelResponse.ClientId)
 	switch {
 	case err.Error() == "mongo: no documents in result":
 
@@ -135,7 +135,7 @@ func (sc *ScreenSwipeManager) updateScreenSwipe(modelResponse *model.ScreenSwipe
 	oldModel.TotalSwipeStartYCor = modelResponse.TotalSwipeStartYCor + oldModel.TotalSwipeStartYCor
 	oldModel.TotalSwipeFinishXCor = modelResponse.TotalSwipeFinishXCor + oldModel.TotalSwipeFinishXCor
 	oldModel.TotalSwipeFinishYCor = modelResponse.TotalSwipeFinishYCor + oldModel.TotalSwipeFinishYCor
-	logErr := sc.IScreenSwipeDal.UpdateScreenSwipeByCustomerId(oldModel.CustomerId, oldModel)
+	logErr := sc.IScreenSwipeDal.UpdateScreenSwipeById(oldModel.ClientId, oldModel)
 	if logErr != nil {
 		return false, logErr
 	}

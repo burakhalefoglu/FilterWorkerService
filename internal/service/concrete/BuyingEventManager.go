@@ -53,7 +53,7 @@ func (b *BuyingEventManager) ConvertRawModelToResponseModel(data *[]byte) (s boo
 	modelResponse.LevelBasedAverageBuyingCount = calculateBuyingLevelBasedAvgBuyingCount(&modelResponse)
 
 
-	oldModel, err := b.IBuyingEventDal.GetBuyingEventByCustomerId(modelResponse.CustomerId)
+	oldModel, err := b.IBuyingEventDal.GetBuyingEventById(modelResponse.ClientId)
 	switch {
 	case err.Error() == "mongo: no documents in result":
 
@@ -64,7 +64,7 @@ func (b *BuyingEventManager) ConvertRawModelToResponseModel(data *[]byte) (s boo
 		return true, ""
 
 	case err == nil:
-		updateResult, updateErr := b.updateBuyingEventByCustomerId(&modelResponse, oldModel)
+		updateResult, updateErr := b.updateBuyingEvent(&modelResponse, oldModel)
 		if updateErr != nil {
 		return updateResult, updateErr.Error()
 	}
@@ -79,7 +79,7 @@ func (b *BuyingEventManager) ConvertRawModelToResponseModel(data *[]byte) (s boo
 }
 
 
-func (b *BuyingEventManager) updateBuyingEventByCustomerId(modelResponse *model.BuyingEventRespondModel, oldModel *model.BuyingEventRespondModel) (s bool, m error) {
+func (b *BuyingEventManager) updateBuyingEvent(modelResponse *model.BuyingEventRespondModel, oldModel *model.BuyingEventRespondModel) (s bool, m error) {
 	
 	oldModel.ProjectId = modelResponse.ProjectId
 	oldModel.ClientId = modelResponse.ClientId
@@ -116,7 +116,7 @@ func (b *BuyingEventManager) updateBuyingEventByCustomerId(modelResponse *model.
 	oldModel.Buying18To23HourCount = oldModel.Buying18To23HourCount + modelResponse.Buying18To23HourCount
 	oldModel.BuyingDayAverageBuyingCount = float64(oldModel.TotalBuyingCount) / float64(oldModel.TotalBuyingDay)
 	oldModel.LevelBasedAverageBuyingCount = calculateBuyingLevelBasedAvgBuyingCount(oldModel)
-	logErr := b.IBuyingEventDal.UpdateBuyingEventByCustomerId(oldModel.CustomerId, oldModel)
+	logErr := b.IBuyingEventDal.UpdateBuyingEventById(oldModel.ClientId, oldModel)
 	if logErr != nil {
 		return false, logErr
 	}

@@ -89,12 +89,12 @@ func (m *MdbDScreenClickDal) Add(data *model.ScreenClickRespondModel) error {
 	return nil
 }
 
-func (m *MdbDScreenClickDal) GetScreenClickByCustomerId(CustomerId string) (*model.ScreenClickRespondModel, error) {
+func (m *MdbDScreenClickDal) GetScreenClickById(ClientId string) (*model.ScreenClickRespondModel, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	collection := m.Client.Database("MLDatabase").Collection("ScreenClickModel")
 	var result = collection.FindOne(ctx, bson.D{{
-		"CustomerId", CustomerId,
+		"ClientId", ClientId,
 	}})
 	var model = model.ScreenClickRespondModel{}
 	if result.Err() != nil {
@@ -107,7 +107,7 @@ func (m *MdbDScreenClickDal) GetScreenClickByCustomerId(CustomerId string) (*mod
 	return &model, nil
 }
 
-func (m *MdbDScreenClickDal) UpdateScreenClickByCustomerId(CustomerId string, data *model.ScreenClickRespondModel) error {
+func (m *MdbDScreenClickDal) UpdateScreenClickById(ClientId string, data *model.ScreenClickRespondModel) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	update := bson.D{{"$set", bson.D{
@@ -178,7 +178,7 @@ func (m *MdbDScreenClickDal) UpdateScreenClickByCustomerId(CustomerId string, da
 	}}}
 	collection := m.Client.Database("MLDatabase").Collection("ScreenClickModel")
 	updateResult := collection.FindOneAndUpdate(ctx, bson.D{{
-		"CustomerId", CustomerId,
+		"ClientId", ClientId,
 	}}, update)
 	if updateResult.Err() != nil {
 		return updateResult.Err()

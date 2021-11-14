@@ -13,7 +13,7 @@ type ScreenClickManager struct {
 	IJsonParser     IJsonParser.IJsonParser
 }
 
-func (sc *ScreenClickManager) ConvertRawModelToResponseModel(data *[]byte) ( s bool, m string) {
+func (sc *ScreenClickManager) ConvertRawModelToResponseModel(data *[]byte) (s bool, m string) {
 	firstModel := model.ScreenClickModel{}
 	err := sc.IJsonParser.DecodeJson(data, &firstModel)
 	if err != nil {
@@ -89,7 +89,7 @@ func (sc *ScreenClickManager) ConvertRawModelToResponseModel(data *[]byte) ( s b
 	modelResponse.DailyAvegareClickCount = float64(firstModel.TouchCount)
 	modelResponse.LastTouchCountMinusSessionBasedAvegareClickCount = 0
 
-	oldModel, err := sc.IScreenClickDal.GetScreenClickByCustomerId(modelResponse.CustomerId)
+	oldModel, err := sc.IScreenClickDal.GetScreenClickById(modelResponse.ClientId)
 	switch {
 	case err.Error() == "mongo: no documents in result":
 
@@ -113,9 +113,8 @@ func (sc *ScreenClickManager) ConvertRawModelToResponseModel(data *[]byte) ( s b
 	}
 }
 
-
 func (sc *ScreenClickManager) updateScreenClick(modelResponse *model.ScreenClickRespondModel, oldModel *model.ScreenClickRespondModel) (s bool, m error) {
-	
+
 	oldModel.ProjectId = modelResponse.ProjectId
 	oldModel.ClientId = modelResponse.ClientId
 	oldModel.CustomerId = modelResponse.CustomerId
@@ -170,7 +169,7 @@ func (sc *ScreenClickManager) updateScreenClick(modelResponse *model.ScreenClick
 	oldModel.SessionBasedAvegareClickCount = float64(oldModel.TotalClickCount) / float64(oldModel.TotalClickSessionCount)
 	oldModel.DailyAvegareClickCount = float64(oldModel.TotalClickCount) / float64(oldModel.TotalClickDay)
 	oldModel.LastTouchCountMinusSessionBasedAvegareClickCount = float64(oldModel.LastTouchCount) - float64(oldModel.SessionBasedAvegareClickCount)
-	logErr := sc.IScreenClickDal.UpdateScreenClickByCustomerId(oldModel.CustomerId, oldModel)
+	logErr := sc.IScreenClickDal.UpdateScreenClickById(oldModel.ClientId, oldModel)
 	if logErr != nil {
 		return false, logErr
 	}

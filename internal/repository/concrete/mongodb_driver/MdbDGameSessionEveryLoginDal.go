@@ -24,7 +24,7 @@ func (m *MdbdDGameSessionEveryLoginDal) Add(data *model.GameSessionEveryLoginRes
 		{"FirstSessionYearOfDay", data.FirstSessionYearOfDay},
 		{"FirstSessionYear", data.FirstSessionYear},
 		{"FirstSessionWeekDay", data.FirstSessionWeekDay},
-		{"FirstSessionHour", data.FirstSessionHour},		
+		{"FirstSessionHour", data.FirstSessionHour},
 		{"FirstSessionDuration", data.FirstSessionDuration},
 		{"FirstSessionMinute", data.FirstSessionMinute},
 		{"SecondSessionHour", data.SecondSessionHour},
@@ -80,12 +80,12 @@ func (m *MdbdDGameSessionEveryLoginDal) Add(data *model.GameSessionEveryLoginRes
 	return nil
 }
 
-func (m *MdbdDGameSessionEveryLoginDal) GetGameSessionEveryLoginByCustomerId(CustomerId string) (*model.GameSessionEveryLoginRespondModel, error) {
+func (m *MdbdDGameSessionEveryLoginDal) GetGameSessionEveryLoginById(ClientId string) (*model.GameSessionEveryLoginRespondModel, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	collection := m.Client.Database("MLDatabase").Collection("GameSessionEveryLoginModel")
 	var result = collection.FindOne(ctx, bson.D{{
-		"CustomerId", CustomerId,
+		"ClientId", ClientId,
 	}})
 	var model = model.GameSessionEveryLoginRespondModel{}
 	if result.Err() != nil {
@@ -98,7 +98,7 @@ func (m *MdbdDGameSessionEveryLoginDal) GetGameSessionEveryLoginByCustomerId(Cus
 	return &model, nil
 }
 
-func (m *MdbdDGameSessionEveryLoginDal) UpdateGameSessionEveryLoginByCustomerId(CustomerId string, data *model.GameSessionEveryLoginRespondModel) error {
+func (m *MdbdDGameSessionEveryLoginDal) UpdateGameSessionEveryLoginById(ClientId string, data *model.GameSessionEveryLoginRespondModel) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	update := bson.D{{"$set", bson.D{
@@ -108,7 +108,7 @@ func (m *MdbdDGameSessionEveryLoginDal) UpdateGameSessionEveryLoginByCustomerId(
 		{"FirstSessionYearOfDay", data.FirstSessionYearOfDay},
 		{"FirstSessionYear", data.FirstSessionYear},
 		{"FirstSessionWeekDay", data.FirstSessionWeekDay},
-		{"FirstSessionHour", data.FirstSessionHour},		
+		{"FirstSessionHour", data.FirstSessionHour},
 		{"FirstSessionDuration", data.FirstSessionDuration},
 		{"FirstSessionMinute", data.FirstSessionMinute},
 		{"SecondSessionHour", data.SecondSessionHour},
@@ -160,7 +160,7 @@ func (m *MdbdDGameSessionEveryLoginDal) UpdateGameSessionEveryLoginByCustomerId(
 	}}}
 	collection := m.Client.Database("MLDatabase").Collection("GameSessionEveryLoginModel")
 	updateResult := collection.FindOneAndUpdate(ctx, bson.D{{
-		"CustomerId", CustomerId,
+		"ClientId", ClientId,
 	}}, update)
 	if updateResult.Err() != nil {
 		return updateResult.Err()

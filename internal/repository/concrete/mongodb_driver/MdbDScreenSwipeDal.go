@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -19,7 +18,7 @@ func (m *MdbDScreenSwipeDal) Add(data *model.ScreenSwipeRespondModel) error {
 	defer cancel()
 	collection := m.Client.Database("MLDatabase").Collection("ScreenSwipeModel")
 	var _, err = collection.InsertOne(ctx, bson.D{
-			{"ClientId", data.ClientId},
+		{"ClientId", data.ClientId},
 		{"ProjectId", data.ProjectId},
 		{"CustomerId", data.CustomerId},
 		{"LevelIndex", data.LevelIndex},
@@ -75,12 +74,12 @@ func (m *MdbDScreenSwipeDal) Add(data *model.ScreenSwipeRespondModel) error {
 	return nil
 }
 
-func (m *MdbDScreenSwipeDal) GetScreenSwipeByCustomerId(CustomerId string) (*model.ScreenSwipeRespondModel, error) {
+func (m *MdbDScreenSwipeDal) GetScreenSwipeById(ClientId string) (*model.ScreenSwipeRespondModel, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	collection := m.Client.Database("MLDatabase").Collection("ScreenSwipeModel")
-	var result = collection.FindOne(ctx, bson.D{primitive.E{
-		Key: "CustomerId", Value: CustomerId,
+	var result = collection.FindOne(ctx, bson.D{{
+		"ClientId", ClientId,
 	}})
 	var model = model.ScreenSwipeRespondModel{}
 	if result.Err() != nil {
@@ -93,7 +92,7 @@ func (m *MdbDScreenSwipeDal) GetScreenSwipeByCustomerId(CustomerId string) (*mod
 	return &model, nil
 }
 
-func (m *MdbDScreenSwipeDal) UpdateScreenSwipeByCustomerId(CustomerId string, data *model.ScreenSwipeRespondModel) error {
+func (m *MdbDScreenSwipeDal) UpdateScreenSwipeById(ClientId string, data *model.ScreenSwipeRespondModel) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	update := bson.D{{"$set", bson.D{
@@ -148,8 +147,8 @@ func (m *MdbDScreenSwipeDal) UpdateScreenSwipeByCustomerId(CustomerId string, da
 		{"TotalSwipeFinishYCor", data.TotalSwipeFinishYCor},
 	}}}
 	collection := m.Client.Database("MLDatabase").Collection("ScreenSwipeModel")
-	updateResult := collection.FindOneAndUpdate(ctx, bson.D{primitive.E{
-		Key: "CustomerId", Value: CustomerId,
+	updateResult := collection.FindOneAndUpdate(ctx, bson.D{{
+		"ClientId", ClientId,
 	}}, update)
 	if updateResult.Err() != nil {
 		return updateResult.Err()

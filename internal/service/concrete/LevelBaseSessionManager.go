@@ -41,7 +41,7 @@ func (l *LevelBaseSessionManager) ConvertRawModelToResponseModel(data *[]byte) (
 	modelResponse.LastLevelSessionLevelIndex = int64(firstModel.LevelIndex)
 	modelResponse.LastLevelSessionLevelDuration = int64(firstModel.SessionTimeMinute)
 
-	oldModel, err := l.ILevelBaseSessionDal.GetLevelBaseSessionByCustomerId(modelResponse.CustomerId)
+	oldModel, err := l.ILevelBaseSessionDal.GetLevelBaseSessionById(modelResponse.ClientId)
 	switch {
 	case err.Error() == "mongo: no documents in result":
 
@@ -91,7 +91,7 @@ func (l *LevelBaseSessionManager) updateLevelBaseSession(modelResponse *model.Le
 	oldModel.PenultimateLevelSessionLevelDuration = oldModel.LastLevelSessionLevelDuration
 	oldModel.LastLevelSessionLevelIndex = modelResponse.LastLevelSessionLevelIndex
 	oldModel.LastLevelSessionLevelDuration = modelResponse.LastLevelSessionLevelDuration
-	logErr := l.ILevelBaseSessionDal.UpdateLevelBaseSessionByCustomerId(oldModel.CustomerId, oldModel)
+	logErr := l.ILevelBaseSessionDal.UpdateLevelBaseSessionById(oldModel.ClientId, oldModel)
 	if logErr != nil {
 		return false, logErr
 	}
