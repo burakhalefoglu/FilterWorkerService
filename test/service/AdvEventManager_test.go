@@ -182,18 +182,20 @@ func Test_ConvertRawModelToResponse_AddedSuccess(t *testing.T) {
 
 	testCache.On("ManageCache", "AdvType", advModel.AdvType).Return(int64(1), true, "")
 	testCache.On("ManageCache", "AdvType", advModel.AdvType).Return(int64(1), true, "")
-	testAdv.On("GetAdvEventById", advModel.ClientId).Return(nil,
+	testAdv.On("GetAdvEventById", advModel.ClientId).Return(&responseModel,
 		errors.New("mongo: no documents in result"))
 
-	testAdv.On("Add", &oldModel).Return(nil)
+	testAdv.On("Add", &responseModel).Return(nil)
 	//Act
-	var _, s, m = manager.ConvertRawModelToResponseModel(message)
+	var v, s, m = manager.ConvertRawModelToResponseModel(message)
 
 	assert.Equal(t, true, s)
 	assert.Equal(t, "Added", m)
+	assert.Equal(t, &responseModel, v)
 }
 
-func TestCalculateSecondAdv(t *testing.T) {
+
+func Test_CalculateSecondAdv_DateConversionSuccess(t *testing.T) {
 
 	day, hour, minute := concrete.CalculateSecondAdv(&newModel2, &oldModel)
 
