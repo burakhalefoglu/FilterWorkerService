@@ -128,10 +128,10 @@ func (a *AdvEventManager) UpdateAdvEvent(modelResponse *model.AdvEventRespondMod
 	oldModel.TotalAdvMinute = (((modelResponse.FirstAdvYearOfDay+365*modelResponse.FirstAdvYear)*24+modelResponse.FirstAdvClickHour)*60 + modelResponse.FirstADvClickMinute) - (((oldModel.FirstAdvYearOfDay+365*oldModel.FirstAdvYear)*24+oldModel.FirstAdvClickHour)*60 + oldModel.FirstADvClickMinute)
 	CalculateAdvLevelBasedAvgClickCount(oldModel)
 	oldModel.AverageAdvDailyClickCount = CalculateAverageAdvDailyClickCount(oldModel)
-	//oldModel.FirstAdvYearOfDay = oldModel.FirstAdvYearOfDay
+	//oldModel.FirstAdvYearOfDay
 	//oldModel.FirstAdvYear
 	//oldModel.FirstWeekDay
-	//oldModel.FirstAdvClickHour = oldModel.FirstAdvClickHour
+	//oldModel.FirstAdvClickHour
 	//oldModel.FirstADvClickMinute
 	//oldModel.FirstAdvType
 	oldModel.SecondAdvYearOfDay, oldModel.SecondAdvHour, oldModel.SecondAdvMinute, oldModel.SecondAdvType = CalculateSecondAdv(modelResponse, oldModel)
