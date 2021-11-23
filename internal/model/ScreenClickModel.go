@@ -18,6 +18,12 @@ type ScreenClickRespondModel struct {
 	ThirdClickSessionHour                            int64
 	ThirdClickSessionMinute                          int64
 	ThirdTouchCount                                  int64
+	FourthClickSessionHour                           int64
+	FourthClickSessionMinute                         int64
+	FourthTouchCount                                 int64
+	FifthClickSessionHour                            int64
+	FifthClickSessionMinute                          int64
+	FifthTouchCount                                  int64
 	PenultimateClickSessionHour                      int64
 	PenultimateClickSessionMinute                    int64
 	PenultimateTouchCount                            int64
@@ -38,6 +44,14 @@ type ScreenClickRespondModel struct {
 	ThirdStartYCor                                   float64
 	ThirdFinishXCor                                  float64
 	ThirdFinishYCor                                  float64
+	FourthStartXCor                                  float64
+	FourthStartYCor                                  float64
+	FourthFinishXCor                                 float64
+	FourthFinishYCor                                 float64
+	FifthStartXCor                                   float64
+	FifthStartYCor                                   float64
+	FifthFinishXCor                                  float64
+	FifthFinishYCor                                  float64
 	PenultimateStartXCor                             float64
 	PenultimateStartYCor                             float64
 	PenultimateFinishXCor                            float64
@@ -46,20 +60,32 @@ type ScreenClickRespondModel struct {
 	LastStartYCor                                    float64
 	LastFinishXCor                                   float64
 	LastFinishYCor                                   float64
+	FirstHalfHourTouchCount                          int64
+	FirstHourTouchCount                              int64
+	FirstTwoHourTouchCount                           int64
+	FirstThreeHourTouchCount                         int64
+	FirstSixHourTouchCount                           int64
+	FirstTwelveHourTouchCount                        int64
 	FirstMinusLastTouchCount                         int64
 	FirstFingerId                                    int64
 	PenultimateFingerId                              int64
 	LastFingerId                                     int64
 	FirstDayClickCount                               int64
-	PenultimateDayClickCount                         int64
-	LastDayClickCount                                int64
+	SecondDayClickCount                              int64
+	ThirdDayClickCount                               int64
+	FourthDayClickCount                              int64
+	FifthDayClickCount                               int64
+	SixthDayClickCount                               int64
+	SeventhDayClickCount                             int64
 	TotalClickDay                                    int64
 	TotalClickCount                                  int64
 	TotalClickSessionCount                           int64
-	TotalStartXCor                                   int64
-	TotalStartYCor                                   int64
-	TotalFinishXCor                                  int64
-	TotalFinishYCor                                  int64
+	TotalClickHour                                   int64
+	TotalClickMinute                                 int64
+	TotalStartXCor                                   float64
+	TotalStartYCor                                   float64
+	TotalFinishXCor                                  float64
+	TotalFinishYCor                                  float64
 	SessionBasedAvegareStartXCor                     float64
 	SessionBasedAvegareStartYCor                     float64
 	SessionBasedAvegareFinishXCor                    float64

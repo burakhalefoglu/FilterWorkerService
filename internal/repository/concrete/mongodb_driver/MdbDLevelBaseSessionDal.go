@@ -22,6 +22,16 @@ func (m *MdbDLevelBaseSessionDal) Add(data *model.LevelBaseSessionRespondModel) 
 		{"ClientId", data.ClientId},
 		{"ProjectId", data.ProjectId},
 		{"CustomerId", data.CustomerId},
+
+		{"TotalLevelBaseSessionMinute", data.TotalLevelBaseSessionMinute},
+		{"TotalLevelBaseSessionCount", data.TotalLevelBaseSessionCount},
+
+		{"FirstLevelSessionYearOfDay", data.FirstLevelSessionYearOfDay},
+		{"FirstLevelSessionYear", data.FirstLevelSessionYear},
+		{"FirstLevelSessionWeekDay", data.FirstLevelSessionWeekDay},
+		{"FirstLevelSessionHour", data.FirstLevelSessionHour},
+		{"FirstLevelSessionMinute", data.FirstLevelSessionMinute},
+
 		{"FirstLevelSessionLevelIndex", data.FirstLevelSessionLevelIndex},
 		{"FirstLevelSessionDuration", data.FirstLevelSessionDuration},
 		{"SecondLevelSessionLevelIndex", data.SecondLevelSessionLevelIndex},
@@ -36,10 +46,26 @@ func (m *MdbDLevelBaseSessionDal) Add(data *model.LevelBaseSessionRespondModel) 
 		{"SixLevelSessionDuration", data.SixLevelSessionDuration},
 		{"SevenLevelSessionLevelIndex", data.SevenLevelSessionLevelIndex},
 		{"SevenLevelSessionDuration", data.SevenLevelSessionDuration},
+
+		{"FirstQuarterHourTotalLevelBaseSessionCount", data.FirstQuarterHourTotalLevelBaseSessionCount},
+		{"FirstHalfHourTotalLEvelBaseSessionCount", data.FirstHalfHourTotalLEvelBaseSessionCount},
+		{"FirstHourTotalLevelBaseSessionCount", data.FirstHourTotalLevelBaseSessionCount},
+		{"FirstTwoHourTotalLevelBaseSessionCount", data.FirstTwoHourTotalLevelBaseSessionCount},
+		{"FirstThreeHourTotalLevelBaseSessionCount", data.FirstThreeHourTotalLevelBaseSessionCount},
+		{"FirstSixHourTotalLevelBaseSessionCount", data.FirstSixHourTotalLevelBaseSessionCount},
+		{"FirstTwelveHourTotalLevelBaseSessionCount", data.FirstTwelveHourTotalLevelBaseSessionCount},
+		{"FirstDayTotalLevelBaseSessionCount", data.FirstDayTotalLevelBaseSessionCount},
+
 		{"PenultimateLevelSessionLevelIndex", data.PenultimateLevelSessionLevelIndex},
 		{"PenultimateLevelSessionLevelDuration", data.PenultimateLevelSessionLevelDuration},
 		{"LastLevelSessionLevelIndex", data.LastLevelSessionLevelIndex},
 		{"LastLevelSessionLevelDuration", data.LastLevelSessionLevelDuration},
+
+		{"LastLevelSessionYearOfDay", data.LastLevelSessionYearOfDay},
+		{"LastLevelSessionYear", data.LastLevelSessionYear},
+		{"LastLevelSessionWeekDay", data.LastLevelSessionWeekDay},
+		{"LastLevelSessionHour", data.LastLevelSessionHour},
+		{"LastLevelSessionMinute", data.LastLevelSessionMinute},
 	})
 	if err != nil {
 		return err
@@ -71,9 +97,19 @@ func (m *MdbDBuyingEventDal) UpdateLevelBaseSessionById(ClientId string, data *m
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	update := bson.D{{"$set", bson.D{
-		{"ClientId", data.ClientId},
+				{"ClientId", data.ClientId},
 		{"ProjectId", data.ProjectId},
 		{"CustomerId", data.CustomerId},
+
+		{"TotalLevelBaseSessionMinute", data.TotalLevelBaseSessionMinute},
+		{"TotalLevelBaseSessionCount", data.TotalLevelBaseSessionCount},
+
+		{"FirstLevelSessionYearOfDay", data.FirstLevelSessionYearOfDay},
+		{"FirstLevelSessionYear", data.FirstLevelSessionYear},
+		{"FirstLevelSessionWeekDay", data.FirstLevelSessionWeekDay},
+		{"FirstLevelSessionHour", data.FirstLevelSessionHour},
+		{"FirstLevelSessionMinute", data.FirstLevelSessionMinute},
+
 		{"FirstLevelSessionLevelIndex", data.FirstLevelSessionLevelIndex},
 		{"FirstLevelSessionDuration", data.FirstLevelSessionDuration},
 		{"SecondLevelSessionLevelIndex", data.SecondLevelSessionLevelIndex},
@@ -88,10 +124,26 @@ func (m *MdbDBuyingEventDal) UpdateLevelBaseSessionById(ClientId string, data *m
 		{"SixLevelSessionDuration", data.SixLevelSessionDuration},
 		{"SevenLevelSessionLevelIndex", data.SevenLevelSessionLevelIndex},
 		{"SevenLevelSessionDuration", data.SevenLevelSessionDuration},
+
+		{"FirstQuarterHourTotalLevelBaseSessionCount", data.FirstQuarterHourTotalLevelBaseSessionCount},
+		{"FirstHalfHourTotalLEvelBaseSessionCount", data.FirstHalfHourTotalLEvelBaseSessionCount},
+		{"FirstHourTotalLevelBaseSessionCount", data.FirstHourTotalLevelBaseSessionCount},
+		{"FirstTwoHourTotalLevelBaseSessionCount", data.FirstTwoHourTotalLevelBaseSessionCount},
+		{"FirstThreeHourTotalLevelBaseSessionCount", data.FirstThreeHourTotalLevelBaseSessionCount},
+		{"FirstSixHourTotalLevelBaseSessionCount", data.FirstSixHourTotalLevelBaseSessionCount},
+		{"FirstTwelveHourTotalLevelBaseSessionCount", data.FirstTwelveHourTotalLevelBaseSessionCount},
+		{"FirstDayTotalLevelBaseSessionCount", data.FirstDayTotalLevelBaseSessionCount},
+
 		{"PenultimateLevelSessionLevelIndex", data.PenultimateLevelSessionLevelIndex},
 		{"PenultimateLevelSessionLevelDuration", data.PenultimateLevelSessionLevelDuration},
 		{"LastLevelSessionLevelIndex", data.LastLevelSessionLevelIndex},
 		{"LastLevelSessionLevelDuration", data.LastLevelSessionLevelDuration},
+
+		{"LastLevelSessionYearOfDay", data.LastLevelSessionYearOfDay},
+		{"LastLevelSessionYear", data.LastLevelSessionYear},
+		{"LastLevelSessionWeekDay", data.LastLevelSessionWeekDay},
+		{"LastLevelSessionHour", data.LastLevelSessionHour},
+		{"LastLevelSessionMinute", data.LastLevelSessionMinute},
 	}}}
 
 	collection := m.Client.Database("MLDatabase").Collection("LevelBaseSession")

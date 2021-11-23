@@ -27,15 +27,37 @@ type GameSessionEveryLoginRespondModel struct {
 	LastSessionDuration                                         int64
 	LastSessionMinute                                           int64
 	LastDurationMinusPenultimateDuration                        int64
+	FirstHalfHourTotalSessionCount                              int64
+	FirstHalfHourTotalSessionDuration                           int64
+	FirstHourTotalSessionCount                                  int64
+	FirstHourTotalSessionDuration                               int64
+	FirstTwoHourTotalSessionCount                               int64
+	FirstTwoHourTotalSessionDuration                            int64
+	FirstThreeHourTotalSessionCount                             int64
+	FirstThreeHourTotalSessionDuration                          int64
+	FirstSixHourTotalSessionCount                               int64
+	FirstSixHourTotalSessionDuration                            int64
+	FirstTwelveHourTotalSessionCount                            int64
+	FirstTwelveHourTotalSessionDuration                         int64
 	TotalSessionDay                                             int64
+	TotalSessionHour                                            int64
+	TotalSessionMinute                                          int64
 	TotalSessionDuration                                        int64
 	TotalSessionCount                                           int64
 	FirstDayTotalSessionCount                                   int64
 	FirstDayTotalSessionDuration                                int64
-	PenultimateDayTotalSessionDuration                          int64
-	PenultimateDayTotalSessionCount                             int64
-	LastDayTotalSessionCount                                    int64
-	LastDayTotalSessionDuration                                 int64
+	SecondDayTotalSessionCount                                  int64
+	SecondDayTotalSessionDuration                               int64
+	ThirdDayTotalSessionCount                                   int64
+	ThirdDayTotalSessionDuration                                int64
+	FourthDayTotalSessionCount                                  int64
+	FourthDayTotalSessionDuration                               int64
+	FifthDayTotalSessionCount                                   int64
+	FifthDayTotalSessionDuration                                int64
+	SixthDayTotalSessionCount                                   int64
+	SixthDayTotalSessionDuration                                int64
+	SeventhDayTotalSessionCount                                 int64
+	SeventhDayTotalSessionDuration                              int64
 	MinSessionDuration                                          int64
 	MaxSessionDuration                                          int64
 	DailyAvegareSessionCount                                    float64

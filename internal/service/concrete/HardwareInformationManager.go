@@ -1,7 +1,7 @@
 package concrete
 
 import (
-	model2 "FilterWorkerService/internal/model"
+	model "FilterWorkerService/internal/model"
 	IHardwareInformationDal "FilterWorkerService/internal/repository/abstract"
 	ICacheService "FilterWorkerService/internal/service/abstract"
 	IJsonParser "FilterWorkerService/pkg/jsonParser"
@@ -13,29 +13,29 @@ type HardwareInformationManager struct {
 	IJsonParser             IJsonParser.IJsonParser
 }
 
-func (h *HardwareInformationManager) AddHardwareInformation(data *[]byte) (s bool, m string) {
+func (h *HardwareInformationManager) AddHardwareInformation(data *[]byte) (respondHardwareModel *model.HardwareInformationResponseModel, s bool, m string) {
 	// Todo : 1 Model karşılanacak
-	model := model2.HardwareInformationModel{}
-	err := h.IJsonParser.DecodeJson(data, &model)
+	firstmodel := model.HardwareInformationModel{}
+	err := h.IJsonParser.DecodeJson(data, &firstmodel)
 	if err != nil {
-		return false, err.Error()
+		return &model.HardwareInformationResponseModel{}, false, err.Error()
 	}
 	// Todo: 2 Filtreler Buraya Yazılacak
-	modelResponse := model2.HardwareInformationResponseModel{}
-	modelResponse.ClientId = model.ClientId
-	modelResponse.ProjectId = model.ProjectId
-	modelResponse.CustomerId = model.CustomerId
-	modelResponse.DeviceType = int64(model.DeviceType)
-	modelResponse.GraphicsDeviceType = int64(model.GraphicsDeviceType)
-	modelResponse.GraphicsMemorySize = int64(model.GraphicsMemorySize)
-	modelResponse.OperatingSystem, _, _ = h.ICacheService.ManageCache("OperatingSystem", model.OperatingSystem)
-	modelResponse.ProcessorCount = int64(model.ProcessorCount)
-	modelResponse.ProcessorType, _, _ = h.ICacheService.ManageCache("ProcessorType", model.ProcessorType)
-	modelResponse.SystemMemorySize = int64(model.SystemMemorySize)
+	modelResponse := model.HardwareInformationResponseModel{}
+	modelResponse.ClientId = firstmodel.ClientId
+	modelResponse.ProjectId = firstmodel.ProjectId
+	modelResponse.CustomerId = firstmodel.CustomerId
+	modelResponse.DeviceType = int64(firstmodel.DeviceType)
+	modelResponse.GraphicsDeviceType = int64(firstmodel.GraphicsDeviceType)
+	modelResponse.GraphicsMemorySize = int64(firstmodel.GraphicsMemorySize)
+	modelResponse.OperatingSystem, _, _ = h.ICacheService.ManageCache("OperatingSystem", firstmodel.OperatingSystem)
+	modelResponse.ProcessorCount = int64(firstmodel.ProcessorCount)
+	modelResponse.ProcessorType, _, _ = h.ICacheService.ManageCache("ProcessorType", firstmodel.ProcessorType)
+	modelResponse.SystemMemorySize = int64(firstmodel.SystemMemorySize)
 	// Todo : 3 Model burada kayıt edilecek
 	logErr := h.IHardwareInformationDal.Add(&modelResponse)
 	if logErr != nil {
-		return false, logErr.Error()
+		return &modelResponse, false, logErr.Error()
 	}
-	return true, ""
+	return &modelResponse, true, ""
 }

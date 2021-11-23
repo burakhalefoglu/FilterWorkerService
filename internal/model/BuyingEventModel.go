@@ -12,6 +12,7 @@ type BuyingEventRespondModel struct {
 	FirstBuyingYearOfDay         int64
 	FirstBuyingYear              int64
 	FirstBuyingHour              int64
+	FirstBuyingMinute            int64
 	SecondBuyingYearOfDay        int64
 	SecondBuyingHour             int64
 	ThirdBuyingYearOfDay         int64
@@ -21,6 +22,7 @@ type BuyingEventRespondModel struct {
 	LastBuyingYearOfDay          int64
 	LastBuyingYear               int64
 	LastBuyingHour               int64
+	LastBuyingMinute             int64
 	FirstDayBuyingCount          int64
 	PenultimateDayBuyingCount    int64
 	LastDayBuyingCount           int64
