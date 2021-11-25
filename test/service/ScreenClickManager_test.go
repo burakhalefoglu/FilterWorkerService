@@ -376,7 +376,7 @@ func Test_UpdateScreenClick_Success(t *testing.T){
 	var testClickDal = new(repository.MockScreenClickDal)
 	var manager = concrete.ScreenClickManager{
 		IScreenClickDal: testClickDal,
-		IJsonParser:     &gojson.GoJson{},
+		IJsonParser:     &gojson.goJson{},
 	}
 	testClickDal.On("UpdateScreenClickById", screenClickOldModel.ClientId ,&updatedClickModel).Return(nil)
 	uptModel, s, e := manager.UpdateScreenClick(&clickRespondModel, &screenClickOldModel)
@@ -389,7 +389,7 @@ func Test_ConvertRawModelToResponseModel_Add_Succes(t *testing.T){
 	var testClickDal = new(repository.MockScreenClickDal)
 	var manager = concrete.ScreenClickManager{
 		IScreenClickDal: testClickDal,
-		IJsonParser:     &gojson.GoJson{},
+		IJsonParser:     &gojson.goJson{},
 	}
 	testClickDal.On("Add", &clickRespondModel).Return(nil)
 	testClickDal.On("GetScreenClickById", screenClickOldModel.ClientId).Return(&screenClickOldModel, 

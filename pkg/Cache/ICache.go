@@ -1,4 +1,4 @@
-package Cache
+package cache
 
 type ICache interface {
 	Set(key string, value interface{}, expirationMinutes int32) (success bool, err error)

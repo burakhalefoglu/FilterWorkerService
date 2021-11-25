@@ -44,7 +44,7 @@ func Test_AddLocation_Success(t *testing.T) {
 	testLocationDal.On("Add", &LocationResponseModel).Return(nil)
 	var manager = concrete.LocationManager{
 		ICacheService: testcache,
-		IJsonParser:   &gojson.GoJson{},
+		IJsonParser:   &gojson.goJson{},
 		ILocationDal:  testLocationDal,
 	}
 	bytModel, _ := manager.IJsonParser.EncodeJson(locationModel)

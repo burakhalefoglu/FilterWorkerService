@@ -1,23 +1,36 @@
 package concrete
 
 import (
+	"FilterWorkerService/internal/IoC"
 	model "FilterWorkerService/internal/model"
 	IAdvEventDal "FilterWorkerService/internal/repository/abstract"
 	ICacheService "FilterWorkerService/internal/service/abstract"
+	"FilterWorkerService/pkg/logger"
 
 	IJsonParser "FilterWorkerService/pkg/jsonParser"
 )
 
-type AdvEventManager struct {
-	IAdvEventDal  IAdvEventDal.IAdvEventDal
-	IJsonParser   IJsonParser.IJsonParser
-	ICacheService ICacheService.ICacheService
+type advEventManager struct {
+	IAdvEventDal  *IAdvEventDal.IAdvEventDal
+	IJsonParser   *IJsonParser.IJsonParser
+	ICacheService *ICacheService.ICacheService
+	ILog *logger.ILog
 }
 
-func (a *AdvEventManager) ConvertRawModelToResponseModel(data *[]byte) (adv *model.AdvEventRespondModel, s bool, m string) {
+func AdvEventManagerConstructor() *advEventManager {
+	return &advEventManager{IAdvEventDal: &IoC.AdvEventDal,
+		IJsonParser: &IoC.JsonParser,
+		ICacheService: &IoC.CacheService,
+		ILog: &IoC.Logger,
+	}
+}
+
+func (a *advEventManager) ConvertRawModelToResponseModel(data *[]byte) (adv *model.AdvEventRespondModel, s bool, m string) {
 	firstModel := model.AdvEventModel{}
-	err := a.IJsonParser.DecodeJson(data, &firstModel)
+	err := (*a.IJsonParser).DecodeJson(data, &firstModel)
 	if err != nil {
+		(*a.ILog).SendErrorLog("AdvEventManager", "ConvertRawModelToResponseModel",
+			"byte array to AdvEventModel", "Json Parser Decode Err: ", err.Error())
 		return nil, false, err.Error()
 	}
 	hour := int64(firstModel.TrigerdTime.Hour())
@@ -41,7 +54,7 @@ func (a *AdvEventManager) ConvertRawModelToResponseModel(data *[]byte) (adv *mod
 	modelResponse.FirstWeekDay = day
 	modelResponse.FirstAdvClickHour = hour
 	modelResponse.FirstADvClickMinute = minute
-	modelResponse.FirstAdvType, _, _ = a.ICacheService.ManageCache("AdvType", firstModel.AdvType)
+	modelResponse.FirstAdvType, _, _ = (*a.ICacheService).ManageCache("AdvType", firstModel.AdvType)
 	modelResponse.SecondAdvYearOfDay = 0
 	modelResponse.SecondAdvHour = 0
 	modelResponse.SecondAdvMinute = 0
@@ -92,12 +105,21 @@ func (a *AdvEventManager) ConvertRawModelToResponseModel(data *[]byte) (adv *mod
 	DetermineAdvHour(&modelResponse, hour)
 	DetermineAdvAmPm(&modelResponse, hour)
 
-	oldModel, err := a.IAdvEventDal.GetAdvEventById(modelResponse.ClientId)
+	defer (*a.ILog).SendInfoLog("AdvEventManager", "ConvertRawModelToResponseModel",
+		modelResponse.ClientId, modelResponse.ProjectId)
+
+	oldModel, err := (*a.IAdvEventDal).GetAdvEventById(modelResponse.ClientId)
+	if err != nil{
+		(*a.ILog).SendErrorLog("AdvEventManager", "ConvertRawModelToResponseModel",
+			"AdvEventDal_GetAdvEventById", err.Error())
+	}
 	switch {
 	case err.Error() == "mongo: no documents in result":
 
-		logErr := a.IAdvEventDal.Add(&modelResponse)
+		logErr := (*a.IAdvEventDal).Add(&modelResponse)
 		if logErr != nil {
+			(*a.ILog).SendErrorLog("AdvEventManager", "ConvertRawModelToResponseModel",
+				"AdvEventDal_Add", err.Error())
 			return nil, false, logErr.Error()
 		}
 		return &modelResponse, true, "Added"
@@ -105,6 +127,8 @@ func (a *AdvEventManager) ConvertRawModelToResponseModel(data *[]byte) (adv *mod
 	case err == nil:
 		updatedModel, updateResult, updateErr := a.UpdateAdvEvent(&modelResponse, oldModel)
 		if updateErr != nil {
+			(*a.ILog).SendErrorLog("AdvEventManager", "ConvertRawModelToResponseModel",
+				"AdvEventDal_UpdateAdvEvent", err.Error())
 			return nil, updateResult, "Update went wrong!"
 		}
 		return updatedModel, updateResult, "Updated"
@@ -115,7 +139,7 @@ func (a *AdvEventManager) ConvertRawModelToResponseModel(data *[]byte) (adv *mod
 
 }
 
-func (a *AdvEventManager) UpdateAdvEvent(modelResponse *model.AdvEventRespondModel,
+func (a *advEventManager) UpdateAdvEvent(modelResponse *model.AdvEventRespondModel,
 	oldModel *model.AdvEventRespondModel) (updatedModel *model.AdvEventRespondModel, s bool, m error) {
 
 	oldModel.ProjectId = modelResponse.ProjectId
@@ -184,7 +208,7 @@ func (a *AdvEventManager) UpdateAdvEvent(modelResponse *model.AdvEventRespondMod
 	oldModel.AmAdvClickCount = oldModel.AmAdvClickCount + modelResponse.AmAdvClickCount
 	oldModel.PmAdvClickCount = oldModel.PmAdvClickCount + modelResponse.PmAdvClickCount
 
-	logErr := a.IAdvEventDal.UpdateAdvEventById(oldModel.ClientId, oldModel)
+	logErr := (*a.IAdvEventDal).UpdateAdvEventById(oldModel.ClientId, oldModel)
 	if logErr != nil {
 		return oldModel, false, logErr
 	}

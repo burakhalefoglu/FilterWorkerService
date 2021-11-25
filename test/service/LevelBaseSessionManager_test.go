@@ -194,7 +194,7 @@ func Test_UpdateLevelBaseSession_Updated(t *testing.T) {
 	var testLevelBaseDal = new(repository.MockLevelBaseSessionDal)
 	var manager = concrete.LevelBaseSessionManager{
 		ILevelBaseSessionDal: testLevelBaseDal,
-		IJsonParser:          &gojson.GoJson{},
+		IJsonParser:          &gojson.goJson{},
 	}
 	fmt.Println(TotalLevelBaseSessionMinute)
 	testLevelBaseDal.On("UpdateLevelBaseSessionById", levelBaseOldSession.ClientId, &levelBaseOldSession).Return(nil)
@@ -208,7 +208,7 @@ func Test_ConvertRawModelToResponseModel_AddSucces(t *testing.T){
 	var testLevelBaseDal = new(repository.MockLevelBaseSessionDal)
 	var manager = concrete.LevelBaseSessionManager{
 		ILevelBaseSessionDal: testLevelBaseDal,
-		IJsonParser:          &gojson.GoJson{},
+		IJsonParser:          &gojson.goJson{},
 	}
 	bytData, _ := manager.IJsonParser.EncodeJson(levelBaseSession)
 	testLevelBaseDal.On("GetLevelBaseSessionById", levelBaseRespondSession.ClientId).Return(&levelBaseOldSession, 

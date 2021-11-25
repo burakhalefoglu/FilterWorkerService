@@ -43,7 +43,7 @@ func Test_AddHardwareInformation_Success(t *testing.T){
 	var manager = concrete.HardwareInformationManager{
 		ICacheService:           testCache,
 		IHardwareInformationDal: testHardwareInfoDal,
-		IJsonParser:             &gojson.GoJson{},
+		IJsonParser:             &gojson.goJson{},
 	}
 	
 	testCache.On("ManageCache", "OperatingSystem", harwareModel.OperatingSystem).Return(int64(1), true, "")

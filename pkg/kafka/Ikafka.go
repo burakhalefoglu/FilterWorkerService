@@ -1,4 +1,4 @@
-package Ikafka
+package IKafka
 
 import (
 	"sync"

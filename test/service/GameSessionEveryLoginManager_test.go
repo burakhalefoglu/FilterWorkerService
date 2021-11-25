@@ -282,7 +282,7 @@ func Test_UpdateGameSession_UpdateSuccess(t *testing.T) {
 	var testSessionDal = new(repository.MockGameSessionEveryLoginDal)
 	var manager = concrete.GameSessionEveryLoginManager{
 		IGameSessionEveryLoginDal: testSessionDal,
-		IJsonParser:               &gojson.GoJson{},
+		IJsonParser:               &gojson.goJson{},
 	}
 	testSessionDal.On("UpdateGameSessionEveryLoginById", sessionOldModel.ClientId, &sessionUpdateModel).Return(nil)
 	var v, s, m = manager.UpdateGameSession(&sessionRespondModel, &sessionOldModel)
@@ -295,7 +295,7 @@ func Test_ConvertRawModelToResponseModel_AddS(t *testing.T) {
 	var testSessionDal = new(repository.MockGameSessionEveryLoginDal)
 	var manager = concrete.GameSessionEveryLoginManager{
 		IGameSessionEveryLoginDal: testSessionDal,
-		IJsonParser:               &gojson.GoJson{},
+		IJsonParser:               &gojson.goJson{},
 	}
 	gameByte, _ := manager.IJsonParser.EncodeJson(sessionModel)
 	testSessionDal.On("GetGameSessionEveryLoginById", sessionRespondModel.ClientId).Return(&sessionOldModel,

@@ -1,8 +1,10 @@
 package RedisV8
 
 import (
+	"FilterWorkerService/pkg/logger"
 	"context"
 	"github.com/go-redis/redis/v8"
+	"os"
 	"time"
 )
 
@@ -10,20 +12,30 @@ type redisCache struct {
 	Client *redis.Client
 }
 
-var rdb = redis.NewClient(&redis.Options{
-	Addr:     "localhost:6379",
-	Password: "",
-	DB:       0,
-})
+func RedisCacheConstructor(log *logger.ILog) *redisCache {
+	return &redisCache{Client: getClient(log)}
+}
 
-var RedisV8 = redisCache{
-	Client: rdb,
+func getClient(log *logger.ILog) *redis.Client{
+	client := redis.NewClient(&redis.Options{
+		Addr:     os.Getenv("REDIS_CONN"),
+		Password: os.Getenv("REDIS_PASS"), // no password set
+		DB:       0,  // use default DB
+	})
+	func(log *logger.ILog) {
+		_, err := client.Ping(context.Background()).Result()
+		if err != nil {
+			(*log).SendPanicLog("RedisConnection", "ConnectRedis", err)
+		}
+	}(log)
+
+	return client
 }
 
 func (r *redisCache) Set(key string, value interface{}, expirationMinutes int32) (success bool, err error){
 
 	expMinutes := time.Duration(expirationMinutes) * time.Minute
-	 var result = rdb.Set(context.Background(),key, value, expMinutes)
+	 var result = r.Client.Set(context.Background(),key, value, expMinutes)
 	if result.Err() != nil{
 		return false, result.Err()
 	}
@@ -32,7 +44,7 @@ func (r *redisCache) Set(key string, value interface{}, expirationMinutes int32)
 
 func (r *redisCache) Get(key string) (value string, err error){
 
-	 var result = rdb.Get(context.Background(),key)
+	 var result = r.Client.Get(context.Background(),key)
 	 if result.Err() != nil{
 		 return "", err
 	 }
@@ -41,7 +53,7 @@ func (r *redisCache) Get(key string) (value string, err error){
 
 func (r *redisCache) Delete(key string) (success bool, err error){
 
-	 var result = rdb.Del(context.Background(),key)
+	 var result = r.Client.Del(context.Background(),key)
 	 if result.Err() != nil{
 		 return false, err
 	 }

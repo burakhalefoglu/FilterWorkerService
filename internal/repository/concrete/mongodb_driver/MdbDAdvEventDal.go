@@ -2,6 +2,7 @@ package mongodb_driver
 
 import (
 	"FilterWorkerService/internal/model"
+	"FilterWorkerService/pkg/database/mongodb"
 	"context"
 	"time"
 
@@ -9,11 +10,15 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type MdbDAdvEventDal struct {
+type mdbDAdvEventDal struct {
 	Client *mongo.Client
 }
 
-func (m *MdbDAdvEventDal) Add(data *model.AdvEventRespondModel) error {
+func MdbDAdvEventDalConstructor() *mdbDAdvEventDal {
+	return &mdbDAdvEventDal{Client: mongodb.GetMongodbClient()}
+}
+
+func (m *mdbDAdvEventDal) Add(data *model.AdvEventRespondModel) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -98,7 +103,7 @@ func (m *MdbDAdvEventDal) Add(data *model.AdvEventRespondModel) error {
 	return nil
 }
 
-func (m *MdbDBuyingEventDal) GetAdvEventById(ClientId string) (*model.AdvEventRespondModel, error) {
+func (m *mdbDAdvEventDal) GetAdvEventById(ClientId string) (*model.AdvEventRespondModel, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -118,7 +123,7 @@ func (m *MdbDBuyingEventDal) GetAdvEventById(ClientId string) (*model.AdvEventRe
 	return &model, nil
 }
 
-func (m *MdbDBuyingEventDal) UpdateAdvEventById(ClientId string, data *model.AdvEventRespondModel) error {
+func (m *mdbDAdvEventDal) UpdateAdvEventById(ClientId string, data *model.AdvEventRespondModel) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	update := bson.D{{"$set", bson.D{

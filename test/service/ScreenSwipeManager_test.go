@@ -441,7 +441,7 @@ func Test_UpdateScreenSwipe_Success(t *testing.T) {
 	var testSwipeDal = new(repository.MockScreenSwipeDal)
 	var manager = concrete.ScreenSwipeManager{
 		IScreenSwipeDal: testSwipeDal,
-		IJsonParser:     &gojson.GoJson{},
+		IJsonParser:     &gojson.goJson{},
 	}
 	testSwipeDal.On("UpdateScreenSwipeById", swipeOldModel.ClientId, &swipeOldModel).Return(nil)
 	v, s, m := manager.UpdateScreenSwipe(&swipeRespondModel, &swipeOldModel)
@@ -454,7 +454,7 @@ func Test_ConvertRawModelToResponseModel_Add(t *testing.T) {
 	var testSwipeDal = new(repository.MockScreenSwipeDal)
 	var manager = concrete.ScreenSwipeManager{
 		IScreenSwipeDal: testSwipeDal,
-		IJsonParser:     &gojson.GoJson{},
+		IJsonParser:     &gojson.goJson{},
 	}
 	testSwipeDal.On("GetScreenSwipeById", swipeModel.ClientId).Return(&swipeOldModel,
 		errors.New("mongo: no documents in result"))

@@ -3,7 +3,12 @@ module FilterWorkerService
 go 1.17
 
 require (
+	github.com/bshuster-repo/logrus-logstash-hook v1.0.2
 	github.com/goccy/go-json v0.7.10
+	github.com/golobby/container/v3 v3.0.2
+	github.com/google/uuid v1.3.0
+	github.com/segmentio/kafka-go v0.4.25
+	github.com/sirupsen/logrus v1.8.1
 	go.mongodb.org/mongo-driver v1.7.3
 )
 
@@ -30,8 +35,9 @@ require (
 	github.com/confluentinc/confluent-kafka-go v1.7.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
-	github.com/kr/pretty v0.2.1 // indirect
+	github.com/pierrec/lz4 v2.6.0+incompatible // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/stretchr/objx v0.1.1 // indirect
+	golang.org/x/sys v0.0.0-20210423082822-04245dca01da // indirect
 	gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c // indirect
 )

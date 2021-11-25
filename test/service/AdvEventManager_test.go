@@ -116,9 +116,9 @@ func Test_ConvertRawModelToResponse_AddedSuccess(t *testing.T) {
 	//Arrance
 	var testAdv = new(repository.MockAdvEventDal)
 	var testCache = new(service.MockCacheService)
-	var manager = concrete.AdvEventManager{
+	var manager = concrete.advEventManager{
 		IAdvEventDal:  testAdv,
-		IJsonParser:   &gojson.GoJson{},
+		IJsonParser:   &gojson.goJson{},
 		ICacheService: testCache,
 	}
 	var advModel = model.AdvEventModel{
@@ -131,6 +131,7 @@ func Test_ConvertRawModelToResponse_AddedSuccess(t *testing.T) {
 		InMinutes:   12,
 		TrigerdTime: time.Now(),
 	}
+
 	var responseModel = model.AdvEventRespondModel{
 		ProjectId:                            "Test",
 		ClientId:                             "Test",
@@ -226,9 +227,9 @@ func Test_ConvertRawModelToResponse_AddedSuccess(t *testing.T) {
 func Test_UpdateAdvEvent(t *testing.T){
 	var testADvDal = new(repository.MockAdvEventDal)
 	var testCache = new(service.MockCacheService)
-	var manager = concrete.AdvEventManager{
+	var manager = concrete.advEventManager{
 		IAdvEventDal:  testADvDal,
-		IJsonParser:   &gojson.GoJson{},
+		IJsonParser:   &gojson.goJson{},
 		ICacheService: testCache,
 	}
 	var advModel = model.AdvEventModel{

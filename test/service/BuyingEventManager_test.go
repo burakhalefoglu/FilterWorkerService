@@ -163,7 +163,7 @@ func Test_UpdateBuyingEvent_UpdateSuccess(t *testing.T) {
 	var testBuyingDal = new(repository.MockBuyingEventDal)
 	var manager = concrete.BuyingEventManager{
 		IBuyingEventDal: testBuyingDal,
-		IJsonParser:     &gojson.GoJson{},
+		IJsonParser:     &gojson.goJson{},
 	}
 	
 	testBuyingDal.On("UpdateBuyingEventById", updateBuyingModel.ClientId, &updateBuyingModel).Return(nil)
@@ -179,7 +179,7 @@ func Test_ConvertRawModelToResponseModel_AddSuccess(t *testing.T) {
 	var testBuyingDal = new(repository.MockBuyingEventDal)
 	var manager = concrete.BuyingEventManager{
 		IBuyingEventDal: testBuyingDal,
-		IJsonParser:     &gojson.GoJson{},
+		IJsonParser:     &gojson.goJson{},
 	}
 	buyingByte, _ := manager.IJsonParser.EncodeJson(buyingModel)
 
