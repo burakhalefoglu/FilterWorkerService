@@ -1,19 +1,27 @@
 package concrete
 
 import (
+	"FilterWorkerService/internal/IoC"
 	model "FilterWorkerService/internal/model"
 	IGameSessionEveryLoginDal "FilterWorkerService/internal/repository/abstract"
 	IJsonParser "FilterWorkerService/pkg/jsonParser"
 )
 
-type GameSessionEveryLoginManager struct {
-	IGameSessionEveryLoginDal IGameSessionEveryLoginDal.IGameSessionEveryLoginDal
-	IJsonParser               IJsonParser.IJsonParser
+type gameSessionEveryLoginManager struct {
+	IGameSessionEveryLoginDal *IGameSessionEveryLoginDal.IGameSessionEveryLoginDal
+	IJsonParser               *IJsonParser.IJsonParser
 }
 
-func (g *GameSessionEveryLoginManager) ConvertRawModelToResponseModel(data *[]byte) (gameSession *model.GameSessionEveryLoginRespondModel, s bool, m string) {
+func GameSessionEveryLoginManagerConstructor() *gameSessionEveryLoginManager {
+	return &gameSessionEveryLoginManager{
+		IGameSessionEveryLoginDal: &IoC.GameSessionEveryLoginDal,
+		IJsonParser: &IoC.JsonParser,
+	}
+}
+
+func (g *gameSessionEveryLoginManager) ConvertRawModelToResponseModel(data *[]byte) (gameSession *model.GameSessionEveryLoginRespondModel, s bool, m string) {
 	firstModel := model.GameSessionEveryLoginModel{}
-	err := g.IJsonParser.DecodeJson(data, &firstModel)
+	err := (*g.IJsonParser).DecodeJson(data, &firstModel)
 	if err != nil {
 		return &model.GameSessionEveryLoginRespondModel{}, false, err.Error()
 	}
@@ -99,11 +107,11 @@ func (g *GameSessionEveryLoginManager) ConvertRawModelToResponseModel(data *[]by
 	DetermineGameSessionHour(&modelResponse, hour)
 	DetermineGameSessionAmPm(&modelResponse, hour)
 
-	oldModel, err := g.IGameSessionEveryLoginDal.GetGameSessionEveryLoginById(modelResponse.ClientId)
+	oldModel, err := (*g.IGameSessionEveryLoginDal).GetGameSessionEveryLoginById(modelResponse.ClientId)
 	switch {
 	case err.Error() == "mongo: no documents in result":
 
-		logErr := g.IGameSessionEveryLoginDal.Add(&modelResponse)
+		logErr := (*g.IGameSessionEveryLoginDal).Add(&modelResponse)
 		if logErr != nil {
 			return &modelResponse, false, logErr.Error()
 		}
@@ -123,7 +131,7 @@ func (g *GameSessionEveryLoginManager) ConvertRawModelToResponseModel(data *[]by
 	}
 }
 
-func (g *GameSessionEveryLoginManager) UpdateGameSession(modelResponse *model.GameSessionEveryLoginRespondModel, oldModel *model.GameSessionEveryLoginRespondModel) (updatedModel *model.GameSessionEveryLoginRespondModel, s bool, m error) {
+func (g *gameSessionEveryLoginManager) UpdateGameSession(modelResponse *model.GameSessionEveryLoginRespondModel, oldModel *model.GameSessionEveryLoginRespondModel) (updatedModel *model.GameSessionEveryLoginRespondModel, s bool, m error) {
 
 	oldModel.ProjectId = modelResponse.ProjectId
 	oldModel.ClientId = modelResponse.ClientId
@@ -193,7 +201,7 @@ func (g *GameSessionEveryLoginManager) UpdateGameSession(modelResponse *model.Ga
 	oldModel.Session12To17HourCount = oldModel.Session12To17HourCount + modelResponse.Session12To17HourCount
 	oldModel.Session18To23HourCount = oldModel.Session18To23HourCount + modelResponse.Session18To23HourCount
 
-	logErr := g.IGameSessionEveryLoginDal.UpdateGameSessionEveryLoginById(oldModel.ClientId, oldModel)
+	logErr := (*g.IGameSessionEveryLoginDal).UpdateGameSessionEveryLoginById(oldModel.ClientId, oldModel)
 	if logErr != nil {
 		return oldModel, false, logErr
 	}

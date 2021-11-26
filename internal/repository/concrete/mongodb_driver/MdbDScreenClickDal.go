@@ -2,6 +2,7 @@ package mongodb_driver
 
 import (
 	"FilterWorkerService/internal/model"
+	"FilterWorkerService/pkg/database/mongodb"
 	"context"
 	"time"
 
@@ -9,11 +10,15 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type MdbDScreenClickDal struct {
+type mdbDScreenClickDal struct {
 	Client *mongo.Client
 }
 
-func (m *MdbDScreenClickDal) Add(data *model.ScreenClickRespondModel) error {
+func MdbDScreenClickDalConstructor() *mdbDScreenClickDal {
+	return &mdbDScreenClickDal{Client: mongodb.GetMongodbClient()}
+}
+
+func (m *mdbDScreenClickDal) Add(data *model.ScreenClickRespondModel) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	collection := m.Client.Database("MLDatabase").Collection("ScreenClickModel")
@@ -115,7 +120,7 @@ func (m *MdbDScreenClickDal) Add(data *model.ScreenClickRespondModel) error {
 	return nil
 }
 
-func (m *MdbDScreenClickDal) GetScreenClickById(ClientId string) (*model.ScreenClickRespondModel, error) {
+func (m *mdbDScreenClickDal) GetScreenClickById(ClientId string) (*model.ScreenClickRespondModel, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	collection := m.Client.Database("MLDatabase").Collection("ScreenClickModel")
@@ -133,7 +138,7 @@ func (m *MdbDScreenClickDal) GetScreenClickById(ClientId string) (*model.ScreenC
 	return &model, nil
 }
 
-func (m *MdbDScreenClickDal) UpdateScreenClickById(ClientId string, data *model.ScreenClickRespondModel) error {
+func (m *mdbDScreenClickDal) UpdateScreenClickById(ClientId string, data *model.ScreenClickRespondModel) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	update := bson.D{{"$set", bson.D{

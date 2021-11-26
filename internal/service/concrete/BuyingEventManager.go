@@ -1,19 +1,29 @@
 package concrete
 
 import (
+	"FilterWorkerService/internal/IoC"
 	model "FilterWorkerService/internal/model"
 	IBuyingEventDal "FilterWorkerService/internal/repository/abstract"
 	IJsonParser "FilterWorkerService/pkg/jsonParser"
 )
 
-type BuyingEventManager struct {
-	IBuyingEventDal IBuyingEventDal.IBuyingEventDal
-	IJsonParser     IJsonParser.IJsonParser
+type buyingEventManager struct {
+	IBuyingEventDal *IBuyingEventDal.IBuyingEventDal
+	IJsonParser     *IJsonParser.IJsonParser
 }
 
-func (b *BuyingEventManager) ConvertRawModelToResponseModel(data *[]byte) (buying *model.BuyingEventRespondModel,s bool, m string) {
+
+func BuyingEventManagerConstructor() *buyingEventManager {
+	return &buyingEventManager{
+		IBuyingEventDal: &IoC.BuyingEventDal,
+		IJsonParser: &IoC.JsonParser,
+	}
+}
+
+
+func (b *buyingEventManager) ConvertRawModelToResponseModel(data *[]byte) (buying *model.BuyingEventRespondModel,s bool, m string) {
 	firstModel := model.BuyingEventModel{}
-	err := b.IJsonParser.DecodeJson(data, &firstModel)
+	err := (*b.IJsonParser).DecodeJson(data, &firstModel)
 	if err != nil {
 		return &model.BuyingEventRespondModel{},false, err.Error()
 	}
@@ -51,11 +61,11 @@ func (b *BuyingEventManager) ConvertRawModelToResponseModel(data *[]byte) (buyin
 	modelResponse.BuyingDayAverageBuyingCount = 1
 	CalculateBuyingLevelBasedAvgBuyingCount(&modelResponse)
 
-	oldModel, err := b.IBuyingEventDal.GetBuyingEventById(modelResponse.ClientId)
+	oldModel, err := (*b.IBuyingEventDal).GetBuyingEventById(modelResponse.ClientId)
 	switch {
 	case err.Error() == "mongo: no documents in result":
 
-		logErr := b.IBuyingEventDal.Add(&modelResponse)
+		logErr := (*b.IBuyingEventDal).Add(&modelResponse)
 		if logErr != nil {
 			return nil,false, logErr.Error()
 		}
@@ -76,7 +86,7 @@ func (b *BuyingEventManager) ConvertRawModelToResponseModel(data *[]byte) (buyin
 
 }
 
-func (b *BuyingEventManager) UpdateBuyingEvent(modelResponse *model.BuyingEventRespondModel, oldModel *model.BuyingEventRespondModel) (updatedModel *model.BuyingEventRespondModel, s bool, m error) {
+func (b *buyingEventManager) UpdateBuyingEvent(modelResponse *model.BuyingEventRespondModel, oldModel *model.BuyingEventRespondModel) (updatedModel *model.BuyingEventRespondModel, s bool, m error) {
 
 	oldModel.ProjectId = modelResponse.ProjectId
 	oldModel.ClientId = modelResponse.ClientId
@@ -119,7 +129,7 @@ func (b *BuyingEventManager) UpdateBuyingEvent(modelResponse *model.BuyingEventR
 	oldModel.BuyingDayAverageBuyingCount = float64(oldModel.TotalBuyingCount) / float64(oldModel.TotalBuyingDay)
 	CalculateBuyingLevelBasedAvgBuyingCount(oldModel)
 
-	logErr := b.IBuyingEventDal.UpdateBuyingEventById(oldModel.ClientId, oldModel)
+	logErr := (*b.IBuyingEventDal).UpdateBuyingEventById(oldModel.ClientId, oldModel)
 	if logErr != nil {
 		return oldModel, false, logErr
 	}

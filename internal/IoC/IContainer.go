@@ -13,14 +13,27 @@ type IContainer interface {
 	Inject()
 }
 
-func InjectContainers(container IContainer){
+func InjectContainers(container IContainer) {
 	container.Inject()
 }
 
 var AdvEventDal repository.IAdvEventDal
-var CacheService service.ICacheService
 var AdvEventService service.IAdvEventService
-
+var BuyingEventDal repository.IBuyingEventDal
+var BuyingEventService service.IBuyingEventService
+var GameSessionEveryLoginDal repository.IGameSessionEveryLoginDal
+var GameSessionEveryLoginService service.IGameSessionEveryLoginService
+var HardwareInformationDal repository.IHardwareInformationDal
+var HardwareInformationService service.IHardwareInformationService
+var LevelBaseSessionDal repository.ILevelBaseSessionDal
+var LevelBaseSessionService service.ILevelBaseSessionService
+var LocationDal repository.ILocationDal
+var LocationService service.ILocationService
+var ScreenClickDal repository.IScreenClickDal
+var ScreenClickService service.IScreenClickService
+var ScreenSwipeDal repository.IScreenSwipeDal
+var ScreenSwipeService service.IScreenSwipeService
+var CacheService service.ICacheService
 var Kafka IKafka.IKafka
 var RedisCache cache.ICache
 var Logger logger.ILog

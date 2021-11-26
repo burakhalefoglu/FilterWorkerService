@@ -2,6 +2,7 @@ package mongodb_driver
 
 import (
 	"FilterWorkerService/internal/model"
+	"FilterWorkerService/pkg/database/mongodb"
 	"context"
 	"time"
 
@@ -9,11 +10,15 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type MdbDHardwareInformationDal struct {
+type mdbDHardwareInformationDal struct {
 	Client *mongo.Client
 }
 
-func (m *MdbDHardwareInformationDal) Add(data *model.HardwareInformationResponseModel) error {
+func MdbDHardwareInformationDalConstructor() *mdbDHardwareInformationDal {
+	return &mdbDHardwareInformationDal{Client: mongodb.GetMongodbClient()}
+}
+
+func (m *mdbDHardwareInformationDal) Add(data *model.HardwareInformationResponseModel) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	collection := m.Client.Database("MLDatabase").Collection("HardwareInformationModel")

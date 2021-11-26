@@ -2,6 +2,7 @@ package mongodb_driver
 
 import (
 	"FilterWorkerService/internal/model"
+	"FilterWorkerService/pkg/database/mongodb"
 	"context"
 	"time"
 
@@ -9,11 +10,15 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type MdbDBuyingEventDal struct {
+type mdbDBuyingEventDal struct {
 	Client *mongo.Client
 }
 
-func (m *MdbDBuyingEventDal) Add(data *model.BuyingEventRespondModel) error {
+func MdbDBuyingEventDalConstructor() *mdbDBuyingEventDal {
+	return &mdbDBuyingEventDal{Client: mongodb.GetMongodbClient()}
+}
+
+func (m *mdbDBuyingEventDal) Add(data *model.BuyingEventRespondModel) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	collection := m.Client.Database("MLDatabase").Collection("BuyingEventModel")
@@ -64,10 +69,9 @@ func (m *MdbDBuyingEventDal) Add(data *model.BuyingEventRespondModel) error {
 	return nil
 }
 
-func (m *MdbDBuyingEventDal) GetBuyingEventById(ClientId string) (*model.BuyingEventRespondModel, error) {
+func (m *mdbDBuyingEventDal) GetBuyingEventById(ClientId string) (*model.BuyingEventRespondModel, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	//"BuyingEventModel"
 	collection := m.Client.Database("MLDatabase").Collection("BuyingEventModel")
 	var result = collection.FindOne(ctx, bson.D{{
 		"ClientId", ClientId,
@@ -84,7 +88,7 @@ func (m *MdbDBuyingEventDal) GetBuyingEventById(ClientId string) (*model.BuyingE
 	return &model, nil
 }
 
-func (m *MdbDBuyingEventDal) UpdateBuyingEventById(ClientId string, data *model.BuyingEventRespondModel) error {
+func (m *mdbDBuyingEventDal) UpdateBuyingEventById(ClientId string, data *model.BuyingEventRespondModel) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 

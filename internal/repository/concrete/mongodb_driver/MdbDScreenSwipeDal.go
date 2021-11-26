@@ -2,6 +2,7 @@ package mongodb_driver
 
 import (
 	"FilterWorkerService/internal/model"
+	"FilterWorkerService/pkg/database/mongodb"
 	"context"
 	"time"
 
@@ -9,11 +10,16 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type MdbDScreenSwipeDal struct {
+type mdbDScreenSwipeDal struct {
 	Client *mongo.Client
 }
 
-func (m *MdbDScreenSwipeDal) Add(data *model.ScreenSwipeRespondModel) error {
+func MdbDScreenSwipeDalConstructor() *mdbDScreenSwipeDal {
+	return &mdbDScreenSwipeDal{Client: mongodb.GetMongodbClient()}
+}
+
+
+func (m *mdbDScreenSwipeDal) Add(data *model.ScreenSwipeRespondModel) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	collection := m.Client.Database("MLDatabase").Collection("ScreenSwipeModel")
@@ -102,39 +108,39 @@ func (m *MdbDScreenSwipeDal) Add(data *model.ScreenSwipeRespondModel) error {
 		{"ThirdDaySwipeTotalFinishXCor", data.ThirdDaySwipeTotalFinishXCor},
 		{"ThirdDaySwipeTotalFinishYCor", data.ThirdDaySwipeTotalFinishYCor},
 
-		{"FourthDayTotalSwipeUpCount",    data.FourthDayTotalSwipeUpCount},
-		{"FourthDayTotalSwipeDownCount",  data.FourthDayTotalSwipeDownCount},
+		{"FourthDayTotalSwipeUpCount", data.FourthDayTotalSwipeUpCount},
+		{"FourthDayTotalSwipeDownCount", data.FourthDayTotalSwipeDownCount},
 		{"FourthDayTotalSwipeRightCount", data.FourthDayTotalSwipeRightCount},
-		{"FourthDayTotalSwipeLeftCount",  data.FourthDayTotalSwipeLeftCount},
-		{"FourthDaySwipeTotalStartXCor",  data.FourthDaySwipeTotalStartXCor},
-		{"FourthDaySwipeTotalStartYCor",  data.FourthDaySwipeTotalStartYCor},
+		{"FourthDayTotalSwipeLeftCount", data.FourthDayTotalSwipeLeftCount},
+		{"FourthDaySwipeTotalStartXCor", data.FourthDaySwipeTotalStartXCor},
+		{"FourthDaySwipeTotalStartYCor", data.FourthDaySwipeTotalStartYCor},
 		{"FourthDaySwipeTotalFinishXCor", data.FourthDaySwipeTotalFinishXCor},
 		{"FourthDaySwipeTotalFinishYCor", data.FourthDaySwipeTotalFinishYCor},
 
-		{"FifthDayTotalSwipeUpCount",    data.FifthDayTotalSwipeUpCount},
-		{"FifthDayTotalSwipeDownCount",  data.FifthDayTotalSwipeDownCount},
+		{"FifthDayTotalSwipeUpCount", data.FifthDayTotalSwipeUpCount},
+		{"FifthDayTotalSwipeDownCount", data.FifthDayTotalSwipeDownCount},
 		{"FifthDayTotalSwipeRightCount", data.FifthDayTotalSwipeRightCount},
-		{"FifthDayTotalSwipeLeftCount",  data.FifthDayTotalSwipeLeftCount},
-		{"FifthDaySwipeTotalStartXCor",  data.FifthDaySwipeTotalStartXCor},
-		{"FifthDaySwipeTotalStartYCor",  data.FifthDaySwipeTotalStartYCor},
+		{"FifthDayTotalSwipeLeftCount", data.FifthDayTotalSwipeLeftCount},
+		{"FifthDaySwipeTotalStartXCor", data.FifthDaySwipeTotalStartXCor},
+		{"FifthDaySwipeTotalStartYCor", data.FifthDaySwipeTotalStartYCor},
 		{"FifthDaySwipeTotalFinishXCor", data.FifthDaySwipeTotalFinishXCor},
 		{"FifthDaySwipeTotalFinishYCor", data.FifthDaySwipeTotalFinishYCor},
 
-		{"SixthDayTotalSwipeUpCount",    data.SixthDayTotalSwipeUpCount},
-		{"SixthDayTotalSwipeDownCount",  data.SixthDayTotalSwipeDownCount},
+		{"SixthDayTotalSwipeUpCount", data.SixthDayTotalSwipeUpCount},
+		{"SixthDayTotalSwipeDownCount", data.SixthDayTotalSwipeDownCount},
 		{"SixthDayTotalSwipeRightCount", data.SixthDayTotalSwipeRightCount},
-		{"SixthDayTotalSwipeLeftCount",  data.SixthDayTotalSwipeLeftCount},
-		{"SixthDaySwipeTotalStartXCor",  data.SixthDaySwipeTotalStartXCor},
-		{"SixthDaySwipeTotalStartYCor",  data.SixthDaySwipeTotalStartYCor},
+		{"SixthDayTotalSwipeLeftCount", data.SixthDayTotalSwipeLeftCount},
+		{"SixthDaySwipeTotalStartXCor", data.SixthDaySwipeTotalStartXCor},
+		{"SixthDaySwipeTotalStartYCor", data.SixthDaySwipeTotalStartYCor},
 		{"SixthDaySwipeTotalFinishXCor", data.SixthDaySwipeTotalFinishXCor},
 		{"SixthDaySwipeTotalFinishYCor", data.SixthDaySwipeTotalFinishYCor},
 
-		{"SeventhDayTotalSwipeUpCount",    data.SeventhDayTotalSwipeUpCount},
-		{"SeventhDayTotalSwipeDownCount",  data.SeventhDayTotalSwipeDownCount},
+		{"SeventhDayTotalSwipeUpCount", data.SeventhDayTotalSwipeUpCount},
+		{"SeventhDayTotalSwipeDownCount", data.SeventhDayTotalSwipeDownCount},
 		{"SeventhDayTotalSwipeRightCount", data.SeventhDayTotalSwipeRightCount},
-		{"SeventhDayTotalSwipeLeftCount",  data.SeventhDayTotalSwipeLeftCount},
-		{"SeventhDaySwipeTotalStartXCor",  data.SeventhDaySwipeTotalStartXCor},
-		{"SeventhDaySwipeTotalStartYCor",  data.SeventhDaySwipeTotalStartYCor},
+		{"SeventhDayTotalSwipeLeftCount", data.SeventhDayTotalSwipeLeftCount},
+		{"SeventhDaySwipeTotalStartXCor", data.SeventhDaySwipeTotalStartXCor},
+		{"SeventhDaySwipeTotalStartYCor", data.SeventhDaySwipeTotalStartYCor},
 		{"SeventhDaySwipeTotalFinishXCor", data.SeventhDaySwipeTotalFinishXCor},
 		{"SeventhDaySwipeTotalFinishYCor", data.SeventhDaySwipeTotalFinishYCor},
 
@@ -153,7 +159,7 @@ func (m *MdbDScreenSwipeDal) Add(data *model.ScreenSwipeRespondModel) error {
 	return nil
 }
 
-func (m *MdbDScreenSwipeDal) GetScreenSwipeById(ClientId string) (*model.ScreenSwipeRespondModel, error) {
+func (m *mdbDScreenSwipeDal) GetScreenSwipeById(ClientId string) (*model.ScreenSwipeRespondModel, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	collection := m.Client.Database("MLDatabase").Collection("ScreenSwipeModel")
@@ -171,7 +177,7 @@ func (m *MdbDScreenSwipeDal) GetScreenSwipeById(ClientId string) (*model.ScreenS
 	return &model, nil
 }
 
-func (m *MdbDScreenSwipeDal) UpdateScreenSwipeById(ClientId string, data *model.ScreenSwipeRespondModel) error {
+func (m *mdbDScreenSwipeDal) UpdateScreenSwipeById(ClientId string, data *model.ScreenSwipeRespondModel) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	update := bson.D{{"$set", bson.D{
@@ -259,39 +265,39 @@ func (m *MdbDScreenSwipeDal) UpdateScreenSwipeById(ClientId string, data *model.
 		{"ThirdDaySwipeTotalFinishXCor", data.ThirdDaySwipeTotalFinishXCor},
 		{"ThirdDaySwipeTotalFinishYCor", data.ThirdDaySwipeTotalFinishYCor},
 
-		{"FourthDayTotalSwipeUpCount",    data.FourthDayTotalSwipeUpCount},
-		{"FourthDayTotalSwipeDownCount",  data.FourthDayTotalSwipeDownCount},
+		{"FourthDayTotalSwipeUpCount", data.FourthDayTotalSwipeUpCount},
+		{"FourthDayTotalSwipeDownCount", data.FourthDayTotalSwipeDownCount},
 		{"FourthDayTotalSwipeRightCount", data.FourthDayTotalSwipeRightCount},
-		{"FourthDayTotalSwipeLeftCount",  data.FourthDayTotalSwipeLeftCount},
-		{"FourthDaySwipeTotalStartXCor",  data.FourthDaySwipeTotalStartXCor},
-		{"FourthDaySwipeTotalStartYCor",  data.FourthDaySwipeTotalStartYCor},
+		{"FourthDayTotalSwipeLeftCount", data.FourthDayTotalSwipeLeftCount},
+		{"FourthDaySwipeTotalStartXCor", data.FourthDaySwipeTotalStartXCor},
+		{"FourthDaySwipeTotalStartYCor", data.FourthDaySwipeTotalStartYCor},
 		{"FourthDaySwipeTotalFinishXCor", data.FourthDaySwipeTotalFinishXCor},
 		{"FourthDaySwipeTotalFinishYCor", data.FourthDaySwipeTotalFinishYCor},
 
-		{"FifthDayTotalSwipeUpCount",    data.FifthDayTotalSwipeUpCount},
-		{"FifthDayTotalSwipeDownCount",  data.FifthDayTotalSwipeDownCount},
+		{"FifthDayTotalSwipeUpCount", data.FifthDayTotalSwipeUpCount},
+		{"FifthDayTotalSwipeDownCount", data.FifthDayTotalSwipeDownCount},
 		{"FifthDayTotalSwipeRightCount", data.FifthDayTotalSwipeRightCount},
-		{"FifthDayTotalSwipeLeftCount",  data.FifthDayTotalSwipeLeftCount},
-		{"FifthDaySwipeTotalStartXCor",  data.FifthDaySwipeTotalStartXCor},
-		{"FifthDaySwipeTotalStartYCor",  data.FifthDaySwipeTotalStartYCor},
+		{"FifthDayTotalSwipeLeftCount", data.FifthDayTotalSwipeLeftCount},
+		{"FifthDaySwipeTotalStartXCor", data.FifthDaySwipeTotalStartXCor},
+		{"FifthDaySwipeTotalStartYCor", data.FifthDaySwipeTotalStartYCor},
 		{"FifthDaySwipeTotalFinishXCor", data.FifthDaySwipeTotalFinishXCor},
 		{"FifthDaySwipeTotalFinishYCor", data.FifthDaySwipeTotalFinishYCor},
 
-		{"SixthDayTotalSwipeUpCount",    data.SixthDayTotalSwipeUpCount},
-		{"SixthDayTotalSwipeDownCount",  data.SixthDayTotalSwipeDownCount},
+		{"SixthDayTotalSwipeUpCount", data.SixthDayTotalSwipeUpCount},
+		{"SixthDayTotalSwipeDownCount", data.SixthDayTotalSwipeDownCount},
 		{"SixthDayTotalSwipeRightCount", data.SixthDayTotalSwipeRightCount},
-		{"SixthDayTotalSwipeLeftCount",  data.SixthDayTotalSwipeLeftCount},
-		{"SixthDaySwipeTotalStartXCor",  data.SixthDaySwipeTotalStartXCor},
-		{"SixthDaySwipeTotalStartYCor",  data.SixthDaySwipeTotalStartYCor},
+		{"SixthDayTotalSwipeLeftCount", data.SixthDayTotalSwipeLeftCount},
+		{"SixthDaySwipeTotalStartXCor", data.SixthDaySwipeTotalStartXCor},
+		{"SixthDaySwipeTotalStartYCor", data.SixthDaySwipeTotalStartYCor},
 		{"SixthDaySwipeTotalFinishXCor", data.SixthDaySwipeTotalFinishXCor},
 		{"SixthDaySwipeTotalFinishYCor", data.SixthDaySwipeTotalFinishYCor},
 
-		{"SeventhDayTotalSwipeUpCount",    data.SeventhDayTotalSwipeUpCount},
-		{"SeventhDayTotalSwipeDownCount",  data.SeventhDayTotalSwipeDownCount},
+		{"SeventhDayTotalSwipeUpCount", data.SeventhDayTotalSwipeUpCount},
+		{"SeventhDayTotalSwipeDownCount", data.SeventhDayTotalSwipeDownCount},
 		{"SeventhDayTotalSwipeRightCount", data.SeventhDayTotalSwipeRightCount},
-		{"SeventhDayTotalSwipeLeftCount",  data.SeventhDayTotalSwipeLeftCount},
-		{"SeventhDaySwipeTotalStartXCor",  data.SeventhDaySwipeTotalStartXCor},
-		{"SeventhDaySwipeTotalStartYCor",  data.SeventhDaySwipeTotalStartYCor},
+		{"SeventhDayTotalSwipeLeftCount", data.SeventhDayTotalSwipeLeftCount},
+		{"SeventhDaySwipeTotalStartXCor", data.SeventhDaySwipeTotalStartXCor},
+		{"SeventhDaySwipeTotalStartYCor", data.SeventhDaySwipeTotalStartYCor},
 		{"SeventhDaySwipeTotalFinishXCor", data.SeventhDaySwipeTotalFinishXCor},
 		{"SeventhDaySwipeTotalFinishYCor", data.SeventhDaySwipeTotalFinishYCor},
 

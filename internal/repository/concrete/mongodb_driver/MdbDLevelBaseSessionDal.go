@@ -2,6 +2,7 @@ package mongodb_driver
 
 import (
 	"FilterWorkerService/internal/model"
+	"FilterWorkerService/pkg/database/mongodb"
 	"context"
 	"time"
 
@@ -9,11 +10,15 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type MdbDLevelBaseSessionDal struct {
+type mdbDLevelBaseSessionDal struct {
 	Client *mongo.Client
 }
 
-func (m *MdbDLevelBaseSessionDal) Add(data *model.LevelBaseSessionRespondModel) error {
+func MdbDLevelBaseSessionDalConstructor() *mdbDLevelBaseSessionDal {
+	return &mdbDLevelBaseSessionDal{Client: mongodb.GetMongodbClient()}
+}
+
+func (m *mdbDLevelBaseSessionDal) Add(data *model.LevelBaseSessionRespondModel) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -73,7 +78,7 @@ func (m *MdbDLevelBaseSessionDal) Add(data *model.LevelBaseSessionRespondModel) 
 	return nil
 }
 
-func (m *MdbDBuyingEventDal) GetLevelBaseSessionById(ClientId string) (*model.LevelBaseSessionRespondModel, error) {
+func (m *mdbDLevelBaseSessionDal) GetLevelBaseSessionById(ClientId string) (*model.LevelBaseSessionRespondModel, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -93,11 +98,11 @@ func (m *MdbDBuyingEventDal) GetLevelBaseSessionById(ClientId string) (*model.Le
 	return &model, nil
 }
 
-func (m *MdbDBuyingEventDal) UpdateLevelBaseSessionById(ClientId string, data *model.LevelBaseSessionRespondModel) error {
+func (m *mdbDLevelBaseSessionDal) UpdateLevelBaseSessionById(ClientId string, data *model.LevelBaseSessionRespondModel) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	update := bson.D{{"$set", bson.D{
-				{"ClientId", data.ClientId},
+		{"ClientId", data.ClientId},
 		{"ProjectId", data.ProjectId},
 		{"CustomerId", data.CustomerId},
 

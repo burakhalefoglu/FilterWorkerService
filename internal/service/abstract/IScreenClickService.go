@@ -1,7 +1,7 @@
 package abstract
 
-
+import "FilterWorkerService/internal/model"
 
 type IScreenClickService interface {
-	ConvertRawModelToResponseModel(data *[]byte) ( s bool, m string)
+	ConvertRawModelToResponseModel(data *[]byte) (respondModel *model.ScreenClickRespondModel, s bool, m string)
 }

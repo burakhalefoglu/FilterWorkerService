@@ -14,14 +14,14 @@ type advEventManager struct {
 	IAdvEventDal  *IAdvEventDal.IAdvEventDal
 	IJsonParser   *IJsonParser.IJsonParser
 	ICacheService *ICacheService.ICacheService
-	ILog *logger.ILog
+	ILog          *logger.ILog
 }
 
 func AdvEventManagerConstructor() *advEventManager {
 	return &advEventManager{IAdvEventDal: &IoC.AdvEventDal,
-		IJsonParser: &IoC.JsonParser,
+		IJsonParser:   &IoC.JsonParser,
 		ICacheService: &IoC.CacheService,
-		ILog: &IoC.Logger,
+		ILog:          &IoC.Logger,
 	}
 }
 
@@ -109,7 +109,7 @@ func (a *advEventManager) ConvertRawModelToResponseModel(data *[]byte) (adv *mod
 		modelResponse.ClientId, modelResponse.ProjectId)
 
 	oldModel, err := (*a.IAdvEventDal).GetAdvEventById(modelResponse.ClientId)
-	if err != nil{
+	if err != nil {
 		(*a.ILog).SendErrorLog("AdvEventManager", "ConvertRawModelToResponseModel",
 			"AdvEventDal_GetAdvEventById", err.Error())
 	}
@@ -215,8 +215,8 @@ func (a *advEventManager) UpdateAdvEvent(modelResponse *model.AdvEventRespondMod
 	return oldModel, true, nil
 }
 
-func CalculateAverageAdvDailyClickCount(oldModel *model.AdvEventRespondModel) (count float64){
-	if oldModel.TotalAdvDay == 0{
+func CalculateAverageAdvDailyClickCount(oldModel *model.AdvEventRespondModel) (count float64) {
+	if oldModel.TotalAdvDay == 0 {
 		return float64(oldModel.TotalAdvCount)
 	}
 	return float64(oldModel.TotalAdvCount) / float64(oldModel.TotalAdvDay)

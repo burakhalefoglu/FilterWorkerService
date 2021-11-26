@@ -1,19 +1,27 @@
 package concrete
 
 import (
+	"FilterWorkerService/internal/IoC"
 	model "FilterWorkerService/internal/model"
 	ILevelBaseSessionDal "FilterWorkerService/internal/repository/abstract"
 	IJsonParser "FilterWorkerService/pkg/jsonParser"
 )
 
-type LevelBaseSessionManager struct {
-	ILevelBaseSessionDal ILevelBaseSessionDal.ILevelBaseSessionDal
-	IJsonParser          IJsonParser.IJsonParser
+type levelBaseSessionManager struct {
+	ILevelBaseSessionDal *ILevelBaseSessionDal.ILevelBaseSessionDal
+	IJsonParser          *IJsonParser.IJsonParser
 }
 
-func (l *LevelBaseSessionManager) ConvertRawModelToResponseModel(data *[]byte) (convertedModel *model.LevelBaseSessionRespondModel, s bool, m string) {
+func LevelBaseSessionManagerConstructor() *levelBaseSessionManager {
+	return &levelBaseSessionManager{
+		ILevelBaseSessionDal: &IoC.LevelBaseSessionDal,
+		IJsonParser:          &IoC.JsonParser,
+	}
+}
+
+func (l *levelBaseSessionManager) ConvertRawModelToResponseModel(data *[]byte) (convertedModel *model.LevelBaseSessionRespondModel, s bool, m string) {
 	firstModel := model.LevelBaseSessionDataModel{}
-	err := l.IJsonParser.DecodeJson(data, &firstModel)
+	err := (*l.IJsonParser).DecodeJson(data, &firstModel)
 	if err != nil {
 		return &model.LevelBaseSessionRespondModel{}, false, err.Error()
 	}
@@ -65,11 +73,11 @@ func (l *LevelBaseSessionManager) ConvertRawModelToResponseModel(data *[]byte) (
 	modelResponse.LastLevelSessionHour = 0
 	modelResponse.LastLevelSessionMinute = 0
 
-	oldModel, err := l.ILevelBaseSessionDal.GetLevelBaseSessionById(modelResponse.ClientId)
+	oldModel, err := (*l.ILevelBaseSessionDal).GetLevelBaseSessionById(modelResponse.ClientId)
 	switch {
 	case err.Error() == "mongo: no documents in result":
 
-		logErr := l.ILevelBaseSessionDal.Add(&modelResponse)
+		logErr := (*l.ILevelBaseSessionDal).Add(&modelResponse)
 		if logErr != nil {
 			return &modelResponse, false, logErr.Error()
 		}
@@ -89,7 +97,7 @@ func (l *LevelBaseSessionManager) ConvertRawModelToResponseModel(data *[]byte) (
 	}
 }
 
-func (l *LevelBaseSessionManager) UpdateLevelBaseSession(modelResponse *model.LevelBaseSessionRespondModel, oldModel *model.LevelBaseSessionRespondModel) (updatedModel *model.LevelBaseSessionRespondModel, s bool, m error) {
+func (l *levelBaseSessionManager) UpdateLevelBaseSession(modelResponse *model.LevelBaseSessionRespondModel, oldModel *model.LevelBaseSessionRespondModel) (updatedModel *model.LevelBaseSessionRespondModel, s bool, m error) {
 
 	oldModel.ProjectId = modelResponse.ProjectId
 	oldModel.ClientId = modelResponse.ClientId
@@ -142,7 +150,7 @@ func (l *LevelBaseSessionManager) UpdateLevelBaseSession(modelResponse *model.Le
 	oldModel.LastLevelSessionHour = modelResponse.FirstLevelSessionHour
 	oldModel.LastLevelSessionMinute = modelResponse.FirstLevelSessionMinute
 
-	logErr := l.ILevelBaseSessionDal.UpdateLevelBaseSessionById(oldModel.ClientId, oldModel)
+	logErr := (*l.ILevelBaseSessionDal).UpdateLevelBaseSessionById(oldModel.ClientId, oldModel)
 	if logErr != nil {
 		return oldModel, false, logErr
 	}

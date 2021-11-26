@@ -1,5 +1,7 @@
 package abstract
 
+import "FilterWorkerService/internal/model"
+
 type ILocationService interface {
-	AddLocation(data *[]byte) (s bool, m string)
+	AddLocation(data *[]byte) (respondLocationModel *model.LocationResponseModel, s bool, m string)
 }

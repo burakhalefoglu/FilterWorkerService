@@ -1,19 +1,27 @@
 package concrete
 
 import (
+	"FilterWorkerService/internal/IoC"
 	model "FilterWorkerService/internal/model"
 	IScreenSwipeDal "FilterWorkerService/internal/repository/abstract"
 	IJsonParser "FilterWorkerService/pkg/jsonParser"
 )
 
-type ScreenSwipeManager struct {
-	IScreenSwipeDal IScreenSwipeDal.IScreenSwipeDal
-	IJsonParser     IJsonParser.IJsonParser
+type screenSwipeManager struct {
+	IScreenSwipeDal *IScreenSwipeDal.IScreenSwipeDal
+	IJsonParser     *IJsonParser.IJsonParser
 }
 
-func (sc *ScreenSwipeManager) ConvertRawModelToResponseModel(data *[]byte) (convertedModel *model.ScreenSwipeRespondModel,s bool, m string) {
+func ScreenSwipeManagerConstructor() *screenSwipeManager {
+	return &screenSwipeManager{
+		IScreenSwipeDal: &IoC.ScreenSwipeDal,
+		IJsonParser:     &IoC.JsonParser,
+	}
+}
+
+func (sc *screenSwipeManager) ConvertRawModelToResponseModel(data *[]byte) (convertedModel *model.ScreenSwipeRespondModel,s bool, m string) {
 	firstModel := model.ScreenSwipeModel{}
-	err := sc.IJsonParser.DecodeJson(data, &firstModel)
+	err := (*sc.IJsonParser).DecodeJson(data, &firstModel)
 	if err != nil {
 		return &model.ScreenSwipeRespondModel{},false, err.Error()
 	}
@@ -161,11 +169,11 @@ func (sc *ScreenSwipeManager) ConvertRawModelToResponseModel(data *[]byte) (conv
 	modelResponse.TotalSwipeFinishXCor = firstModel.SwipeFinishXCor
 	modelResponse.TotalSwipeFinishYCor = firstModel.SwipeFinishYCor
 
-	oldModel, err := sc.IScreenSwipeDal.GetScreenSwipeById(modelResponse.ClientId)
+	oldModel, err := (*sc.IScreenSwipeDal).GetScreenSwipeById(modelResponse.ClientId)
 	switch {
 	case err.Error() == "mongo: no documents in result":
 
-		logErr := sc.IScreenSwipeDal.Add(&modelResponse)
+		logErr := (*sc.IScreenSwipeDal).Add(&modelResponse)
 		if logErr != nil {
 			return &modelResponse,false, logErr.Error()
 		}
@@ -185,7 +193,7 @@ func (sc *ScreenSwipeManager) ConvertRawModelToResponseModel(data *[]byte) (conv
 	}
 }
 
-func (sc *ScreenSwipeManager) UpdateScreenSwipe(modelResponse *model.ScreenSwipeRespondModel, oldModel *model.ScreenSwipeRespondModel) (updatedModel *model.ScreenSwipeRespondModel, s bool, m error) {
+func (sc *screenSwipeManager) UpdateScreenSwipe(modelResponse *model.ScreenSwipeRespondModel, oldModel *model.ScreenSwipeRespondModel) (updatedModel *model.ScreenSwipeRespondModel, s bool, m error) {
 
 	oldModel.ProjectId = modelResponse.ProjectId
 	oldModel.ClientId = modelResponse.ClientId
@@ -242,7 +250,7 @@ func (sc *ScreenSwipeManager) UpdateScreenSwipe(modelResponse *model.ScreenSwipe
 	oldModel.TotalSwipeStartYCor =  modelResponse.TotalSwipeStartYCor + oldModel.TotalSwipeStartYCor
 	oldModel.TotalSwipeFinishXCor = modelResponse.TotalSwipeFinishXCor + oldModel.TotalSwipeFinishXCor
 	oldModel.TotalSwipeFinishYCor = modelResponse.TotalSwipeFinishYCor + oldModel.TotalSwipeFinishYCor
-	logErr := sc.IScreenSwipeDal.UpdateScreenSwipeById(oldModel.ClientId, oldModel)
+	logErr := (*sc.IScreenSwipeDal).UpdateScreenSwipeById(oldModel.ClientId, oldModel)
 	if logErr != nil {
 		return oldModel,false, logErr
 	}

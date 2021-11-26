@@ -1,7 +1,7 @@
 package abstract
 
-
+import "FilterWorkerService/internal/model"
 
 type ILevelBaseSessionService interface {
-	ConvertRawModelToResponseModel(data *[]byte) (s bool, m string)
+	ConvertRawModelToResponseModel(data *[]byte) (convertedModel *model.LevelBaseSessionRespondModel, s bool, m string)
 }

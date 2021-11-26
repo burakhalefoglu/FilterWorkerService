@@ -1,6 +1,7 @@
 package concrete
 
 import (
+	"FilterWorkerService/internal/IoC"
 	model "FilterWorkerService/internal/model"
 	IScreenClickDal "FilterWorkerService/internal/repository/abstract"
 
@@ -8,14 +9,21 @@ import (
 	IJsonParser "FilterWorkerService/pkg/jsonParser"
 )
 
-type ScreenClickManager struct {
-	IScreenClickDal IScreenClickDal.IScreenClickDal
-	IJsonParser     IJsonParser.IJsonParser
+type screenClickManager struct {
+	IScreenClickDal *IScreenClickDal.IScreenClickDal
+	IJsonParser     *IJsonParser.IJsonParser
 }
 
-func (sc *ScreenClickManager) ConvertRawModelToResponseModel(data *[]byte) (respondModel *model.ScreenClickRespondModel, s bool, m string) {
+func ScreenClickManagerConstructor() *screenClickManager {
+	return &screenClickManager{
+		IScreenClickDal: &IoC.ScreenClickDal,
+		IJsonParser:     &IoC.JsonParser,
+	}
+}
+
+func (sc *screenClickManager) ConvertRawModelToResponseModel(data *[]byte) (respondModel *model.ScreenClickRespondModel, s bool, m string) {
 	firstModel := model.ScreenClickModel{}
-	err := sc.IJsonParser.DecodeJson(data, &firstModel)
+	err := (*sc.IJsonParser).DecodeJson(data, &firstModel)
 	if err != nil {
 		return &model.ScreenClickRespondModel{},false, err.Error()
 	}
@@ -126,11 +134,11 @@ func (sc *ScreenClickManager) ConvertRawModelToResponseModel(data *[]byte) (resp
 	modelResponse.DailyAvegareClickCount = float64(firstModel.TouchCount)
 	modelResponse.LastTouchCountMinusSessionBasedAvegareClickCount = 0
 
-	oldModel, err := sc.IScreenClickDal.GetScreenClickById(modelResponse.ClientId)
+	oldModel, err := (*sc.IScreenClickDal).GetScreenClickById(modelResponse.ClientId)
 	switch {
 	case err.Error() == "mongo: no documents in result":
 
-		logErr := sc.IScreenClickDal.Add(&modelResponse)
+		logErr := (*sc.IScreenClickDal).Add(&modelResponse)
 		if logErr != nil {
 			return &modelResponse,false, logErr.Error()
 		}
@@ -150,7 +158,7 @@ func (sc *ScreenClickManager) ConvertRawModelToResponseModel(data *[]byte) (resp
 	}
 }
 
-func (sc *ScreenClickManager) UpdateScreenClick(modelResponse *model.ScreenClickRespondModel, oldModel *model.ScreenClickRespondModel) (updatedModel *model.ScreenClickRespondModel, s bool, m error) {
+func (sc *screenClickManager) UpdateScreenClick(modelResponse *model.ScreenClickRespondModel, oldModel *model.ScreenClickRespondModel) (updatedModel *model.ScreenClickRespondModel, s bool, m error) {
 
 	oldModel.ProjectId = modelResponse.ProjectId
 	oldModel.ClientId = modelResponse.ClientId
@@ -220,7 +228,7 @@ func (sc *ScreenClickManager) UpdateScreenClick(modelResponse *model.ScreenClick
 	oldModel.SessionBasedAvegareClickCount = float64(oldModel.TotalClickCount) / float64(oldModel.TotalClickSessionCount)
 	oldModel.DailyAvegareClickCount = CalculateDailyAverageClickCount(oldModel)
 	oldModel.LastTouchCountMinusSessionBasedAvegareClickCount = float64(oldModel.LastTouchCount) - float64(oldModel.SessionBasedAvegareClickCount)
-	logErr := sc.IScreenClickDal.UpdateScreenClickById(oldModel.ClientId, oldModel)
+	logErr := (*sc.IScreenClickDal).UpdateScreenClickById(oldModel.ClientId, oldModel)
 	if logErr != nil {
 		return oldModel, false, logErr
 	}

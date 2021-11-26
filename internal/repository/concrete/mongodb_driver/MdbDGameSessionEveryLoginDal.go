@@ -2,6 +2,7 @@ package mongodb_driver
 
 import (
 	"FilterWorkerService/internal/model"
+	"FilterWorkerService/pkg/database/mongodb"
 	"context"
 	"time"
 
@@ -9,11 +10,15 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type MdbdDGameSessionEveryLoginDal struct {
+type mdbdDGameSessionEveryLoginDal struct {
 	Client *mongo.Client
 }
 
-func (m *MdbdDGameSessionEveryLoginDal) Add(data *model.GameSessionEveryLoginRespondModel) error {
+func MdbDGameSessionEveryLoginDalConstructor() *mdbdDGameSessionEveryLoginDal {
+	return &mdbdDGameSessionEveryLoginDal{Client: mongodb.GetMongodbClient()}
+}
+
+func (m *mdbdDGameSessionEveryLoginDal) Add(data *model.GameSessionEveryLoginRespondModel) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	collection := m.Client.Database("MLDatabase").Collection("GameSessionEveryLoginModel")
@@ -101,7 +106,7 @@ func (m *MdbdDGameSessionEveryLoginDal) Add(data *model.GameSessionEveryLoginRes
 	return nil
 }
 
-func (m *MdbdDGameSessionEveryLoginDal) GetGameSessionEveryLoginById(ClientId string) (*model.GameSessionEveryLoginRespondModel, error) {
+func (m *mdbdDGameSessionEveryLoginDal) GetGameSessionEveryLoginById(ClientId string) (*model.GameSessionEveryLoginRespondModel, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	collection := m.Client.Database("MLDatabase").Collection("GameSessionEveryLoginModel")
@@ -119,7 +124,7 @@ func (m *MdbdDGameSessionEveryLoginDal) GetGameSessionEveryLoginById(ClientId st
 	return &model, nil
 }
 
-func (m *MdbdDGameSessionEveryLoginDal) UpdateGameSessionEveryLoginById(ClientId string, data *model.GameSessionEveryLoginRespondModel) error {
+func (m *mdbdDGameSessionEveryLoginDal) UpdateGameSessionEveryLoginById(ClientId string, data *model.GameSessionEveryLoginRespondModel) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	update := bson.D{{"$set", bson.D{
