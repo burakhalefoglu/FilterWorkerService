@@ -5,25 +5,30 @@ import (
 	model "FilterWorkerService/internal/model"
 	IGameSessionEveryLoginDal "FilterWorkerService/internal/repository/abstract"
 	IJsonParser "FilterWorkerService/pkg/jsonParser"
+	"FilterWorkerService/pkg/logger"
 )
 
 type gameSessionEveryLoginManager struct {
 	IGameSessionEveryLoginDal *IGameSessionEveryLoginDal.IGameSessionEveryLoginDal
 	IJsonParser               *IJsonParser.IJsonParser
+	ILog                      *logger.ILog
 }
 
 func GameSessionEveryLoginManagerConstructor() *gameSessionEveryLoginManager {
 	return &gameSessionEveryLoginManager{
 		IGameSessionEveryLoginDal: &IoC.GameSessionEveryLoginDal,
-		IJsonParser: &IoC.JsonParser,
+		IJsonParser:               &IoC.JsonParser,
+		ILog:                      &IoC.Logger,
 	}
 }
 
 func (g *gameSessionEveryLoginManager) ConvertRawModelToResponseModel(data *[]byte) (gameSession *model.GameSessionEveryLoginRespondModel, s bool, m string) {
 	firstModel := model.GameSessionEveryLoginModel{}
-	err := (*g.IJsonParser).DecodeJson(data, &firstModel)
-	if err != nil {
-		return &model.GameSessionEveryLoginRespondModel{}, false, err.Error()
+	Err := (*g.IJsonParser).DecodeJson(data, &firstModel)
+	if Err != nil {
+		(*g.ILog).SendErrorLog("GameSessionEveryLoginManager", "ConvertRawModelToResponseModel",
+			"byte array to GameSessionEveryLoginModel", "Json Parser Decode Err: ", Err.Error())
+		return &model.GameSessionEveryLoginRespondModel{}, false, Err.Error()
 	}
 	hour := int64(firstModel.SessionFinishTime.Hour())
 	yearOfDay := int64(firstModel.SessionFinishTime.YearDay())
@@ -107,12 +112,21 @@ func (g *gameSessionEveryLoginManager) ConvertRawModelToResponseModel(data *[]by
 	DetermineGameSessionHour(&modelResponse, hour)
 	DetermineGameSessionAmPm(&modelResponse, hour)
 
+	defer (*g.ILog).SendInfoLog("GameSessionEveryLoginManager", "ConvertRawModelToResponseModel",
+		modelResponse.ClientId, modelResponse.ProjectId)
+
 	oldModel, err := (*g.IGameSessionEveryLoginDal).GetGameSessionEveryLoginById(modelResponse.ClientId)
+	if err != nil {
+		(*g.ILog).SendErrorLog("GameSessionEveryLoginManager", "ConvertRawModelToResponseModel",
+			"GameSessionEveryLoginDal_GetGameSessionEveryLoginById", err.Error())
+	}
 	switch {
 	case err.Error() == "mongo: no documents in result":
 
 		logErr := (*g.IGameSessionEveryLoginDal).Add(&modelResponse)
 		if logErr != nil {
+			(*g.ILog).SendErrorLog("GameSessionEveryLoginManager", "ConvertRawModelToResponseModel",
+				"GameSessionEveryLoginDal_Add", logErr.Error())
 			return &modelResponse, false, logErr.Error()
 		}
 		return &modelResponse, true, "Added"
@@ -201,15 +215,19 @@ func (g *gameSessionEveryLoginManager) UpdateGameSession(modelResponse *model.Ga
 	oldModel.Session12To17HourCount = oldModel.Session12To17HourCount + modelResponse.Session12To17HourCount
 	oldModel.Session18To23HourCount = oldModel.Session18To23HourCount + modelResponse.Session18To23HourCount
 
+	defer (*g.ILog).SendInfoLog("GameSessionEveryLoginManager", "UpdateLevelBaseSession",
+		oldModel.ClientId, oldModel.ProjectId)
 	logErr := (*g.IGameSessionEveryLoginDal).UpdateGameSessionEveryLoginById(oldModel.ClientId, oldModel)
 	if logErr != nil {
+		(*g.ILog).SendErrorLog("GameSessionEveryLoginManager", "UpdateGameSession",
+			"GameSessionEveryLoginDal_UpdateGameSessionEveryLoginById", logErr.Error())
 		return oldModel, false, logErr
 	}
 	return oldModel, true, nil
 }
 
-func CalculateDailyAvegareSessionCountAndDuration(oldModel *model.GameSessionEveryLoginRespondModel)(count float64, duration float64){
-	if oldModel.TotalSessionDay == 0{
+func CalculateDailyAvegareSessionCountAndDuration(oldModel *model.GameSessionEveryLoginRespondModel) (count float64, duration float64) {
+	if oldModel.TotalSessionDay == 0 {
 		return float64(oldModel.TotalSessionCount), float64(oldModel.TotalSessionDuration)
 	}
 	return float64(oldModel.TotalSessionCount) / float64(oldModel.TotalSessionDay), float64(oldModel.TotalSessionDuration) / float64(oldModel.TotalSessionDay)
@@ -352,7 +370,6 @@ func CalculateThirdGameSession(modelResponse *model.GameSessionEveryLoginRespond
 	return oldModel.ThirdSessionHour, oldModel.ThirdSessionDuration, oldModel.ThirdSessinMinute
 }
 
-
 func CalculateMinDuration(modelResponse *model.GameSessionEveryLoginRespondModel, oldModel *model.GameSessionEveryLoginRespondModel) (duration int64) {
 	if oldModel.MinSessionDuration > modelResponse.MinSessionDuration {
 		oldModel.MinSessionDuration = modelResponse.MinSessionDuration
@@ -368,7 +385,6 @@ func CalculateMaxDuration(modelResponse *model.GameSessionEveryLoginRespondModel
 	}
 	return oldModel.MaxSessionDuration
 }
-
 
 func DetermineGameSessionDay(modelResponse *model.GameSessionEveryLoginRespondModel, day int64) {
 	switch day {

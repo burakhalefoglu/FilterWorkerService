@@ -7,25 +7,30 @@ import (
 
 	//ICacheService "FilterWorkerService/internal/service/abstract"
 	IJsonParser "FilterWorkerService/pkg/jsonParser"
+	"FilterWorkerService/pkg/logger"
 )
 
 type screenClickManager struct {
 	IScreenClickDal *IScreenClickDal.IScreenClickDal
 	IJsonParser     *IJsonParser.IJsonParser
+	ILog          *logger.ILog
 }
 
 func ScreenClickManagerConstructor() *screenClickManager {
 	return &screenClickManager{
 		IScreenClickDal: &IoC.ScreenClickDal,
 		IJsonParser:     &IoC.JsonParser,
+		ILog:          &IoC.Logger,
 	}
 }
 
 func (sc *screenClickManager) ConvertRawModelToResponseModel(data *[]byte) (respondModel *model.ScreenClickRespondModel, s bool, m string) {
 	firstModel := model.ScreenClickModel{}
-	err := (*sc.IJsonParser).DecodeJson(data, &firstModel)
-	if err != nil {
-		return &model.ScreenClickRespondModel{},false, err.Error()
+	Err := (*sc.IJsonParser).DecodeJson(data, &firstModel)
+	if Err != nil {
+		(*sc.ILog).SendErrorLog("ScreenClickManager", "ConvertRawModelToResponseModel",
+			"byte array to ScreenClickModel", "Json Parser Decode Err: ", Err.Error())
+		return &model.ScreenClickRespondModel{},false, Err.Error()
 	}
 	hour := int64(firstModel.CreationAt.Hour())
 	yearOfDay := int64(firstModel.CreationAt.YearDay())
@@ -134,12 +139,20 @@ func (sc *screenClickManager) ConvertRawModelToResponseModel(data *[]byte) (resp
 	modelResponse.DailyAvegareClickCount = float64(firstModel.TouchCount)
 	modelResponse.LastTouchCountMinusSessionBasedAvegareClickCount = 0
 
+	defer (*sc.ILog).SendInfoLog("ScreenClickManager", "ConvertRawModelToResponseModel",
+		modelResponse.ClientId, modelResponse.ProjectId)
 	oldModel, err := (*sc.IScreenClickDal).GetScreenClickById(modelResponse.ClientId)
+	if err != nil {
+		(*sc.ILog).SendErrorLog("ScreenClickManager", "ConvertRawModelToResponseModel",
+			"ScreenClickDal_GetScreenClickById", err.Error())
+	}
 	switch {
 	case err.Error() == "mongo: no documents in result":
 
 		logErr := (*sc.IScreenClickDal).Add(&modelResponse)
 		if logErr != nil {
+			(*sc.ILog).SendErrorLog("ScreenClickManager", "ConvertRawModelToResponseModel",
+				"ScreenClickDal_Add", logErr.Error())
 			return &modelResponse,false, logErr.Error()
 		}
 		return &modelResponse, true, "Added"
@@ -228,8 +241,13 @@ func (sc *screenClickManager) UpdateScreenClick(modelResponse *model.ScreenClick
 	oldModel.SessionBasedAvegareClickCount = float64(oldModel.TotalClickCount) / float64(oldModel.TotalClickSessionCount)
 	oldModel.DailyAvegareClickCount = CalculateDailyAverageClickCount(oldModel)
 	oldModel.LastTouchCountMinusSessionBasedAvegareClickCount = float64(oldModel.LastTouchCount) - float64(oldModel.SessionBasedAvegareClickCount)
+
+	defer (*sc.ILog).SendInfoLog("ScreenClickManager", "UpdateScreenClick",
+		oldModel.ClientId, oldModel.ProjectId)
 	logErr := (*sc.IScreenClickDal).UpdateScreenClickById(oldModel.ClientId, oldModel)
 	if logErr != nil {
+		(*sc.ILog).SendErrorLog("ScreenClickManager", "UpdateScreenClick",
+			"ScreenClickDal_UpdateScreenClickById", logErr.Error())
 		return oldModel, false, logErr
 	}
 	return oldModel, true, nil

@@ -5,27 +5,30 @@ import (
 	model "FilterWorkerService/internal/model"
 	IBuyingEventDal "FilterWorkerService/internal/repository/abstract"
 	IJsonParser "FilterWorkerService/pkg/jsonParser"
+	"FilterWorkerService/pkg/logger"
 )
 
 type buyingEventManager struct {
 	IBuyingEventDal *IBuyingEventDal.IBuyingEventDal
 	IJsonParser     *IJsonParser.IJsonParser
+	ILog            *logger.ILog
 }
-
 
 func BuyingEventManagerConstructor() *buyingEventManager {
 	return &buyingEventManager{
 		IBuyingEventDal: &IoC.BuyingEventDal,
-		IJsonParser: &IoC.JsonParser,
+		IJsonParser:     &IoC.JsonParser,
+		ILog:            &IoC.Logger,
 	}
 }
 
-
-func (b *buyingEventManager) ConvertRawModelToResponseModel(data *[]byte) (buying *model.BuyingEventRespondModel,s bool, m string) {
+func (b *buyingEventManager) ConvertRawModelToResponseModel(data *[]byte) (buying *model.BuyingEventRespondModel, s bool, m string) {
 	firstModel := model.BuyingEventModel{}
-	err := (*b.IJsonParser).DecodeJson(data, &firstModel)
-	if err != nil {
-		return &model.BuyingEventRespondModel{},false, err.Error()
+	Err := (*b.IJsonParser).DecodeJson(data, &firstModel)
+	if Err != nil {
+		(*b.ILog).SendErrorLog("BuyingEventManager", "ConvertRawModelToResponseModel",
+			"byte array to BuyingEventModel", "Json Parser Decode Err: ", Err.Error())
+		return &model.BuyingEventRespondModel{}, false, Err.Error()
 	}
 	hour := int64(firstModel.TrigerdTime.Hour())
 	day := int64(firstModel.TrigerdTime.Weekday())
@@ -61,26 +64,34 @@ func (b *buyingEventManager) ConvertRawModelToResponseModel(data *[]byte) (buyin
 	modelResponse.BuyingDayAverageBuyingCount = 1
 	CalculateBuyingLevelBasedAvgBuyingCount(&modelResponse)
 
+	defer (*b.ILog).SendInfoLog("BuyingEventManager", "ConvertRawModelToResponseModel",
+		modelResponse.ClientId, modelResponse.ProjectId)
 	oldModel, err := (*b.IBuyingEventDal).GetBuyingEventById(modelResponse.ClientId)
+	if err != nil {
+		(*b.ILog).SendErrorLog("BuyingEventManager", "ConvertRawModelToResponseModel",
+			"BuyingEventDal_GetBuyingEventById", err.Error())
+	}
 	switch {
 	case err.Error() == "mongo: no documents in result":
 
 		logErr := (*b.IBuyingEventDal).Add(&modelResponse)
 		if logErr != nil {
-			return nil,false, logErr.Error()
+			(*b.ILog).SendErrorLog("BuyingEventManager", "ConvertRawModelToResponseModel",
+				"BuyingEventDal_Add", logErr.Error())
+			return nil, false, logErr.Error()
 		}
-		return &modelResponse,true, "Added"
+		return &modelResponse, true, "Added"
 
 	case err == nil:
-		updModel ,updateResult, updateErr := b.UpdateBuyingEvent(&modelResponse, oldModel)
+		updModel, updateResult, updateErr := b.UpdateBuyingEvent(&modelResponse, oldModel)
 		if updateErr != nil {
-			return nil,updateResult, updateErr.Error()
+			return nil, updateResult, updateErr.Error()
 		}
-		return updModel,updateResult, "Updated"
+		return updModel, updateResult, "Updated"
 
 	default:
 
-		return nil,false, err.Error()
+		return nil, false, err.Error()
 
 	}
 
@@ -100,11 +111,11 @@ func (b *buyingEventManager) UpdateBuyingEvent(modelResponse *model.BuyingEventR
 	//oldModel.FirstBuyingMinute
 	oldModel.SecondBuyingYearOfDay, oldModel.SecondBuyingHour = CalculateSecondBuying(modelResponse, oldModel)
 	oldModel.ThirdBuyingYearOfDay, modelResponse.ThirdBuyingHour = CalculateThirdBuying(modelResponse, oldModel)
-	
+
 	oldModel.FirstDayBuyingCount = CalculateFirstDayBuyingCount(modelResponse, oldModel)
 	oldModel.PenultimateDayBuyingCount = CalculatePenultimateDayBuyingCount(modelResponse, oldModel)
 	oldModel.LastDayBuyingCount = CalculateLastDayBuyingCount(modelResponse, oldModel)
-	
+
 	oldModel.PenultimateBuyingYearOfDay = oldModel.LastBuyingYearOfDay
 	oldModel.PenultimateBuyingHour = oldModel.LastBuyingHour
 	oldModel.LastBuyingYearOfDay = modelResponse.FirstBuyingYearOfDay
@@ -129,8 +140,12 @@ func (b *buyingEventManager) UpdateBuyingEvent(modelResponse *model.BuyingEventR
 	oldModel.BuyingDayAverageBuyingCount = float64(oldModel.TotalBuyingCount) / float64(oldModel.TotalBuyingDay)
 	CalculateBuyingLevelBasedAvgBuyingCount(oldModel)
 
+	defer (*b.ILog).SendInfoLog("BuyingEventManager", "UpdateBuyingEvent",
+		oldModel.ClientId, oldModel.ProjectId)
 	logErr := (*b.IBuyingEventDal).UpdateBuyingEventById(oldModel.ClientId, oldModel)
 	if logErr != nil {
+		(*b.ILog).SendErrorLog("BuyingEventManager", "UpdateBuyingEvent",
+			"BuyingEventDal_UpdateBuyingEventById", logErr.Error())
 		return oldModel, false, logErr
 	}
 	return oldModel, true, nil
@@ -155,14 +170,14 @@ func CalculateThirdBuying(modelResponse *model.BuyingEventRespondModel, oldModel
 }
 
 func CalculatePenultimateDayBuyingCount(modelResponse *model.BuyingEventRespondModel, oldModel *model.BuyingEventRespondModel) (count int64) {
-	if ((modelResponse.FirstBuyingYearOfDay + (365 * modelResponse.FirstBuyingYear)) > (oldModel.LastBuyingYearOfDay + (365 * oldModel.LastBuyingYear))) && ((modelResponse.FirstBuyingYearOfDay + 365*modelResponse.FirstBuyingYear) != (oldModel.FirstBuyingYearOfDay+365*oldModel.FirstBuyingYear)){
+	if ((modelResponse.FirstBuyingYearOfDay + (365 * modelResponse.FirstBuyingYear)) > (oldModel.LastBuyingYearOfDay + (365 * oldModel.LastBuyingYear))) && ((modelResponse.FirstBuyingYearOfDay + 365*modelResponse.FirstBuyingYear) != (oldModel.FirstBuyingYearOfDay + 365*oldModel.FirstBuyingYear)) {
 		return oldModel.LastDayBuyingCount
 	}
 	return oldModel.PenultimateDayBuyingCount
 }
 
 func CalculateFirstDayBuyingCount(modelResponse *model.BuyingEventRespondModel, oldModel *model.BuyingEventRespondModel) int64 {
-	if ((oldModel.FirstBuyingYearOfDay) == (modelResponse.FirstBuyingYearOfDay)) && ((oldModel.FirstBuyingYear) == (modelResponse.FirstBuyingYear)){
+	if ((oldModel.FirstBuyingYearOfDay) == (modelResponse.FirstBuyingYearOfDay)) && ((oldModel.FirstBuyingYear) == (modelResponse.FirstBuyingYear)) {
 		oldModel.FirstDayBuyingCount = oldModel.FirstDayBuyingCount + modelResponse.FirstDayBuyingCount
 		return oldModel.FirstDayBuyingCount
 	}
@@ -171,14 +186,14 @@ func CalculateFirstDayBuyingCount(modelResponse *model.BuyingEventRespondModel, 
 
 func CalculateLastDayBuyingCount(modelResponse *model.BuyingEventRespondModel, oldModel *model.BuyingEventRespondModel) int64 {
 	switch {
-	case ((oldModel.LastBuyingYearOfDay + (365 * oldModel.LastBuyingYear)) == (modelResponse.FirstBuyingYearOfDay + (365 * modelResponse.FirstBuyingYear))) && ((modelResponse.FirstBuyingYearOfDay + 365*modelResponse.FirstBuyingYear) != (oldModel.FirstBuyingYearOfDay+365*oldModel.FirstBuyingYear)):
+	case ((oldModel.LastBuyingYearOfDay + (365 * oldModel.LastBuyingYear)) == (modelResponse.FirstBuyingYearOfDay + (365 * modelResponse.FirstBuyingYear))) && ((modelResponse.FirstBuyingYearOfDay + 365*modelResponse.FirstBuyingYear) != (oldModel.FirstBuyingYearOfDay + 365*oldModel.FirstBuyingYear)):
 		oldModel.LastDayBuyingCount = oldModel.LastDayBuyingCount + modelResponse.FirstDayBuyingCount
 		return oldModel.LastDayBuyingCount
-	case ((modelResponse.FirstBuyingYearOfDay + (365 * modelResponse.FirstBuyingYear)) > (oldModel.LastBuyingYearOfDay + (365 * oldModel.LastBuyingYear))) && ((modelResponse.FirstBuyingYearOfDay + 365*modelResponse.FirstBuyingYear) != (oldModel.FirstBuyingYearOfDay+365*oldModel.FirstBuyingYear)):
+	case ((modelResponse.FirstBuyingYearOfDay + (365 * modelResponse.FirstBuyingYear)) > (oldModel.LastBuyingYearOfDay + (365 * oldModel.LastBuyingYear))) && ((modelResponse.FirstBuyingYearOfDay + 365*modelResponse.FirstBuyingYear) != (oldModel.FirstBuyingYearOfDay + 365*oldModel.FirstBuyingYear)):
 		return modelResponse.FirstDayBuyingCount
 	default:
 		return oldModel.LastDayBuyingCount
-		
+
 	}
 }
 
@@ -229,6 +244,6 @@ func CalculateBuyingLevelBasedAvgBuyingCount(modelResponse *model.BuyingEventRes
 		modelResponse.LevelBasedAverageBuyingCount = float64(modelResponse.TotalBuyingCount)
 	default:
 		modelResponse.LevelBasedAverageBuyingCount = float64(modelResponse.TotalBuyingCount) / float64(modelResponse.LevelIndex)
-		
+
 	}
 }

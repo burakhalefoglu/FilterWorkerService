@@ -27,11 +27,11 @@ func AdvEventManagerConstructor() *advEventManager {
 
 func (a *advEventManager) ConvertRawModelToResponseModel(data *[]byte) (adv *model.AdvEventRespondModel, s bool, m string) {
 	firstModel := model.AdvEventModel{}
-	err := (*a.IJsonParser).DecodeJson(data, &firstModel)
-	if err != nil {
+	Err := (*a.IJsonParser).DecodeJson(data, &firstModel)
+	if Err != nil {
 		(*a.ILog).SendErrorLog("AdvEventManager", "ConvertRawModelToResponseModel",
-			"byte array to AdvEventModel", "Json Parser Decode Err: ", err.Error())
-		return nil, false, err.Error()
+			"byte array to AdvEventModel", "Json Parser Decode Err: ", Err.Error())
+		return nil, false, Err.Error()
 	}
 	hour := int64(firstModel.TrigerdTime.Hour())
 	day := int64(firstModel.TrigerdTime.Weekday())
@@ -119,7 +119,7 @@ func (a *advEventManager) ConvertRawModelToResponseModel(data *[]byte) (adv *mod
 		logErr := (*a.IAdvEventDal).Add(&modelResponse)
 		if logErr != nil {
 			(*a.ILog).SendErrorLog("AdvEventManager", "ConvertRawModelToResponseModel",
-				"AdvEventDal_Add", err.Error())
+				"AdvEventDal_Add", logErr.Error())
 			return nil, false, logErr.Error()
 		}
 		return &modelResponse, true, "Added"
@@ -127,8 +127,6 @@ func (a *advEventManager) ConvertRawModelToResponseModel(data *[]byte) (adv *mod
 	case err == nil:
 		updatedModel, updateResult, updateErr := a.UpdateAdvEvent(&modelResponse, oldModel)
 		if updateErr != nil {
-			(*a.ILog).SendErrorLog("AdvEventManager", "ConvertRawModelToResponseModel",
-				"AdvEventDal_UpdateAdvEvent", err.Error())
 			return nil, updateResult, "Update went wrong!"
 		}
 		return updatedModel, updateResult, "Updated"
@@ -208,8 +206,12 @@ func (a *advEventManager) UpdateAdvEvent(modelResponse *model.AdvEventRespondMod
 	oldModel.AmAdvClickCount = oldModel.AmAdvClickCount + modelResponse.AmAdvClickCount
 	oldModel.PmAdvClickCount = oldModel.PmAdvClickCount + modelResponse.PmAdvClickCount
 
+	defer (*a.ILog).SendInfoLog("AdvEventManager", "UpdateAdvEvent",
+		oldModel.ClientId, oldModel.ProjectId)
 	logErr := (*a.IAdvEventDal).UpdateAdvEventById(oldModel.ClientId, oldModel)
 	if logErr != nil {
+		(*a.ILog).SendErrorLog("AdvEventManager", "UpdateAdvEvent",
+			"AdvEventDal_UpdateAdvEventById", logErr.Error())
 		return oldModel, false, logErr
 	}
 	return oldModel, true, nil

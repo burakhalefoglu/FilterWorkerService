@@ -3,7 +3,7 @@ package concrete
 import (
 	"FilterWorkerService/internal/model"
 	"FilterWorkerService/internal/repository/abstract"
-	"FilterWorkerService/pkg/Cache"
+	Cache "FilterWorkerService/pkg/Cache"
 	Ijsonparser "FilterWorkerService/pkg/jsonParser"
 	"log"
 	"strconv"

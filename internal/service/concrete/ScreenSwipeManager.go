@@ -5,25 +5,30 @@ import (
 	model "FilterWorkerService/internal/model"
 	IScreenSwipeDal "FilterWorkerService/internal/repository/abstract"
 	IJsonParser "FilterWorkerService/pkg/jsonParser"
+	"FilterWorkerService/pkg/logger"
 )
 
 type screenSwipeManager struct {
 	IScreenSwipeDal *IScreenSwipeDal.IScreenSwipeDal
 	IJsonParser     *IJsonParser.IJsonParser
+	ILog          *logger.ILog
 }
 
 func ScreenSwipeManagerConstructor() *screenSwipeManager {
 	return &screenSwipeManager{
 		IScreenSwipeDal: &IoC.ScreenSwipeDal,
 		IJsonParser:     &IoC.JsonParser,
+		ILog:          &IoC.Logger,
 	}
 }
 
 func (sc *screenSwipeManager) ConvertRawModelToResponseModel(data *[]byte) (convertedModel *model.ScreenSwipeRespondModel,s bool, m string) {
 	firstModel := model.ScreenSwipeModel{}
-	err := (*sc.IJsonParser).DecodeJson(data, &firstModel)
-	if err != nil {
-		return &model.ScreenSwipeRespondModel{},false, err.Error()
+	Err := (*sc.IJsonParser).DecodeJson(data, &firstModel)
+	if Err != nil {
+		(*sc.ILog).SendErrorLog("ScreenSwipeManager", "ConvertRawModelToResponseModel",
+			"byte array to ScreenSwipeModel", "Json Parser Decode Err: ", Err.Error())
+		return &model.ScreenSwipeRespondModel{},false, Err.Error()
 	}
 	hour := int64(firstModel.CreationAt.Hour())
 	yearOfDay := int64(firstModel.CreationAt.YearDay())
@@ -169,12 +174,20 @@ func (sc *screenSwipeManager) ConvertRawModelToResponseModel(data *[]byte) (conv
 	modelResponse.TotalSwipeFinishXCor = firstModel.SwipeFinishXCor
 	modelResponse.TotalSwipeFinishYCor = firstModel.SwipeFinishYCor
 
+	defer (*sc.ILog).SendInfoLog("ScreenSwipeManager", "ConvertRawModelToResponseModel",
+		modelResponse.ClientId, modelResponse.ProjectId)
 	oldModel, err := (*sc.IScreenSwipeDal).GetScreenSwipeById(modelResponse.ClientId)
+	if err != nil {
+		(*sc.ILog).SendErrorLog("ScreenSwipeManager", "ConvertRawModelToResponseModel",
+			"ScreenSwipeDal_GetScreenSwipeById", err.Error())
+	}
 	switch {
 	case err.Error() == "mongo: no documents in result":
 
 		logErr := (*sc.IScreenSwipeDal).Add(&modelResponse)
 		if logErr != nil {
+			(*sc.ILog).SendErrorLog("ScreenSwipeManager", "ConvertRawModelToResponseModel",
+				"ScreenSwipeDal_Add", logErr.Error())
 			return &modelResponse,false, logErr.Error()
 		}
 		return &modelResponse,true, "Added"
@@ -250,8 +263,13 @@ func (sc *screenSwipeManager) UpdateScreenSwipe(modelResponse *model.ScreenSwipe
 	oldModel.TotalSwipeStartYCor =  modelResponse.TotalSwipeStartYCor + oldModel.TotalSwipeStartYCor
 	oldModel.TotalSwipeFinishXCor = modelResponse.TotalSwipeFinishXCor + oldModel.TotalSwipeFinishXCor
 	oldModel.TotalSwipeFinishYCor = modelResponse.TotalSwipeFinishYCor + oldModel.TotalSwipeFinishYCor
+
+	defer (*sc.ILog).SendInfoLog("ScreenSwipeManager", "UpdateScreenSwipe",
+		oldModel.ClientId, oldModel.ProjectId)
 	logErr := (*sc.IScreenSwipeDal).UpdateScreenSwipeById(oldModel.ClientId, oldModel)
 	if logErr != nil {
+		(*sc.ILog).SendErrorLog("ScreenSwipeManager", "UpdateScreenSwipe",
+			"ScreenSwipeDal_UpdateScreenSwipeById", logErr.Error())
 		return oldModel,false, logErr
 	}
 	return oldModel,true, nil

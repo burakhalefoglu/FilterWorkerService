@@ -6,12 +6,14 @@ import (
 	ILocationDal "FilterWorkerService/internal/repository/abstract"
 	ICacheService "FilterWorkerService/internal/service/abstract"
 	Ijsonparser "FilterWorkerService/pkg/jsonParser"
+	"FilterWorkerService/pkg/logger"
 )
 
 type locationManager struct {
 	ICacheService *ICacheService.ICacheService
 	IJsonParser   *Ijsonparser.IJsonParser
 	ILocationDal  *ILocationDal.ILocationDal
+	ILog          *logger.ILog
 }
 
 func LocationManagerConstructor() *locationManager {
@@ -19,17 +21,19 @@ func LocationManagerConstructor() *locationManager {
 		ICacheService: &IoC.CacheService,
 		IJsonParser:   &IoC.JsonParser,
 		ILocationDal:  &IoC.LocationDal,
+		ILog:          &IoC.Logger,
 	}
 }
 
 func (l *locationManager) AddLocation(data *[]byte) (respondLocationModel *model.LocationResponseModel, s bool, m string) {
 
 	firstmodel := model.LocationModel{}
-	err := (*l.IJsonParser).DecodeJson(data, &firstmodel)
-	if err != nil {
-		return &model.LocationResponseModel{}, false, err.Error()
+	Err := (*l.IJsonParser).DecodeJson(data, &firstmodel)
+	if Err != nil {
+		(*l.ILog).SendErrorLog("LocationManager", "AddLocation",
+			"byte array to LocationModel", "Json Parser Decode Err: ", Err.Error())
+		return &model.LocationResponseModel{}, false, Err.Error()
 	}
-
 	modelResponse := model.LocationResponseModel{}
 	modelResponse.ProjectId = firstmodel.ProjectId
 	modelResponse.ClientId = firstmodel.ClientId
@@ -39,10 +43,13 @@ func (l *locationManager) AddLocation(data *[]byte) (respondLocationModel *model
 	modelResponse.Org, _, _ = (*l.ICacheService).ManageCache("Org", firstmodel.Org)
 	modelResponse.City, _, _ = (*l.ICacheService).ManageCache("City", firstmodel.City)
 	modelResponse.Continent, _, _ = (*l.ICacheService).ManageCache("Continent", firstmodel.Continent)
-
-	locerr := (*l.ILocationDal).Add(&modelResponse)
-	if locerr != nil {
-		return &modelResponse, false, locerr.Error()
+	defer (*l.ILog).SendInfoLog("LocationManager", "AddLocation",
+		modelResponse.ClientId, modelResponse.ProjectId)
+	logErr := (*l.ILocationDal).Add(&modelResponse)
+	if logErr != nil {
+		(*l.ILog).SendErrorLog("LocationManager", "AddLocation",
+			"LocationDal_Add", logErr.Error())
+		return &modelResponse, false, logErr.Error()
 	}
 	return &modelResponse, true, ""
 }
