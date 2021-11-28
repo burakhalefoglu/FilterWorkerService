@@ -8,20 +8,18 @@ import (
 )
 
 type kafkaController struct {
-	Kafka *Kafka.IKafka
-	AdvEventService *service.IAdvEventService
-	BuyingEventService *service.IBuyingEventService
+	Kafka                        *Kafka.IKafka
+	AdvEventService              *service.IAdvEventService
+	BuyingEventService           *service.IBuyingEventService
 	GameSessionEveryLoginService *service.IGameSessionEveryLoginService
-	HardwareInformationService *service.IHardwareInformationService
-	LevelBaseSessionService *service.ILevelBaseSessionService
-	LocationService *service.ILocationService
-	ScreenClickService *service.IScreenClickService
-	ScreenSwipeService *service.IScreenSwipeService
-
+	HardwareInformationService   *service.IHardwareInformationService
+	LevelBaseSessionService      *service.ILevelBaseSessionService
+	LocationService              *service.ILocationService
+	ScreenClickService           *service.IScreenClickService
+	ScreenSwipeService           *service.IScreenSwipeService
 }
 
-func KafkaControllerConstructor(
-	) *kafkaController {
+func KafkaControllerConstructor() *kafkaController {
 	return &kafkaController{
 		Kafka:                        &IoC.Kafka,
 		AdvEventService:              &IoC.AdvEventService,
@@ -60,12 +58,12 @@ func (k *kafkaController) StartListen(waitGroup *sync.WaitGroup) {
 		(*k.HardwareInformationService).AddHardwareInformation)
 
 	go (*k.Kafka).Consume("LevelBaseSessionDataModel",
-		"LevelBaseSessionModel_Filter_ConsumerGroup",
+		"LevelBaseSessionDataModel_Filter_ConsumerGroup",
 		waitGroup,
 		(*k.LevelBaseSessionService).ConvertRawModelToResponseModel)
 
 	go (*k.Kafka).Consume("LocationDataModel",
-		"LocationModel_Filter_ConsumerGroup",
+		"LocationDataModel_Filter_ConsumerGroup",
 		waitGroup,
 		(*k.LocationService).AddLocation)
 
@@ -78,6 +76,5 @@ func (k *kafkaController) StartListen(waitGroup *sync.WaitGroup) {
 		"ScreenSwipeDataModel_Filter_ConsumerGroup",
 		waitGroup,
 		(*k.ScreenSwipeService).ConvertRawModelToResponseModel)
-
 
 }

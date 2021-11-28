@@ -4,6 +4,7 @@ import (
 	"FilterWorkerService/internal/IoC"
 	model "FilterWorkerService/internal/model"
 	IBuyingEventDal "FilterWorkerService/internal/repository/abstract"
+	ICacheService "FilterWorkerService/internal/service/abstract"
 	IJsonParser "FilterWorkerService/pkg/jsonParser"
 	"FilterWorkerService/pkg/logger"
 )
@@ -11,6 +12,7 @@ import (
 type buyingEventManager struct {
 	IBuyingEventDal *IBuyingEventDal.IBuyingEventDal
 	IJsonParser     *IJsonParser.IJsonParser
+	ICacheService   *ICacheService.ICacheService
 	ILog            *logger.ILog
 }
 
@@ -18,6 +20,7 @@ func BuyingEventManagerConstructor() *buyingEventManager {
 	return &buyingEventManager{
 		IBuyingEventDal: &IoC.BuyingEventDal,
 		IJsonParser:     &IoC.JsonParser,
+		ICacheService:   &IoC.CacheService,
 		ILog:            &IoC.Logger,
 	}
 }
@@ -41,20 +44,44 @@ func (b *buyingEventManager) ConvertRawModelToResponseModel(data *[]byte) (v int
 	modelResponse.LevelIndex = int64(firstModel.LevelIndex)
 	modelResponse.TotalBuyingCount = 1
 	modelResponse.TotalBuyingDay = 1
+	modelResponse.TotalBuyingHour = 0
 	modelResponse.FirstBuyingYearOfDay = yearOfDay
 	modelResponse.FirstBuyingYear = year
 	modelResponse.FirstBuyingHour = hour
 	modelResponse.FirstBuyingMinute = int64(firstModel.InWhatMinutes)
+	modelResponse.FirstBuyingProductType, _, _ = (*b.ICacheService).ManageCache("ProductType", firstModel.ProductType)
 	modelResponse.SecondBuyingYearOfDay = 0
 	modelResponse.SecondBuyingHour = 0
+	modelResponse.SecondBuyingMinute = 0
+	modelResponse.SecondBuyingProductType = 0
 	modelResponse.ThirdBuyingYearOfDay = 0
 	modelResponse.ThirdBuyingHour = 0
+	modelResponse.ThirdBuyingMinute = 0
+	modelResponse.ThirdBuyingProductType = 0
+	modelResponse.FourthBuyingYearOfDay = 0
+	modelResponse.FourthBuyingHour = 0
+	modelResponse.FourthBuyingMinute = 0
+	modelResponse.FourthBuyingProductType = 0
+	modelResponse.FifthBuyingYearOfDay = 0
+	modelResponse.FifthBuyingHour = 0
+	modelResponse.FifthBuyingMinute = 0
+	modelResponse.FifthBuyingProductType = 0
 	modelResponse.PenultimateBuyingYearOfDay = 0
 	modelResponse.PenultimateBuyingHour = 0
+	modelResponse.PenultimateBuyingMinute = 0
+	modelResponse.PenultimateBuyingProductType = 0
 	modelResponse.LastBuyingYearOfDay = 0
 	modelResponse.LastBuyingYear = 0
 	modelResponse.LastBuyingHour = 0
+	modelResponse.LastBuyingMinute = 0
+	modelResponse.LastBuyingProductType = 0
 	modelResponse.FirstDayBuyingCount = 1
+	modelResponse.SecondDayBuyingCount = 0
+	modelResponse.ThirdDayBuyingCount = 0
+	modelResponse.FourthDayBuyingCount = 0
+	modelResponse.FifthDayBuyingCount = 0
+	modelResponse.SixthDayBuyingCount = 0
+	modelResponse.SeventhDayBuyingCount = 0
 	modelResponse.PenultimateDayBuyingCount = 0
 	modelResponse.LastDayBuyingCount = 0
 	modelResponse.LastMinusFirstDayBuyingCount = -1
@@ -72,7 +99,7 @@ func (b *buyingEventManager) ConvertRawModelToResponseModel(data *[]byte) (v int
 			"BuyingEventDal_GetBuyingEventById", err.Error())
 	}
 	switch {
-	case err.Error() == "mongo: no documents in result":
+	case err.Error() == "null data error":
 
 		logErr := (*b.IBuyingEventDal).Add(&modelResponse)
 		if logErr != nil {
@@ -105,23 +132,30 @@ func (b *buyingEventManager) UpdateBuyingEvent(modelResponse *model.BuyingEventR
 	oldModel.LevelIndex = modelResponse.LevelIndex
 	oldModel.TotalBuyingCount = oldModel.TotalBuyingCount + modelResponse.TotalBuyingCount
 	oldModel.TotalBuyingDay = (modelResponse.FirstBuyingYearOfDay - oldModel.FirstBuyingYearOfDay) + 365*(modelResponse.FirstBuyingYear-oldModel.FirstBuyingYear)
-	//oldModel.FirstBuyingYearOfDay
-	//oldModel.FirstBuyingYear
-	//oldModel.FirstBuyingHour
-	//oldModel.FirstBuyingMinute
-	oldModel.SecondBuyingYearOfDay, oldModel.SecondBuyingHour = CalculateSecondBuying(modelResponse, oldModel)
-	oldModel.ThirdBuyingYearOfDay, modelResponse.ThirdBuyingHour = CalculateThirdBuying(modelResponse, oldModel)
-
-	oldModel.FirstDayBuyingCount = CalculateFirstDayBuyingCount(modelResponse, oldModel)
+	oldModel.TotalBuyingHour = ((modelResponse.FirstBuyingYearOfDay+365*modelResponse.FirstBuyingYear)*24 + modelResponse.TotalBuyingHour) - ((oldModel.FirstBuyingYearOfDay+365*oldModel.FirstBuyingYear)*24 + oldModel.TotalBuyingHour)
+	CalculateSecondBuying(modelResponse, oldModel)
+	CalculateThirdBuying(modelResponse, oldModel)
+	CalculateFourthBuying(modelResponse, oldModel)
+	CalculateFifthBuying(modelResponse, oldModel)
+	CalculateFirstDayBuyingCount(modelResponse, oldModel, oldModel.TotalBuyingHour)
+	CalculateSecondDayBuyingCount(modelResponse, oldModel, oldModel.TotalBuyingHour)
+	CalculateThirdDayBuyingCount(modelResponse, oldModel, oldModel.TotalBuyingHour)
+	CalculateFourthDayBuyingCount(modelResponse, oldModel, oldModel.TotalBuyingHour)
+	CalculateFifthDayBuyingCount(modelResponse, oldModel, oldModel.TotalBuyingHour)
+	CalculateSixthDayBuyingCount(modelResponse, oldModel, oldModel.TotalBuyingHour)
+	CalculateSeventhDayBuyingCount(modelResponse, oldModel, oldModel.TotalBuyingHour)
 	oldModel.PenultimateDayBuyingCount = CalculatePenultimateDayBuyingCount(modelResponse, oldModel)
 	oldModel.LastDayBuyingCount = CalculateLastDayBuyingCount(modelResponse, oldModel)
 
 	oldModel.PenultimateBuyingYearOfDay = oldModel.LastBuyingYearOfDay
 	oldModel.PenultimateBuyingHour = oldModel.LastBuyingHour
+	oldModel.PenultimateBuyingMinute = oldModel.LastBuyingMinute
+	oldModel.PenultimateBuyingProductType = oldModel.LastBuyingProductType
 	oldModel.LastBuyingYearOfDay = modelResponse.FirstBuyingYearOfDay
 	oldModel.LastBuyingYear = modelResponse.FirstBuyingYear
 	oldModel.LastBuyingHour = modelResponse.FirstBuyingHour
 	oldModel.LastBuyingMinute = modelResponse.FirstBuyingMinute
+	oldModel.LastBuyingProductType = modelResponse.FirstBuyingProductType
 
 	oldModel.LastMinusFirstDayBuyingCount = oldModel.LastDayBuyingCount - oldModel.FirstDayBuyingCount
 	oldModel.SundayBuyingCount = oldModel.SundayBuyingCount + modelResponse.SundayBuyingCount
@@ -151,22 +185,44 @@ func (b *buyingEventManager) UpdateBuyingEvent(modelResponse *model.BuyingEventR
 	return oldModel, true, nil
 }
 
-func CalculateSecondBuying(modelResponse *model.BuyingEventRespondModel, oldModel *model.BuyingEventRespondModel) (day int64, hour int64) {
-	if oldModel.TotalBuyingCount == 2 {
+func CalculateSecondBuying(modelResponse *model.BuyingEventRespondModel, oldModel *model.BuyingEventRespondModel) {
+	switch oldModel.TotalBuyingCount {
+	case 2:
 		oldModel.SecondBuyingYearOfDay = modelResponse.FirstBuyingYearOfDay
 		oldModel.SecondBuyingHour = modelResponse.FirstBuyingHour
-		return oldModel.SecondBuyingYearOfDay, oldModel.SecondBuyingHour
+		oldModel.SecondBuyingMinute = modelResponse.FirstBuyingMinute
+		oldModel.SecondBuyingProductType = modelResponse.FirstBuyingProductType
 	}
-	return oldModel.SecondBuyingYearOfDay, oldModel.SecondBuyingHour
 }
 
-func CalculateThirdBuying(modelResponse *model.BuyingEventRespondModel, oldModel *model.BuyingEventRespondModel) (day int64, hour int64) {
-	if oldModel.TotalBuyingCount == 3 {
+func CalculateThirdBuying(modelResponse *model.BuyingEventRespondModel, oldModel *model.BuyingEventRespondModel) {
+	switch oldModel.TotalBuyingCount {
+	case 3:
 		oldModel.ThirdBuyingYearOfDay = modelResponse.FirstBuyingYearOfDay
 		oldModel.ThirdBuyingHour = modelResponse.FirstBuyingHour
-		return oldModel.ThirdBuyingYearOfDay, oldModel.ThirdBuyingHour
+		oldModel.ThirdBuyingMinute = modelResponse.FirstBuyingMinute
+		oldModel.ThirdBuyingProductType = modelResponse.FirstBuyingProductType
 	}
-	return oldModel.ThirdBuyingYearOfDay, oldModel.ThirdBuyingHour
+}
+
+func CalculateFourthBuying(modelResponse *model.BuyingEventRespondModel, oldModel *model.BuyingEventRespondModel) {
+	switch oldModel.TotalBuyingCount {
+	case 4:
+		oldModel.FourthBuyingYearOfDay = modelResponse.FirstBuyingYearOfDay
+		oldModel.FourthBuyingHour = modelResponse.FirstBuyingHour
+		oldModel.FourthBuyingMinute = modelResponse.FourthBuyingMinute
+		oldModel.FourthBuyingProductType = modelResponse.FourthBuyingProductType
+	}
+}
+
+func CalculateFifthBuying(modelResponse *model.BuyingEventRespondModel, oldModel *model.BuyingEventRespondModel) {
+	switch oldModel.TotalBuyingCount {
+	case 5:
+		oldModel.FifthBuyingYearOfDay = modelResponse.FirstBuyingYearOfDay
+		oldModel.FifthBuyingHour = modelResponse.FirstBuyingHour
+		oldModel.FifthBuyingMinute = modelResponse.FourthBuyingMinute
+		oldModel.FifthBuyingProductType = modelResponse.FourthBuyingProductType
+	}
 }
 
 func CalculatePenultimateDayBuyingCount(modelResponse *model.BuyingEventRespondModel, oldModel *model.BuyingEventRespondModel) (count int64) {
@@ -176,12 +232,53 @@ func CalculatePenultimateDayBuyingCount(modelResponse *model.BuyingEventRespondM
 	return oldModel.PenultimateDayBuyingCount
 }
 
-func CalculateFirstDayBuyingCount(modelResponse *model.BuyingEventRespondModel, oldModel *model.BuyingEventRespondModel) int64 {
-	if ((oldModel.FirstBuyingYearOfDay) == (modelResponse.FirstBuyingYearOfDay)) && ((oldModel.FirstBuyingYear) == (modelResponse.FirstBuyingYear)) {
+func CalculateFirstDayBuyingCount(modelResponse *model.BuyingEventRespondModel, oldModel *model.BuyingEventRespondModel, total_adv_hour int64) {
+	switch {
+	case total_adv_hour <= 24:
 		oldModel.FirstDayBuyingCount = oldModel.FirstDayBuyingCount + modelResponse.FirstDayBuyingCount
-		return oldModel.FirstDayBuyingCount
 	}
-	return oldModel.FirstDayBuyingCount
+}
+
+func CalculateSecondDayBuyingCount(modelResponse *model.BuyingEventRespondModel, oldModel *model.BuyingEventRespondModel, total_adv_hour int64) {
+	switch {
+	case total_adv_hour <= 48 && total_adv_hour > 24:
+		oldModel.SecondDayBuyingCount = oldModel.SecondDayBuyingCount + modelResponse.FirstDayBuyingCount
+	}
+}
+
+func CalculateThirdDayBuyingCount(modelResponse *model.BuyingEventRespondModel, oldModel *model.BuyingEventRespondModel, total_adv_hour int64) {
+	switch {
+	case total_adv_hour <= 72 && total_adv_hour > 48:
+		oldModel.ThirdDayBuyingCount = oldModel.ThirdDayBuyingCount + modelResponse.FirstDayBuyingCount
+	}
+}
+
+func CalculateFourthDayBuyingCount(modelResponse *model.BuyingEventRespondModel, oldModel *model.BuyingEventRespondModel, total_adv_hour int64) {
+	switch {
+	case total_adv_hour <= 96 && total_adv_hour > 72:
+		oldModel.FourthDayBuyingCount = oldModel.FourthDayBuyingCount + modelResponse.FirstDayBuyingCount
+	}
+}
+
+func CalculateFifthDayBuyingCount(modelResponse *model.BuyingEventRespondModel, oldModel *model.BuyingEventRespondModel, total_adv_hour int64) {
+	switch {
+	case total_adv_hour <= 120 && total_adv_hour > 96:
+		oldModel.FifthDayBuyingCount = oldModel.FifthDayBuyingCount + modelResponse.FirstDayBuyingCount
+	}
+}
+
+func CalculateSixthDayBuyingCount(modelResponse *model.BuyingEventRespondModel, oldModel *model.BuyingEventRespondModel, total_adv_hour int64) {
+	switch {
+	case total_adv_hour <= 144 && total_adv_hour > 120:
+		oldModel.SixthDayBuyingCount = oldModel.SixthDayBuyingCount + modelResponse.FirstDayBuyingCount
+	}
+}
+
+func CalculateSeventhDayBuyingCount(modelResponse *model.BuyingEventRespondModel, oldModel *model.BuyingEventRespondModel, total_adv_hour int64) {
+	switch {
+	case total_adv_hour <= 168 && total_adv_hour > 144:
+		oldModel.SeventhDayBuyingCount = oldModel.SeventhDayBuyingCount + modelResponse.FirstDayBuyingCount
+	}
 }
 
 func CalculateLastDayBuyingCount(modelResponse *model.BuyingEventRespondModel, oldModel *model.BuyingEventRespondModel) int64 {
@@ -244,6 +341,5 @@ func CalculateBuyingLevelBasedAvgBuyingCount(modelResponse *model.BuyingEventRes
 		modelResponse.LevelBasedAverageBuyingCount = float64(modelResponse.TotalBuyingCount)
 	default:
 		modelResponse.LevelBasedAverageBuyingCount = float64(modelResponse.TotalBuyingCount) / float64(modelResponse.LevelIndex)
-
 	}
 }

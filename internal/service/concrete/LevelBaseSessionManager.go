@@ -86,7 +86,7 @@ func (l *levelBaseSessionManager) ConvertRawModelToResponseModel(data *[]byte) (
 			"LevelBaseSessionDal_GetLevelBaseSessionById", err.Error())
 	}
 	switch {
-	case err.Error() == "mongo: no documents in result":
+	case err.Error() == "null data error":
 
 		logErr := (*l.ILevelBaseSessionDal).Add(&modelResponse)
 		if logErr != nil {
@@ -118,25 +118,6 @@ func (l *levelBaseSessionManager) UpdateLevelBaseSession(modelResponse *model.Le
 	oldModel.TotalLevelBaseSessionMinute = (((modelResponse.FirstLevelSessionYearOfDay+365*modelResponse.FirstLevelSessionYear)*24+modelResponse.FirstLevelSessionHour)*60 + modelResponse.FirstLevelSessionMinute) - (((oldModel.FirstLevelSessionYearOfDay+365*oldModel.FirstLevelSessionYear)*24+oldModel.FirstLevelSessionHour)*60 + oldModel.FirstLevelSessionMinute)
 	oldModel.TotalLevelBaseSessionCount = modelResponse.TotalLevelBaseSessionCount + oldModel.TotalLevelBaseSessionCount
 	CalculateLevelIndexBaseSession(modelResponse, oldModel)
-	// oldModel.FirstLevelSessionLevelIndex
-	// oldModel.FirstLevelSessionDuration
-	// oldModel.FirstLevelSessionYearOfDay
-	// oldModel.FirstLevelSessionYear
-	// oldModel.FirstLevelSessionWeekDay
-	// oldModel.FirstLevelSessionHour
-	// oldModel.FirstLevelSessionMinute
-	// oldModel.SecondLevelSessionLevelIndex
-	// oldModel.SecondLevelSessionDuration
-	// oldModel.ThirdLevelSessionLevelIndex
-	// oldModel.ThirdLevelSessionDuration
-	// oldModel.FourLevelSessionLevelIndex
-	// oldModel.FourLevelSessionDuration
-	// oldModel.FiveLevelSessionLevelIndex
-	// oldModel.FiveLevelSessionDuration
-	// oldModel.SixLevelSessionLevelIndex
-	// oldModel.SixLevelSessionDuration
-	// oldModel.SevenLevelSessionLevelIndex
-	// oldModel.SevenLevelSessionDuration
 	CalculateLevelBaseSessionFirstQuarterHour(modelResponse, oldModel, oldModel.TotalLevelBaseSessionMinute)
 	CalculateLevelBaseSessionFirstHalfHour(modelResponse, oldModel, oldModel.TotalLevelBaseSessionMinute)
 	CalculateLevelBaseSessionFirstHour(modelResponse, oldModel, oldModel.TotalLevelBaseSessionMinute)
@@ -145,14 +126,7 @@ func (l *levelBaseSessionManager) UpdateLevelBaseSession(modelResponse *model.Le
 	CalculateLevelBaseSessionFirstSixHour(modelResponse, oldModel, oldModel.TotalLevelBaseSessionMinute)
 	CalculateLevelBaseSessionFirstTwelveHour(modelResponse, oldModel, oldModel.TotalLevelBaseSessionMinute)
 	CalculateLevelBaseSessionFirstDay(modelResponse, oldModel, oldModel.TotalLevelBaseSessionMinute)
-	// oldModel.FirstQuarterHourTotalLevelBaseSessionCount
-	// oldModel.FirstHalfHourTotalLEvelBaseSessionCount
-	// oldModel.FirstHourTotalLevelBaseSessionCount
-	// oldModel.FirstTwoHourTotalLevelBaseSessionCount
-	// oldModel.FirstThreeHourTotalLevelBaseSessionCount
-	// oldModel.FirstSixHourTotalLevelBaseSessionCount
-	// oldModel.FirstTwelveHourTotalLevelBaseSessionCount
-	// oldModel.FirstDayTotalLevelBaseSessionCount
+	
 	oldModel.PenultimateLevelSessionLevelIndex = oldModel.LastLevelSessionLevelIndex
 	oldModel.PenultimateLevelSessionLevelDuration = oldModel.LastLevelSessionLevelDuration
 	oldModel.LastLevelSessionLevelIndex = modelResponse.FirstLevelSessionLevelIndex

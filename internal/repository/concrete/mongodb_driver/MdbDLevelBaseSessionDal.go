@@ -4,6 +4,7 @@ import (
 	"FilterWorkerService/internal/model"
 	"FilterWorkerService/pkg/database/mongodb"
 	"context"
+	"errors"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -88,7 +89,10 @@ func (m *mdbDLevelBaseSessionDal) GetLevelBaseSessionById(ClientId string) (*mod
 	}})
 
 	var model = model.LevelBaseSessionRespondModel{}
-	if result.Err() != nil {
+	if result.Err() != nil && result.Err().Error() == "mongo: no documents in result"{
+		return &model, errors.New("null data error")
+	}
+	if result.Err() != nil && result.Err().Error() != "mongo: no documents in result" {
 		return &model, result.Err()
 	}
 	var err = result.Decode(&model)

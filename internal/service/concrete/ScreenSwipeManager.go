@@ -182,7 +182,7 @@ func (sc *screenSwipeManager) ConvertRawModelToResponseModel(data *[]byte) (v in
 			"ScreenSwipeDal_GetScreenSwipeById", err.Error())
 	}
 	switch {
-	case err.Error() == "mongo: no documents in result":
+	case err.Error() == "null data error":
 
 		logErr := (*sc.IScreenSwipeDal).Add(&modelResponse)
 		if logErr != nil {
@@ -214,16 +214,7 @@ func (sc *screenSwipeManager) UpdateScreenSwipe(modelResponse *model.ScreenSwipe
 	oldModel.LevelIndex = modelResponse.LevelIndex
 	oldModel.TotalSwipeSessionCount = modelResponse.TotalSwipeSessionCount + oldModel.TotalSwipeSessionCount
 	oldModel.TotalSwipeHour = ((modelResponse.FirstSwipeYearOfDay+365*modelResponse.FirstSwipeYear)*24 + modelResponse.FirstSwipeHour) - ((oldModel.FirstSwipeYearOfDay+365*oldModel.FirstSwipeYear)*24 + oldModel.FirstSwipeHour)
-	// oldModel.FirstSwipeYearOfDay
-	// oldModel.FirstSwipeYear
-	// oldModel.FirstSwipeHour
-	//oldModel.FirstSwipeWeekDay
-	//oldModel.FirstSwipeMinute
-	// oldModel.FistSwipeDirection
-	// oldModel.FirstSwipeStartXCor
-	// oldModel.FirstSwipeStartYCor
-	// oldModel.FirstSwipeFinishXCor
-	// oldModel.FirstSwipeFinishYCor
+
 	CalculateSwipeNumber(modelResponse, oldModel)
 	oldModel.PenultimateSwipeDirection = oldModel.LastSwipeDirection
 	oldModel.PenultimateSwipeStartXCor = oldModel.LastSwipeStartXCor

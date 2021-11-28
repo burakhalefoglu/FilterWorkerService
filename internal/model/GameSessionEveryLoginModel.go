@@ -18,6 +18,12 @@ type GameSessionEveryLoginRespondModel struct {
 	ThirdSessionHour                                            int64
 	ThirdSessionDuration                                        int64
 	ThirdSessinMinute                                           int64
+	FourthSessionHour                                           int64
+	FourthSessionDuration                                       int64
+	FourthSessinMinute                                          int64
+	FifthSessionHour                                            int64
+	FifthSessionDuration                                        int64
+	FifthSessinMinute                                           int64
 	PenultimateSessionHour                                      int64
 	PenultimateSessionDuration                                  int64
 	PenultimateSessionMinute                                    int64

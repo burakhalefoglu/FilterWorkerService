@@ -114,7 +114,7 @@ func (a *advEventManager) ConvertRawModelToResponseModel(data *[]byte) (v interf
 			"AdvEventDal_GetAdvEventById", err.Error())
 	}
 	switch {
-	case err.Error() == "mongo: no documents in result":
+	case err.Error() == "null data error":
 
 		logErr := (*a.IAdvEventDal).Add(&modelResponse)
 		if logErr != nil {
@@ -150,16 +150,7 @@ func (a *advEventManager) UpdateAdvEvent(modelResponse *model.AdvEventRespondMod
 	oldModel.TotalAdvMinute = (((modelResponse.FirstAdvYearOfDay+365*modelResponse.FirstAdvYear)*24+modelResponse.FirstAdvClickHour)*60 + modelResponse.FirstADvClickMinute) - (((oldModel.FirstAdvYearOfDay+365*oldModel.FirstAdvYear)*24+oldModel.FirstAdvClickHour)*60 + oldModel.FirstADvClickMinute)
 	CalculateAdvLevelBasedAvgClickCount(oldModel)
 	oldModel.AverageAdvDailyClickCount = CalculateAverageAdvDailyClickCount(oldModel)
-	//oldModel.FirstAdvYearOfDay
-	//oldModel.FirstAdvYear
-	//oldModel.FirstWeekDay
-	//oldModel.FirstAdvClickHour
-	//oldModel.FirstADvClickMinute
-	//oldModel.FirstAdvType
-	//oldModel.SecondAdvYearOfDay, oldModel.SecondAdvHour, oldModel.SecondAdvMinute, oldModel.SecondAdvType
-	//oldModel.ThirdAdvYearOfDay, oldModel.ThirdAdvHour, oldModel.ThirdAdvMinute, oldModel.ThirdAdvType
-	//modelResponse.FourthAdvYearOfDay, modelResponse.FourthAdvHour, modelResponse.FourthAdvMinute, modelResponse.FourthAdvType
-	//modelResponse.FifthAdvYearOfDay, modelResponse.FifthAdvHour, modelResponse.FifthAdvMinute, modelResponse.FifthAdvType
+	
 	CalculateSecondAdv(modelResponse, oldModel)
 	CalculateThirdAdv(modelResponse, oldModel)
 	CalculateFourthAdv(modelResponse, oldModel)
