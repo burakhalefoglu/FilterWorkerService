@@ -1,7 +1,5 @@
 package abstract
 
-import "FilterWorkerService/internal/model"
-
 type IGameSessionEveryLoginService interface {
-	ConvertRawModelToResponseModel(data *[]byte) (gameSession *model.GameSessionEveryLoginRespondModel, s bool, m string)
+	ConvertRawModelToResponseModel(data *[]byte) (v interface{}, s bool, m string)
 }

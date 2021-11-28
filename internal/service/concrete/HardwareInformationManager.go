@@ -25,7 +25,7 @@ func HardwareInformationManagerConstructor() *hardwareInformationManager {
 	}
 }
 
-func (h *hardwareInformationManager) AddHardwareInformation(data *[]byte) (respondHardwareModel *model.HardwareInformationResponseModel, s bool, m string) {
+func (h *hardwareInformationManager) AddHardwareInformation(data *[]byte) (v interface{}, s bool, m string) {
 	// Todo : 1 Model karşılanacak
 	firstmodel := model.HardwareInformationModel{}
 	Err := (*h.IJsonParser).DecodeJson(data, &firstmodel)

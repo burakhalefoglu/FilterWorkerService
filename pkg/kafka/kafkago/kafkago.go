@@ -1,6 +1,8 @@
 package kafkago
 
 import (
+	"FilterWorkerService/internal/IoC"
+	"FilterWorkerService/pkg/logger"
 	"context"
 	"log"
 	"os"
@@ -13,11 +15,11 @@ import (
 )
 
 type kafkaGo struct {
-	//Log *logger.ILog
+	Log *logger.ILog
 }
 
-func KafkaGoConstructor(/*log *logger.ILog*/) *kafkaGo {
-	return &kafkaGo{/*Log: log*/}
+func KafkaGoConstructor() *kafkaGo {
+	return &kafkaGo{Log: &IoC.Logger}
 }
 
 
@@ -29,29 +31,29 @@ func (k *kafkaGo) Produce(key *[]byte, value *[]byte, topic string) (err error) 
 		Time:  time.Now(),
 	}
 	err = writer.WriteMessages(context.Background(), message)
-	//(*k.Log).SendInfoLog("kafkaGo", "Producer", topic, key)
+	(*k.Log).SendInfoLog("kafkaGo", "Producer", topic, key)
 	return err
 }
 
 
-func (k *kafkaGo) Consume(topic string, groupId string, wg *sync.WaitGroup,callback func(data *[]byte) (bool, string)) {
+func (k *kafkaGo) Consume(topic string, groupId string, wg *sync.WaitGroup,callback func(data *[]byte) (interface{}, bool, string)) {
 	reader, _ := readerConfigure([]string{os.Getenv("KAFKA_BROKER")}, groupId, topic)
 	log.Println("Consumer Started: ",topic, groupId)
 	defer func(reader *kafka.Reader) {
 		err := reader.Close()
 		if err != nil {
-			//(*k.Log).SendErrorLog("kafkaGo", "Consume", "failed to reader.Close() messages:" + err.Error())
+			(*k.Log).SendErrorLog("kafkaGo", "Consume", "failed to reader.Close() messages:" + err.Error())
 		}
 	}(reader)
-	//(*k.Log).SendInfoLog("kafkaGo", "Consume", reader.Stats().ClientID)
+	(*k.Log).SendInfoLog("kafkaGo", "Consume", reader.Stats().ClientID)
 	for {
 		m, err := reader.FetchMessage(context.Background())
 		if err != nil {
-			//(*k.Log).SendFatalLog("kafkaGo", "Consume", "error while receiving message: " + err.Error())
+			(*k.Log).SendFatalLog("kafkaGo", "Consume", "error while receiving message: " + err.Error())
 			continue
 		}
-		//(*k.Log).SendInfoLog("kafkaGo", "Consume", topic, groupId)
-		isSuccess, _ := callback(&m.Value)
+		(*k.Log).SendInfoLog("kafkaGo", "Consume", topic, groupId)
+		_, isSuccess, _ := callback(&m.Value)
 		if isSuccess {
 			if err := reader.CommitMessages(context.Background(), m); err != nil {
 				//(*k.Log).SendFatalLog("kafkaGo", "Consume", "failed to commit messages:" + err.Error())

@@ -3,6 +3,7 @@ package RedisV8
 import (
 	"FilterWorkerService/pkg/logger"
 	"context"
+	"errors"
 	"github.com/go-redis/redis/v8"
 	"os"
 	"time"
@@ -13,10 +14,10 @@ type redisCache struct {
 }
 
 func RedisCacheConstructor(log *logger.ILog) *redisCache {
-	return &redisCache{Client: getClient(log)}
+	return &redisCache{Client: createClient(log)}
 }
 
-func getClient(log *logger.ILog) *redis.Client{
+func createClient(log *logger.ILog) *redis.Client{
 	client := redis.NewClient(&redis.Options{
 		Addr:     os.Getenv("REDIS_CONN"),
 		Password: os.Getenv("REDIS_PASS"), // no password set
@@ -45,6 +46,9 @@ func (r *redisCache) Set(key string, value interface{}, expirationMinutes int32)
 func (r *redisCache) Get(key string) (value string, err error){
 
 	 var result = r.Client.Get(context.Background(),key)
+	if result.Err() == redis.Nil{
+		return "", errors.New("null data error")
+	}
 	 if result.Err() != nil{
 		 return "", err
 	 }
@@ -64,6 +68,9 @@ func (r *redisCache) Delete(key string) (success bool, err error){
 func (r *redisCache) GetHash(key string) (*map[string]string, error) {
 
 	result := r.Client.HGetAll(context.Background(),key)
+	if result.Err() == redis.Nil{
+		return nil, errors.New("null data error")
+	}
 	if result.Err() != nil {
 		return nil, result.Err()
 	}

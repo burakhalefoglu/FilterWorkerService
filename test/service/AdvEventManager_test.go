@@ -1,9 +1,11 @@
 package test
 
 import (
+	"FilterWorkerService/internal/IoC"
 	"FilterWorkerService/internal/model"
 	"FilterWorkerService/internal/service/concrete"
 	"FilterWorkerService/pkg/jsonParser/gojson"
+	"FilterWorkerService/test/Mock/Log"
 	"FilterWorkerService/test/Mock/repository"
 	"FilterWorkerService/test/Mock/service"
 	"errors"
@@ -116,11 +118,16 @@ func Test_ConvertRawModelToResponse_AddedSuccess(t *testing.T) {
 	//Arrance
 	var testAdv = new(repository.MockAdvEventDal)
 	var testCache = new(service.MockCacheService)
-	var manager = concrete.advEventManager{
-		IAdvEventDal:  testAdv,
-		IJsonParser:   &gojson.goJson{},
-		ICacheService: testCache,
-	}
+	var testLog = new(Log.MockLogger)
+	var json = gojson.GoJsonConstructor()
+
+	IoC.JsonParser = json
+	IoC.AdvEventDal = testAdv
+	IoC.Logger = testLog
+	IoC.CacheService = testCache
+
+	var manager = concrete.AdvEventManagerConstructor()
+
 	var advModel = model.AdvEventModel{
 		ProjectId:   "Test",
 		ClientId:    "Test",
@@ -206,7 +213,7 @@ func Test_ConvertRawModelToResponse_AddedSuccess(t *testing.T) {
 		AdvClick12To17HourCount: 0,
 		AdvClick18To23HourCount: 1,
 	}
-	var message, _ = manager.IJsonParser.EncodeJson(&advModel)
+	var message, _ = (*manager.IJsonParser).EncodeJson(&advModel)
 
 	testCache.On("ManageCache", "AdvType", advModel.AdvType).Return(int64(1), true, "")
 	testCache.On("ManageCache", "AdvType", advModel.AdvType).Return(int64(1), true, "")
@@ -225,13 +232,20 @@ func Test_ConvertRawModelToResponse_AddedSuccess(t *testing.T) {
 
 
 func Test_UpdateAdvEvent(t *testing.T){
-	var testADvDal = new(repository.MockAdvEventDal)
+
+	//Arrance
+	var testAdv = new(repository.MockAdvEventDal)
 	var testCache = new(service.MockCacheService)
-	var manager = concrete.advEventManager{
-		IAdvEventDal:  testADvDal,
-		IJsonParser:   &gojson.goJson{},
-		ICacheService: testCache,
-	}
+	var testLog = new(Log.MockLogger)
+	var json = gojson.GoJsonConstructor()
+
+	IoC.JsonParser = json
+	IoC.AdvEventDal = testAdv
+	IoC.Logger = testLog
+	IoC.CacheService = testCache
+
+	var manager = concrete.AdvEventManagerConstructor()
+
 	var advModel = model.AdvEventModel{
 		ProjectId:   "Test",
 		ClientId:    "Test",
@@ -478,7 +492,7 @@ func Test_UpdateAdvEvent(t *testing.T){
 		AdvClick12To17HourCount: responseModel.AdvClick12To17HourCount + oldModel.AdvClick12To17HourCount,
 		AdvClick18To23HourCount: responseModel.AdvClick18To23HourCount + oldModel.AdvClick18To23HourCount,
 	}
-	testADvDal.On("UpdateAdvEventById", advModel.ClientId, &updatedModel).Return(nil)
+	testAdv.On("UpdateAdvEventById", advModel.ClientId, &updatedModel).Return(nil)
 
 	var v, s, m = manager.UpdateAdvEvent(&responseModel, &oldModel)
 	assert.Equal(t, true, s)

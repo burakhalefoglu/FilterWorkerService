@@ -25,7 +25,7 @@ func LocationManagerConstructor() *locationManager {
 	}
 }
 
-func (l *locationManager) AddLocation(data *[]byte) (respondLocationModel *model.LocationResponseModel, s bool, m string) {
+func (l *locationManager) AddLocation(data *[]byte) (v interface{}, s bool, m string) {
 
 	firstmodel := model.LocationModel{}
 	Err := (*l.IJsonParser).DecodeJson(data, &firstmodel)

@@ -33,6 +33,7 @@ var ScreenClickDal repository.IScreenClickDal
 var ScreenClickService service.IScreenClickService
 var ScreenSwipeDal repository.IScreenSwipeDal
 var ScreenSwipeService service.IScreenSwipeService
+var TypeStandardizationDal repository.ITypeStandardizationDal
 var CacheService service.ICacheService
 var Kafka IKafka.IKafka
 var RedisCache cache.ICache

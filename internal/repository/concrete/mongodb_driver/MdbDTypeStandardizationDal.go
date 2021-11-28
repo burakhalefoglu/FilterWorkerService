@@ -2,17 +2,22 @@ package mongodb_driver
 
 import (
 	"FilterWorkerService/internal/model"
+	"FilterWorkerService/pkg/database/mongodb"
 	"context"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"time"
 )
 
-type MdbDTypeStandardizationDal struct {
+type mdbDTypeStandardizationDal struct {
 	Client *mongo.Client
 }
 
-func (m *MdbDTypeStandardizationDal) Add(tableName string, data *model.TypeStandardizationModel) error{
+func MdbDTypeStandardizationDalConstructor() *mdbDTypeStandardizationDal {
+	return &mdbDTypeStandardizationDal{Client: mongodb.GetMongodbClient()}
+}
+
+func (m *mdbDTypeStandardizationDal) Add(tableName string, data *model.TypeStandardizationModel) error{
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	collection := m.Client.Database("MLDatabase").Collection(tableName)
@@ -26,7 +31,7 @@ func (m *MdbDTypeStandardizationDal) Add(tableName string, data *model.TypeStand
 	return nil
 }
 
-func (m *MdbDTypeStandardizationDal) GetByKey(tableName string, key string) (*model.TypeStandardizationModel, error){
+func (m *mdbDTypeStandardizationDal) GetByKey(tableName string, key string) (*model.TypeStandardizationModel, error){
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	collection := m.Client.Database("MLDatabase").Collection(tableName)
@@ -45,7 +50,7 @@ func (m *MdbDTypeStandardizationDal) GetByKey(tableName string, key string) (*mo
 	return &model, nil
 }
 
-func (m *MdbDTypeStandardizationDal) GetAll(tableName string)(*[]model.TypeStandardizationModel, error){
+func (m *mdbDTypeStandardizationDal) GetAll(tableName string)(*[]model.TypeStandardizationModel, error){
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -60,7 +65,7 @@ func (m *MdbDTypeStandardizationDal) GetAll(tableName string)(*[]model.TypeStand
 	return &models, nil
 }
 
-func (m *MdbDTypeStandardizationDal) GetMaxByValue(tableName string)(int64, error){
+func (m *mdbDTypeStandardizationDal) GetMaxByValue(tableName string)(int64, error){
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	collection := m.Client.Database("MLDatabase").Collection(tableName)

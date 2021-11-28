@@ -22,7 +22,7 @@ func BuyingEventManagerConstructor() *buyingEventManager {
 	}
 }
 
-func (b *buyingEventManager) ConvertRawModelToResponseModel(data *[]byte) (buying *model.BuyingEventRespondModel, s bool, m string) {
+func (b *buyingEventManager) ConvertRawModelToResponseModel(data *[]byte) (v interface{}, s bool, m string) {
 	firstModel := model.BuyingEventModel{}
 	Err := (*b.IJsonParser).DecodeJson(data, &firstModel)
 	if Err != nil {

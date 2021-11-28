@@ -22,7 +22,7 @@ func ScreenSwipeManagerConstructor() *screenSwipeManager {
 	}
 }
 
-func (sc *screenSwipeManager) ConvertRawModelToResponseModel(data *[]byte) (convertedModel *model.ScreenSwipeRespondModel,s bool, m string) {
+func (sc *screenSwipeManager) ConvertRawModelToResponseModel(data *[]byte) (v interface{},s bool, m string) {
 	firstModel := model.ScreenSwipeModel{}
 	Err := (*sc.IJsonParser).DecodeJson(data, &firstModel)
 	if Err != nil {

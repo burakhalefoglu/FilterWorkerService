@@ -22,7 +22,7 @@ func GameSessionEveryLoginManagerConstructor() *gameSessionEveryLoginManager {
 	}
 }
 
-func (g *gameSessionEveryLoginManager) ConvertRawModelToResponseModel(data *[]byte) (gameSession *model.GameSessionEveryLoginRespondModel, s bool, m string) {
+func (g *gameSessionEveryLoginManager) ConvertRawModelToResponseModel(data *[]byte) (v interface{}, s bool, m string) {
 	firstModel := model.GameSessionEveryLoginModel{}
 	Err := (*g.IJsonParser).DecodeJson(data, &firstModel)
 	if Err != nil {

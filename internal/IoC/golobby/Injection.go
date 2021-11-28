@@ -26,10 +26,12 @@ func InjectionConstructor() *golobbyInjection {
 
 func (i *golobbyInjection) Inject() {
 	injectLog()
+	injectJsonParser()
 	injectKafka()
 	injectCache()
-	injectJsonParser()
 
+	injectTypeStandardiseDal()
+	injectCacheService()
 	injectAdvEventDal()
 	injectAdvEventService()
 	injectBuyingEventDal()
@@ -46,6 +48,29 @@ func (i *golobbyInjection) Inject() {
 	injectScreenClickManagerService()
 	injectScreenSwipeDal()
 	injectScreenSwipeManagerService()
+}
+
+func injectTypeStandardiseDal() {
+	if err := container.Singleton(func() repository.ITypeStandardizationDal {
+		return mongodb_driver.MdbDTypeStandardizationDalConstructor()
+	}); err != nil {
+		panic(err)
+	}
+	if err := container.Resolve(&IoC.TypeStandardizationDal); err != nil {
+		panic(err)
+	}
+}
+
+func injectCacheService() {
+
+	if err := container.Singleton(func() service.ICacheService {
+		return concrete.CacheManagerConstructor()
+	}); err != nil {
+		panic(err)
+	}
+	if err := container.Resolve(&IoC.CacheService); err != nil {
+		panic(err)
+	}
 }
 
 func injectAdvEventDal() {
@@ -252,18 +277,6 @@ func injectKafka() {
 	}
 }
 
-func injectCache() {
-
-	if err := container.Singleton(func() cache.ICache {
-		return rediscachev8.RedisCacheConstructor(&IoC.Logger)
-	}); err != nil {
-		panic(err)
-	}
-	if err := container.Resolve(&IoC.RedisCache); err != nil {
-		panic(err)
-	}
-}
-
 func injectLog() {
 	if err := container.Singleton(func() logger.ILog {
 		return logrus_logstash_hook.LogrusToLogstashLOGConstructor()
@@ -284,6 +297,18 @@ func injectJsonParser() {
 	}
 
 	if err := container.Resolve(&IoC.JsonParser); err != nil {
+		panic(err)
+	}
+}
+
+func injectCache() {
+
+	if err := container.Singleton(func() cache.ICache {
+		return rediscachev8.RedisCacheConstructor(&IoC.Logger)
+	}); err != nil {
+		panic(err)
+	}
+	if err := container.Resolve(&IoC.RedisCache); err != nil {
 		panic(err)
 	}
 }

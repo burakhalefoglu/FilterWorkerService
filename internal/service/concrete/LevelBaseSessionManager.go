@@ -22,7 +22,7 @@ func LevelBaseSessionManagerConstructor() *levelBaseSessionManager {
 	}
 }
 
-func (l *levelBaseSessionManager) ConvertRawModelToResponseModel(data *[]byte) (convertedModel *model.LevelBaseSessionRespondModel, s bool, m string) {
+func (l *levelBaseSessionManager) ConvertRawModelToResponseModel(data *[]byte) (v interface{}, s bool, m string) {
 	firstModel := model.LevelBaseSessionDataModel{}
 	Err := (*l.IJsonParser).DecodeJson(data, &firstModel)
 	if Err != nil {

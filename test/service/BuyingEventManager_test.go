@@ -4,6 +4,7 @@ import (
 	"FilterWorkerService/internal/model"
 	"FilterWorkerService/internal/service/concrete"
 	"FilterWorkerService/pkg/jsonParser/gojson"
+	"FilterWorkerService/test/Mock/Log"
 	"FilterWorkerService/test/Mock/repository"
 	"errors"
 	"testing"
@@ -161,6 +162,7 @@ var updateBuyingModel = model.BuyingEventRespondModel{
 
 func Test_UpdateBuyingEvent_UpdateSuccess(t *testing.T) {
 	var testBuyingDal = new(repository.MockBuyingEventDal)
+
 	var manager = concrete.BuyingEventManager{
 		IBuyingEventDal: testBuyingDal,
 		IJsonParser:     &gojson.goJson{},

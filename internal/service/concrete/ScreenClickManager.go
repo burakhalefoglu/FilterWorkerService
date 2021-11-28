@@ -24,7 +24,7 @@ func ScreenClickManagerConstructor() *screenClickManager {
 	}
 }
 
-func (sc *screenClickManager) ConvertRawModelToResponseModel(data *[]byte) (respondModel *model.ScreenClickRespondModel, s bool, m string) {
+func (sc *screenClickManager) ConvertRawModelToResponseModel(data *[]byte) (v interface{}, s bool, m string) {
 	firstModel := model.ScreenClickModel{}
 	Err := (*sc.IJsonParser).DecodeJson(data, &firstModel)
 	if Err != nil {

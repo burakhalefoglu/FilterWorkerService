@@ -25,7 +25,7 @@ func AdvEventManagerConstructor() *advEventManager {
 	}
 }
 
-func (a *advEventManager) ConvertRawModelToResponseModel(data *[]byte) (adv *model.AdvEventRespondModel, s bool, m string) {
+func (a *advEventManager) ConvertRawModelToResponseModel(data *[]byte) (v interface{}, s bool, m string) {
 	firstModel := model.AdvEventModel{}
 	Err := (*a.IJsonParser).DecodeJson(data, &firstModel)
 	if Err != nil {
