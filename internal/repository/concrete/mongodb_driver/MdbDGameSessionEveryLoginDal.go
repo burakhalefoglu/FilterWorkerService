@@ -39,6 +39,12 @@ func (m *mdbdDGameSessionEveryLoginDal) Add(data *model.GameSessionEveryLoginRes
 		{"ThirdSessionHour", data.ThirdSessionHour},
 		{"ThirdSessionDuration", data.ThirdSessionDuration},
 		{"ThirdSessinMinute", data.ThirdSessinMinute},
+		{"FourthSessionHour", data.FourthSessionHour},
+		{"FourthSessionDuration", data.FourthSessionDuration},
+		{"FourthSessinMinute", data.FourthSessinMinute},
+		{"FifthSessionHour", data.FifthSessionHour},
+		{"FifthSessionDuration", data.FifthSessionDuration},
+		{"FifthSessinMinute", data.FifthSessinMinute},
 		{"PenultimateSessionHour", data.PenultimateSessionHour},
 		{"PenultimateSessionDuration", data.PenultimateSessionDuration},
 		{"PenultimateSessionMinute", data.PenultimateSessionMinute},
@@ -59,10 +65,10 @@ func (m *mdbdDGameSessionEveryLoginDal) Add(data *model.GameSessionEveryLoginRes
 		{"FirstSixHourTotalSessionCount", data.FirstSixHourTotalSessionCount},
 		{"FirstSixHourTotalSessionDuration", data.FirstSixHourTotalSessionDuration},
 		{"FirstTwelveHourTotalSessionCount", data.FirstTwelveHourTotalSessionCount},
-		{"FirstTwelveHourTotalSessionDuration", data.FirstTwelveHourTotalSessionDuration},	
+		{"FirstTwelveHourTotalSessionDuration", data.FirstTwelveHourTotalSessionDuration},
 		{"TotalSessionDay", data.TotalSessionDay},
-		{"TotalSessionHour",data.TotalSessionHour},
-		{"TotalSessionMinute",data.TotalSessionMinute},
+		{"TotalSessionHour", data.TotalSessionHour},
+		{"TotalSessionMinute", data.TotalSessionMinute},
 		{"TotalSessionDuration", data.TotalSessionDuration},
 		{"TotalSessionCount", data.TotalSessionCount},
 		{"FirstDayTotalSessionCount", data.FirstDayTotalSessionCount},
@@ -115,10 +121,10 @@ func (m *mdbdDGameSessionEveryLoginDal) GetGameSessionEveryLoginById(ClientId st
 		"ClientId", ClientId,
 	}})
 	var model = model.GameSessionEveryLoginRespondModel{}
-	if result.Err() != nil && result.Err().Error() == "mongo: no documents in result"{
+	if result.Err() != nil && result.Err().Error() == "mongo: no documents in result" {
 		return &model, errors.New("null data error")
 	}
-	if result.Err() != nil && result.Err().Error() != "mongo: no documents in result"{
+	if result.Err() != nil && result.Err().Error() != "mongo: no documents in result" {
 		return &model, result.Err()
 	}
 	var err = result.Decode(&model)
@@ -147,6 +153,12 @@ func (m *mdbdDGameSessionEveryLoginDal) UpdateGameSessionEveryLoginById(ClientId
 		{"ThirdSessionHour", data.ThirdSessionHour},
 		{"ThirdSessionDuration", data.ThirdSessionDuration},
 		{"ThirdSessinMinute", data.ThirdSessinMinute},
+		{"FourthSessionHour", data.FourthSessionHour},
+		{"FourthSessionDuration", data.FourthSessionDuration},
+		{"FourthSessinMinute", data.FourthSessinMinute},
+		{"FifthSessionHour", data.FifthSessionHour},
+		{"FifthSessionDuration", data.FifthSessionDuration},
+		{"FifthSessinMinute", data.FifthSessinMinute},
 		{"PenultimateSessionHour", data.PenultimateSessionHour},
 		{"PenultimateSessionDuration", data.PenultimateSessionDuration},
 		{"PenultimateSessionMinute", data.PenultimateSessionMinute},
@@ -167,10 +179,10 @@ func (m *mdbdDGameSessionEveryLoginDal) UpdateGameSessionEveryLoginById(ClientId
 		{"FirstSixHourTotalSessionCount", data.FirstSixHourTotalSessionCount},
 		{"FirstSixHourTotalSessionDuration", data.FirstSixHourTotalSessionDuration},
 		{"FirstTwelveHourTotalSessionCount", data.FirstTwelveHourTotalSessionCount},
-		{"FirstTwelveHourTotalSessionDuration", data.FirstTwelveHourTotalSessionDuration},	
+		{"FirstTwelveHourTotalSessionDuration", data.FirstTwelveHourTotalSessionDuration},
 		{"TotalSessionDay", data.TotalSessionDay},
-		{"TotalSessionHour",data.TotalSessionHour},
-		{"TotalSessionMinute",data.TotalSessionMinute},
+		{"TotalSessionHour", data.TotalSessionHour},
+		{"TotalSessionMinute", data.TotalSessionMinute},
 		{"TotalSessionDuration", data.TotalSessionDuration},
 		{"TotalSessionCount", data.TotalSessionCount},
 		{"FirstDayTotalSessionCount", data.FirstDayTotalSessionCount},
@@ -187,7 +199,6 @@ func (m *mdbdDGameSessionEveryLoginDal) UpdateGameSessionEveryLoginById(ClientId
 		{"SixthDayTotalSessionDuration", data.SixthDayTotalSessionDuration},
 		{"SeventhDayTotalSessionCount", data.SeventhDayTotalSessionCount},
 		{"SeventhDayTotalSessionDuration", data.SeventhDayTotalSessionDuration},
-		{"MinSessionDuration", data.MinSessionDuration},
 		{"MaxSessionDuration", data.MaxSessionDuration},
 		{"DailyAvegareSessionCount", data.DailyAvegareSessionCount},
 		{"DailyAverageSessionDuration", data.DailyAverageSessionDuration},

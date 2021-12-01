@@ -1,9 +1,11 @@
 package test
 
 import (
+	"FilterWorkerService/internal/IoC"
 	"FilterWorkerService/internal/model"
 	"FilterWorkerService/internal/service/concrete"
 	"FilterWorkerService/pkg/jsonParser/gojson"
+	"FilterWorkerService/test/Mock/Log"
 	"FilterWorkerService/test/Mock/repository"
 	"FilterWorkerService/test/Mock/service"
 	"testing"
@@ -35,20 +37,31 @@ var LocationResponseModel = model.LocationResponseModel{
 
 func Test_AddLocation_Success(t *testing.T) {
 	var testLocationDal = new(repository.MockLocationDal)
-	var testcache = new(service.MockCacheService)
-	testcache.On("ManageCache", "Continent", locationModel.Continent).Return(int64(1), true, "")
-	testcache.On("ManageCache", "Country", locationModel.Country).Return(int64(30), true, "")
-	testcache.On("ManageCache", "City", locationModel.City).Return(int64(187), true, "")
-	testcache.On("ManageCache", "Region", locationModel.Region).Return(int64(93), true, "")
-	testcache.On("ManageCache", "Org", locationModel.Org).Return(int64(8), true, "")
-	testLocationDal.On("Add", &LocationResponseModel).Return(nil)
-	var manager = concrete.LocationManager{
-		ICacheService: testcache,
-		IJsonParser:   &gojson.goJson{},
-		ILocationDal:  testLocationDal,
+	var testCache = new(service.MockCacheService)
+	var testLog = new(Log.MockLogger)
+	var json = gojson.GoJsonConstructor()
+	IoC.JsonParser = json
+	IoC.LocationDal = testLocationDal
+	IoC.Logger = testLog
+	IoC.CacheService = testCache
+	var manager = concrete.LocationManagerConstructor()
+	var locationModel_test = locationModel
+	var LocationResponseModel_test = LocationResponseModel
+	var locationModel_test_byte, _ = json.EncodeJson(locationModel_test)
+
+	testCache.On("ManageCache", "Continent", locationModel_test.Continent).Return(int64(1), true, "")
+	testCache.On("ManageCache", "Country", locationModel_test.Country).Return(int64(30), true, "")
+	testCache.On("ManageCache", "City", locationModel_test.City).Return(int64(187), true, "")
+	testCache.On("ManageCache", "Region", locationModel_test.Region).Return(int64(93), true, "")
+	testCache.On("ManageCache", "Org", locationModel_test.Org).Return(int64(8), true, "")
+	testLocationDal.On("Add", &LocationResponseModel_test).Return(nil)
+
+	var v, s, m = manager.AddLocation(locationModel_test_byte)
+	var value, success = v.(model.LocationResponseModel)
+	if success == true {
+		assert.Equal(t, &LocationResponseModel_test, value)
 	}
-	bytModel, _ := manager.IJsonParser.EncodeJson(locationModel)
-	var v, s, m = manager.AddLocation(bytModel)
+	assert.Equal(t, true, success)
 	assert.Equal(t, &LocationResponseModel, v)
 	assert.Equal(t, true, s)
 	assert.Equal(t, "", m)

@@ -1,9 +1,11 @@
 package test
 
 import (
+	"FilterWorkerService/internal/IoC"
 	"FilterWorkerService/internal/model"
 	"FilterWorkerService/internal/service/concrete"
 	"FilterWorkerService/pkg/jsonParser/gojson"
+	"FilterWorkerService/test/Mock/Log"
 	"FilterWorkerService/test/Mock/repository"
 	"errors"
 	"fmt"
@@ -190,103 +192,525 @@ var levelBaseUpdateSession = model.LevelBaseSessionRespondModel{
 	LastLevelSessionMinute:                     levelBaseRespondSession.FirstLevelSessionMinute ,
 }
 
-func Test_UpdateLevelBaseSession_Updated(t *testing.T) {
+func Test_UpdateLevelBaseSession_UpdatedSuccess(t *testing.T) {
+
 	var testLevelBaseDal = new(repository.MockLevelBaseSessionDal)
-	var manager = concrete.LevelBaseSessionManager{
-		ILevelBaseSessionDal: testLevelBaseDal,
-		IJsonParser:          &gojson.goJson{},
-	}
+	var testLog = new(Log.MockLogger)
+	var json = gojson.GoJsonConstructor()
+	IoC.JsonParser = json
+	IoC.LevelBaseSessionDal = testLevelBaseDal
+	IoC.Logger = testLog
+	var manager = concrete.LevelBaseSessionManagerConstructor()
+	var levelBaseOldSession_test = levelBaseOldSession
+	var levelBaseRespondSession_test = levelBaseRespondSession
+	var levelBaseUpdateSession_test = levelBaseUpdateSession
+
+
 	fmt.Println(TotalLevelBaseSessionMinute)
-	testLevelBaseDal.On("UpdateLevelBaseSessionById", levelBaseOldSession.ClientId, &levelBaseOldSession).Return(nil)
-	v,s,m:= manager.UpdateLevelBaseSession(&levelBaseRespondSession, &levelBaseOldSession)
-	assert.Equal(t, &levelBaseUpdateSession, v)
+	testLevelBaseDal.On("UpdateLevelBaseSessionById", levelBaseOldSession_test.ClientId, &levelBaseOldSession_test).Return(nil)
+	v,s,m:= manager.UpdateLevelBaseSession(&levelBaseRespondSession_test, &levelBaseOldSession_test)
+	assert.Equal(t, &levelBaseUpdateSession_test, v)
 	assert.Equal(t, true, s)
 	assert.Equal(t, nil, m)
 }
 
 func Test_ConvertRawModelToResponseModel_AddSucces(t *testing.T){
 	var testLevelBaseDal = new(repository.MockLevelBaseSessionDal)
-	var manager = concrete.LevelBaseSessionManager{
-		ILevelBaseSessionDal: testLevelBaseDal,
-		IJsonParser:          &gojson.goJson{},
+	var testLog = new(Log.MockLogger)
+	var json = gojson.GoJsonConstructor()
+	IoC.JsonParser = json
+	IoC.LevelBaseSessionDal = testLevelBaseDal
+	IoC.Logger = testLog
+	var manager = concrete.LevelBaseSessionManagerConstructor()
+
+	var levelBaseModel_test = levelBaseSession
+
+	var levelBaseOldSession_test = levelBaseOldSession
+	var levelBaseRespondSession_test = levelBaseRespondSession
+	
+	var levelBaseModel_test_byte, _ = json.EncodeJson(levelBaseModel_test)
+
+	
+	testLevelBaseDal.On("GetLevelBaseSessionById", levelBaseRespondSession_test.ClientId).Return(&levelBaseOldSession_test, 
+		errors.New("null data error"))
+
+	testLevelBaseDal.On("Add", &levelBaseRespondSession_test).Return(nil)
+
+	v, s, m := manager.ConvertRawModelToResponseModel(levelBaseModel_test_byte)
+	var value, success = v.(model.LevelBaseSessionRespondModel)
+	if success == true {
+		assert.Equal(t, &levelBaseRespondSession_test, value)
 	}
-	bytData, _ := manager.IJsonParser.EncodeJson(levelBaseSession)
-	testLevelBaseDal.On("GetLevelBaseSessionById", levelBaseRespondSession.ClientId).Return(&levelBaseOldSession, 
-		errors.New("mongo: no documents in result"))
-	testLevelBaseDal.On("Add", &levelBaseRespondSession).Return(nil)
-	v, s, m := manager.ConvertRawModelToResponseModel(bytData)
-	assert.Equal(t, &levelBaseRespondSession, v)
+	assert.Equal(t, true, success)
 	assert.Equal(t, true, s)
 	assert.Equal(t, "Added", m)
 	
 }
 
-func Test_CalculateLevelBaseSessionFirstQuarterHour(t *testing.T) {
-	concrete.CalculateLevelBaseSessionFirstQuarterHour(&levelBaseRespondSession, &levelBaseOldSession, TotalLevelBaseSessionMinute)
-	fmt.Println(TotalLevelBaseSessionMinute)
-	//var ExpFirstQuarterHour int64 = 0 + 2
-	var ExpFirstQuarterHour int64 = 1 + 2
-	assert.Equal(t, ExpFirstQuarterHour, levelBaseOldSession.FirstQuarterHourTotalLevelBaseSessionCount)
+
+func Test_CalculateLevelBaseSessionFirstQuarterHour_In15Minutes(t *testing.T) {
+	var levelBaseOldSession_test = levelBaseOldSession
+	levelBaseOldSession_test.FirstLevelSessionYearOfDay = 350
+	levelBaseOldSession_test.FirstLevelSessionYear = 2021
+	levelBaseOldSession_test.FirstLevelSessionHour = 16
+	levelBaseOldSession_test.FirstLevelSessionMinute = 48
+	levelBaseOldSession_test.FirstQuarterHourTotalLevelBaseSessionCount = 2
+	var levelBaseRespondSession_test = levelBaseRespondSession
+	levelBaseRespondSession_test.FirstLevelSessionYearOfDay = 350
+	levelBaseRespondSession_test.FirstLevelSessionYear = 2021
+	levelBaseRespondSession_test.FirstLevelSessionHour = 16
+	levelBaseRespondSession_test.FirstLevelSessionMinute = 55
+	levelBaseRespondSession_test.FirstQuarterHourTotalLevelBaseSessionCount = 3
+	var TotalLevelBaseSessionMinute_test = int64((((levelBaseRespondSession_test.FirstLevelSessionYearOfDay+365*levelBaseRespondSession_test.FirstLevelSessionYear)*24+levelBaseRespondSession_test.FirstLevelSessionHour)*60 + levelBaseRespondSession_test.FirstLevelSessionMinute) - (((levelBaseOldSession_test.FirstLevelSessionYearOfDay+365*levelBaseOldSession_test.FirstLevelSessionYear)*24+levelBaseOldSession_test.FirstLevelSessionHour)*60 + levelBaseOldSession_test.FirstLevelSessionMinute))
+	concrete.CalculateLevelBaseSessionFirstQuarterHour(&levelBaseRespondSession_test, &levelBaseOldSession_test, TotalLevelBaseSessionMinute_test)
+	fmt.Println(TotalLevelBaseSessionMinute_test)
+	var ExpFirstQuarterHour int64 = 5
+	assert.Equal(t, ExpFirstQuarterHour, levelBaseOldSession_test.FirstQuarterHourTotalLevelBaseSessionCount)
 }
 
-func Test_CalculateLevelBaseSessionFirstHalfHour(t *testing.T) {
-	concrete.CalculateLevelBaseSessionFirstHalfHour(&levelBaseRespondSession, &levelBaseOldSession, TotalLevelBaseSessionMinute)
-	fmt.Println(TotalLevelBaseSessionMinute)
-	//var ExpFirstHalfHour    int64 = 1 + 3
-	var ExpFirstHalfHour int64 = 0 + 3
-	assert.Equal(t, ExpFirstHalfHour, levelBaseOldSession.FirstHalfHourTotalLEvelBaseSessionCount)
+func Test_CalculateLevelBaseSessionFirstQuarterHour_Out15Minutes(t *testing.T) {
+	var levelBaseOldSession_test = levelBaseOldSession
+	levelBaseOldSession_test.FirstLevelSessionYearOfDay = 350
+	levelBaseOldSession_test.FirstLevelSessionYear = 2021
+	levelBaseOldSession_test.FirstLevelSessionHour = 16
+	levelBaseOldSession_test.FirstLevelSessionMinute = 45
+	levelBaseOldSession_test.FirstQuarterHourTotalLevelBaseSessionCount = 2
+	var levelBaseRespondSession_test = levelBaseRespondSession
+	levelBaseRespondSession_test.FirstLevelSessionYearOfDay = 350
+	levelBaseRespondSession_test.FirstLevelSessionYear = 2021
+	levelBaseRespondSession_test.FirstLevelSessionHour = 17
+	levelBaseRespondSession_test.FirstLevelSessionMinute = 01
+	levelBaseRespondSession_test.FirstQuarterHourTotalLevelBaseSessionCount = 3
+	var TotalLevelBaseSessionMinute_test = int64((((levelBaseRespondSession_test.FirstLevelSessionYearOfDay+365*levelBaseRespondSession_test.FirstLevelSessionYear)*24+levelBaseRespondSession_test.FirstLevelSessionHour)*60 + levelBaseRespondSession_test.FirstLevelSessionMinute) - (((levelBaseOldSession_test.FirstLevelSessionYearOfDay+365*levelBaseOldSession_test.FirstLevelSessionYear)*24+levelBaseOldSession_test.FirstLevelSessionHour)*60 + levelBaseOldSession_test.FirstLevelSessionMinute))
+	concrete.CalculateLevelBaseSessionFirstQuarterHour(&levelBaseRespondSession_test, &levelBaseOldSession_test, TotalLevelBaseSessionMinute_test)
+	fmt.Println(TotalLevelBaseSessionMinute_test)
+	var ExpFirstQuarterHour int64 = 2
+	assert.Equal(t, ExpFirstQuarterHour, levelBaseOldSession_test.FirstQuarterHourTotalLevelBaseSessionCount)
 }
 
-func Test_CalculateLevelBaseSessionFirstHour(t *testing.T) {
-	concrete.CalculateLevelBaseSessionFirstHour(&levelBaseRespondSession, &levelBaseOldSession, TotalLevelBaseSessionMinute)
+func Test_CalculateLevelBaseSessionFirstHalfHour_In30Minutes(t *testing.T) {
+	var levelBaseOldSession_test = levelBaseOldSession
+	levelBaseOldSession_test.FirstLevelSessionYearOfDay = 350
+	levelBaseOldSession_test.FirstLevelSessionYear = 2021
+	levelBaseOldSession_test.FirstLevelSessionHour = 16
+	levelBaseOldSession_test.FirstLevelSessionMinute = 50
+	levelBaseOldSession_test.FirstHalfHourTotalLEvelBaseSessionCount = 4
+	var levelBaseRespondSession_test = levelBaseRespondSession
+	levelBaseRespondSession_test.FirstLevelSessionYearOfDay = 350
+	levelBaseRespondSession_test.FirstLevelSessionYear = 2021
+	levelBaseRespondSession_test.FirstLevelSessionHour = 17
+	levelBaseRespondSession_test.FirstLevelSessionMinute = 20
+	levelBaseRespondSession_test.FirstHalfHourTotalLEvelBaseSessionCount = 1
+	var TotalLevelBaseSessionMinute_test = int64((((levelBaseRespondSession_test.FirstLevelSessionYearOfDay+365*levelBaseRespondSession_test.FirstLevelSessionYear)*24+levelBaseRespondSession_test.FirstLevelSessionHour)*60 + levelBaseRespondSession_test.FirstLevelSessionMinute) - (((levelBaseOldSession_test.FirstLevelSessionYearOfDay+365*levelBaseOldSession_test.FirstLevelSessionYear)*24+levelBaseOldSession_test.FirstLevelSessionHour)*60 + levelBaseOldSession_test.FirstLevelSessionMinute))
+	concrete.CalculateLevelBaseSessionFirstHalfHour(&levelBaseRespondSession_test, &levelBaseOldSession_test, TotalLevelBaseSessionMinute_test)
 	fmt.Println(TotalLevelBaseSessionMinute)
-	//var ExpFirstHour        int64 = 1 + 1
-	var ExpFirstHour int64 = 0 + 1
+	var ExpFirstHalfHour int64 = 5
+	assert.Equal(t, ExpFirstHalfHour, levelBaseOldSession_test.FirstHalfHourTotalLEvelBaseSessionCount)
+}
+
+func Test_CalculateLevelBaseSessionFirstHalfHour_Out30Minutes(t *testing.T) {
+	var levelBaseOldSession_test = levelBaseOldSession
+	levelBaseOldSession_test.FirstLevelSessionYearOfDay = 350
+	levelBaseOldSession_test.FirstLevelSessionYear = 2021
+	levelBaseOldSession_test.FirstLevelSessionHour = 16
+	levelBaseOldSession_test.FirstLevelSessionMinute = 50
+	levelBaseOldSession_test.FirstHalfHourTotalLEvelBaseSessionCount = 4
+	var levelBaseRespondSession_test = levelBaseRespondSession
+	levelBaseRespondSession_test.FirstLevelSessionYearOfDay = 350
+	levelBaseRespondSession_test.FirstLevelSessionYear = 2021
+	levelBaseRespondSession_test.FirstLevelSessionHour = 17
+	levelBaseRespondSession_test.FirstLevelSessionMinute = 21
+	levelBaseRespondSession_test.FirstHalfHourTotalLEvelBaseSessionCount = 1
+	var TotalLevelBaseSessionMinute_test = int64((((levelBaseRespondSession_test.FirstLevelSessionYearOfDay+365*levelBaseRespondSession_test.FirstLevelSessionYear)*24+levelBaseRespondSession_test.FirstLevelSessionHour)*60 + levelBaseRespondSession_test.FirstLevelSessionMinute) - (((levelBaseOldSession_test.FirstLevelSessionYearOfDay+365*levelBaseOldSession_test.FirstLevelSessionYear)*24+levelBaseOldSession_test.FirstLevelSessionHour)*60 + levelBaseOldSession_test.FirstLevelSessionMinute))
+	concrete.CalculateLevelBaseSessionFirstHalfHour(&levelBaseRespondSession_test, &levelBaseOldSession_test, TotalLevelBaseSessionMinute_test)
+	fmt.Println(TotalLevelBaseSessionMinute)
+	var ExpFirstHalfHour int64 = 4
+	assert.Equal(t, ExpFirstHalfHour, levelBaseOldSession_test.FirstHalfHourTotalLEvelBaseSessionCount)
+}
+
+func Test_CalculateLevelBaseSessionFirstHour_In60Minutes(t *testing.T) {
+	var levelBaseOldSession_test = levelBaseOldSession
+	levelBaseOldSession_test.FirstLevelSessionYearOfDay = 350
+	levelBaseOldSession_test.FirstLevelSessionYear = 2021
+	levelBaseOldSession_test.FirstLevelSessionHour = 16
+	levelBaseOldSession_test.FirstLevelSessionMinute = 50
+	levelBaseOldSession_test.FirstHourTotalLevelBaseSessionCount = 2
+	var levelBaseRespondSession_test = levelBaseRespondSession
+	levelBaseRespondSession_test.FirstLevelSessionYearOfDay = 350
+	levelBaseRespondSession_test.FirstLevelSessionYear = 2021
+	levelBaseRespondSession_test.FirstLevelSessionHour = 17
+	levelBaseRespondSession_test.FirstLevelSessionMinute = 50
+	levelBaseRespondSession_test.FirstHourTotalLevelBaseSessionCount = 1
+	var TotalLevelBaseSessionMinute_test = int64((((levelBaseRespondSession_test.FirstLevelSessionYearOfDay+365*levelBaseRespondSession_test.FirstLevelSessionYear)*24+levelBaseRespondSession_test.FirstLevelSessionHour)*60 + levelBaseRespondSession_test.FirstLevelSessionMinute) - (((levelBaseOldSession_test.FirstLevelSessionYearOfDay+365*levelBaseOldSession_test.FirstLevelSessionYear)*24+levelBaseOldSession_test.FirstLevelSessionHour)*60 + levelBaseOldSession_test.FirstLevelSessionMinute))
+	concrete.CalculateLevelBaseSessionFirstHour(&levelBaseRespondSession_test, &levelBaseOldSession_test, TotalLevelBaseSessionMinute_test)
+	fmt.Println(TotalLevelBaseSessionMinute_test)
+	var ExpFirstHour int64 = 2 + 1
 	assert.Equal(t, ExpFirstHour, levelBaseOldSession.FirstHourTotalLevelBaseSessionCount)
 }
 
-func Test_CalculateLevelBaseSessionFirstTwoHour(t *testing.T) {
-	concrete.CalculateLevelBaseSessionFirstTwoHour(&levelBaseRespondSession, &levelBaseOldSession, TotalLevelBaseSessionMinute)
-	fmt.Println(TotalLevelBaseSessionMinute)
-	//var ExpFirstTwoHour     int64 = 1 + 1
-	var ExpFirstTwoHour int64 = 0 + 1
+func Test_CalculateLevelBaseSessionFirstHour_Out60Minutes(t *testing.T) {
+	var levelBaseOldSession_test = levelBaseOldSession
+	levelBaseOldSession_test.FirstLevelSessionYearOfDay = 346
+	levelBaseOldSession_test.FirstLevelSessionYear = 2021
+	levelBaseOldSession_test.FirstLevelSessionHour = 16
+	levelBaseOldSession_test.FirstLevelSessionMinute = 50
+	levelBaseOldSession_test.FirstHourTotalLevelBaseSessionCount = 2
+	var levelBaseRespondSession_test = levelBaseRespondSession
+	levelBaseRespondSession_test.FirstLevelSessionYearOfDay = 346
+	levelBaseRespondSession_test.FirstLevelSessionYear = 2021
+	levelBaseRespondSession_test.FirstLevelSessionHour = 17
+	levelBaseRespondSession_test.FirstLevelSessionMinute = 51
+	levelBaseRespondSession_test.FirstHourTotalLevelBaseSessionCount = 1
+	var TotalLevelBaseSessionMinute_test = int64((((levelBaseRespondSession_test.FirstLevelSessionYearOfDay+365*levelBaseRespondSession_test.FirstLevelSessionYear)*24+levelBaseRespondSession_test.FirstLevelSessionHour)*60 + levelBaseRespondSession_test.FirstLevelSessionMinute) - (((levelBaseOldSession_test.FirstLevelSessionYearOfDay+365*levelBaseOldSession_test.FirstLevelSessionYear)*24+levelBaseOldSession_test.FirstLevelSessionHour)*60 + levelBaseOldSession_test.FirstLevelSessionMinute))
+	concrete.CalculateLevelBaseSessionFirstHour(&levelBaseRespondSession_test, &levelBaseOldSession_test, TotalLevelBaseSessionMinute_test)
+	fmt.Println(TotalLevelBaseSessionMinute_test)
+	var ExpFirstHour int64 = 2
+	assert.Equal(t, ExpFirstHour, levelBaseOldSession.FirstHourTotalLevelBaseSessionCount)
+}
+
+func Test_CalculateLevelBaseSessionFirstTwoHour_In120Minutes(t *testing.T) {
+	var levelBaseOldSession_test = levelBaseOldSession
+	levelBaseOldSession_test.FirstLevelSessionYearOfDay = 346
+	levelBaseOldSession_test.FirstLevelSessionYear = 2021
+	levelBaseOldSession_test.FirstLevelSessionHour = 16
+	levelBaseOldSession_test.FirstLevelSessionMinute = 50
+	levelBaseOldSession_test.FirstHourTotalLevelBaseSessionCount = 9
+	var levelBaseRespondSession_test = levelBaseRespondSession
+	levelBaseRespondSession_test.FirstLevelSessionYearOfDay = 346
+	levelBaseRespondSession_test.FirstLevelSessionYear = 2021
+	levelBaseRespondSession_test.FirstLevelSessionHour = 18
+	levelBaseRespondSession_test.FirstLevelSessionMinute = 50
+	levelBaseRespondSession_test.FirstHourTotalLevelBaseSessionCount = 1
+	var TotalLevelBaseSessionMinute_test = int64((((levelBaseRespondSession_test.FirstLevelSessionYearOfDay+365*levelBaseRespondSession_test.FirstLevelSessionYear)*24+levelBaseRespondSession_test.FirstLevelSessionHour)*60 + levelBaseRespondSession_test.FirstLevelSessionMinute) - (((levelBaseOldSession_test.FirstLevelSessionYearOfDay+365*levelBaseOldSession_test.FirstLevelSessionYear)*24+levelBaseOldSession_test.FirstLevelSessionHour)*60 + levelBaseOldSession_test.FirstLevelSessionMinute))
+	concrete.CalculateLevelBaseSessionFirstTwoHour(&levelBaseRespondSession_test, &levelBaseOldSession_test, TotalLevelBaseSessionMinute_test)
+	fmt.Println(TotalLevelBaseSessionMinute_test)
+	var ExpFirstTwoHour int64 = 9 + 1
 	assert.Equal(t, ExpFirstTwoHour, levelBaseOldSession.FirstTwoHourTotalLevelBaseSessionCount)
 }
 
-func Test_CalculateLevelBaseSessionFirstThreeHour(t *testing.T) {
-	concrete.CalculateLevelBaseSessionFirstThreeHour(&levelBaseRespondSession, &levelBaseOldSession, TotalLevelBaseSessionMinute)
-	fmt.Println(TotalLevelBaseSessionMinute)
-	//var ExpFirstThreeHour   int64 = 1 + 4
-	var ExpFirstThreeHour int64 = 0 + 4
+func Test_CalculateLevelBaseSessionFirstTwoHour_Out120Minutes(t *testing.T) {
+	var levelBaseOldSession_test = levelBaseOldSession
+	levelBaseOldSession_test.FirstLevelSessionYearOfDay = 346
+	levelBaseOldSession_test.FirstLevelSessionYear = 2021
+	levelBaseOldSession_test.FirstLevelSessionHour = 16
+	levelBaseOldSession_test.FirstLevelSessionMinute = 50
+	levelBaseOldSession_test.FirstTwoHourTotalLevelBaseSessionCount = 9
+	var levelBaseRespondSession_test = levelBaseRespondSession
+	levelBaseRespondSession_test.FirstLevelSessionYearOfDay = 346
+	levelBaseRespondSession_test.FirstLevelSessionYear = 2021
+	levelBaseRespondSession_test.FirstLevelSessionHour = 18
+	levelBaseRespondSession_test.FirstLevelSessionMinute = 51
+	levelBaseRespondSession_test.FirstTwoHourTotalLevelBaseSessionCount = 1
+	var TotalLevelBaseSessionMinute_test = int64((((levelBaseRespondSession_test.FirstLevelSessionYearOfDay+365*levelBaseRespondSession_test.FirstLevelSessionYear)*24+levelBaseRespondSession_test.FirstLevelSessionHour)*60 + levelBaseRespondSession_test.FirstLevelSessionMinute) - (((levelBaseOldSession_test.FirstLevelSessionYearOfDay+365*levelBaseOldSession_test.FirstLevelSessionYear)*24+levelBaseOldSession_test.FirstLevelSessionHour)*60 + levelBaseOldSession_test.FirstLevelSessionMinute))
+	concrete.CalculateLevelBaseSessionFirstTwoHour(&levelBaseRespondSession_test, &levelBaseOldSession_test, TotalLevelBaseSessionMinute_test)
+	fmt.Println(TotalLevelBaseSessionMinute_test)
+	var ExpFirstTwoHour int64 = 9
+	assert.Equal(t, ExpFirstTwoHour, levelBaseOldSession.FirstTwoHourTotalLevelBaseSessionCount)
+}
+
+func Test_CalculateLevelBaseSessionFirstThreeHour_In180Minutes(t *testing.T) {
+	var levelBaseOldSession_test = levelBaseOldSession
+	levelBaseOldSession_test.FirstLevelSessionYearOfDay = 346
+	levelBaseOldSession_test.FirstLevelSessionYear = 2021
+	levelBaseOldSession_test.FirstLevelSessionHour = 16
+	levelBaseOldSession_test.FirstLevelSessionMinute = 50
+	levelBaseOldSession_test.FirstThreeHourTotalLevelBaseSessionCount = 12
+	var levelBaseRespondSession_test = levelBaseRespondSession
+	levelBaseRespondSession_test.FirstLevelSessionYearOfDay = 346
+	levelBaseRespondSession_test.FirstLevelSessionYear = 2021
+	levelBaseRespondSession_test.FirstLevelSessionHour = 19
+	levelBaseRespondSession_test.FirstLevelSessionMinute = 30
+	levelBaseRespondSession_test.FirstThreeHourTotalLevelBaseSessionCount = 1
+	var TotalLevelBaseSessionMinute_test = int64((((levelBaseRespondSession_test.FirstLevelSessionYearOfDay+365*levelBaseRespondSession_test.FirstLevelSessionYear)*24+levelBaseRespondSession_test.FirstLevelSessionHour)*60 + levelBaseRespondSession_test.FirstLevelSessionMinute) - (((levelBaseOldSession_test.FirstLevelSessionYearOfDay+365*levelBaseOldSession_test.FirstLevelSessionYear)*24+levelBaseOldSession_test.FirstLevelSessionHour)*60 + levelBaseOldSession_test.FirstLevelSessionMinute))
+	concrete.CalculateLevelBaseSessionFirstThreeHour(&levelBaseRespondSession_test, &levelBaseOldSession_test, TotalLevelBaseSessionMinute_test)
+	fmt.Println(TotalLevelBaseSessionMinute_test)
+	var ExpFirstThreeHour int64 =12+1
 	assert.Equal(t, ExpFirstThreeHour, levelBaseOldSession.FirstThreeHourTotalLevelBaseSessionCount)
 }
 
-func Test_CalculateLevelBaseSessionFirstSixHour(t *testing.T) {
-	concrete.CalculateLevelBaseSessionFirstSixHour(&levelBaseRespondSession, &levelBaseOldSession, TotalLevelBaseSessionMinute)
+func Test_CalculateLevelBaseSessionFirstThreeHour_Out180Minutes(t *testing.T) {
+	var levelBaseOldSession_test = levelBaseOldSession
+	levelBaseOldSession_test.FirstLevelSessionYearOfDay = 346
+	levelBaseOldSession_test.FirstLevelSessionYear = 2021
+	levelBaseOldSession_test.FirstLevelSessionHour = 16
+	levelBaseOldSession_test.FirstLevelSessionMinute = 50
+	levelBaseOldSession_test.FirstThreeHourTotalLevelBaseSessionCount = 12
+	var levelBaseRespondSession_test = levelBaseRespondSession
+	levelBaseRespondSession_test.FirstLevelSessionYearOfDay = 346
+	levelBaseRespondSession_test.FirstLevelSessionYear = 2021
+	levelBaseRespondSession_test.FirstLevelSessionHour = 19
+	levelBaseRespondSession_test.FirstLevelSessionMinute = 51
+	levelBaseRespondSession_test.FirstThreeHourTotalLevelBaseSessionCount = 1
+	var TotalLevelBaseSessionMinute_test = int64((((levelBaseRespondSession_test.FirstLevelSessionYearOfDay+365*levelBaseRespondSession_test.FirstLevelSessionYear)*24+levelBaseRespondSession_test.FirstLevelSessionHour)*60 + levelBaseRespondSession_test.FirstLevelSessionMinute) - (((levelBaseOldSession_test.FirstLevelSessionYearOfDay+365*levelBaseOldSession_test.FirstLevelSessionYear)*24+levelBaseOldSession_test.FirstLevelSessionHour)*60 + levelBaseOldSession_test.FirstLevelSessionMinute))
+	concrete.CalculateLevelBaseSessionFirstThreeHour(&levelBaseRespondSession_test, &levelBaseOldSession_test, TotalLevelBaseSessionMinute_test)
+	fmt.Println(TotalLevelBaseSessionMinute_test)
+	var ExpFirstThreeHour int64 =12
+	assert.Equal(t, ExpFirstThreeHour, levelBaseOldSession.FirstThreeHourTotalLevelBaseSessionCount)
+}
+
+func Test_CalculateLevelBaseSessionFirstSixHour_In360Minutes(t *testing.T) {
+	var levelBaseOldSession_test = levelBaseOldSession
+	levelBaseOldSession_test.FirstLevelSessionYearOfDay = 346
+	levelBaseOldSession_test.FirstLevelSessionYear = 2021
+	levelBaseOldSession_test.FirstLevelSessionHour = 12
+	levelBaseOldSession_test.FirstLevelSessionMinute = 00
+	levelBaseOldSession_test.FirstSixHourTotalLevelBaseSessionCount = 18
+	var levelBaseRespondSession_test = levelBaseRespondSession
+	levelBaseRespondSession_test.FirstLevelSessionYearOfDay = 346
+	levelBaseRespondSession_test.FirstLevelSessionYear = 2021
+	levelBaseRespondSession_test.FirstLevelSessionHour = 18
+	levelBaseRespondSession_test.FirstLevelSessionMinute = 00
+	levelBaseRespondSession_test.FirstSixHourTotalLevelBaseSessionCount = 1
+	var TotalLevelBaseSessionMinute_test = int64((((levelBaseRespondSession_test.FirstLevelSessionYearOfDay+365*levelBaseRespondSession_test.FirstLevelSessionYear)*24+levelBaseRespondSession_test.FirstLevelSessionHour)*60 + levelBaseRespondSession_test.FirstLevelSessionMinute) - (((levelBaseOldSession_test.FirstLevelSessionYearOfDay+365*levelBaseOldSession_test.FirstLevelSessionYear)*24+levelBaseOldSession_test.FirstLevelSessionHour)*60 + levelBaseOldSession_test.FirstLevelSessionMinute))
+	concrete.CalculateLevelBaseSessionFirstSixHour(&levelBaseRespondSession_test, &levelBaseOldSession_test, TotalLevelBaseSessionMinute_test)
 	fmt.Println(TotalLevelBaseSessionMinute)
-	//var ExpFirstSixHour     int64 = 1 + 1
-	var ExpFirstSixHour int64 = 0 + 1
+	var ExpFirstSixHour int64 = 18 + 1
 	assert.Equal(t, ExpFirstSixHour, levelBaseOldSession.FirstSixHourTotalLevelBaseSessionCount)
 }
 
-func Test_CalculateLevelBaseSessionFirstTwelveHour(t *testing.T) {
-	concrete.CalculateLevelBaseSessionFirstTwelveHour(&levelBaseRespondSession, &levelBaseOldSession, TotalLevelBaseSessionMinute)
+func Test_CalculateLevelBaseSessionFirstSixHour_Out360Minutes(t *testing.T) {
+	var levelBaseOldSession_test = levelBaseOldSession
+	levelBaseOldSession_test.FirstLevelSessionYearOfDay = 346
+	levelBaseOldSession_test.FirstLevelSessionYear = 2021
+	levelBaseOldSession_test.FirstLevelSessionHour = 12
+	levelBaseOldSession_test.FirstLevelSessionMinute = 00
+	levelBaseOldSession_test.FirstSixHourTotalLevelBaseSessionCount = 18
+	var levelBaseRespondSession_test = levelBaseRespondSession
+	levelBaseRespondSession_test.FirstLevelSessionYearOfDay = 346
+	levelBaseRespondSession_test.FirstLevelSessionYear = 2021
+	levelBaseRespondSession_test.FirstLevelSessionHour = 18
+	levelBaseRespondSession_test.FirstLevelSessionMinute = 01
+	levelBaseRespondSession_test.FirstSixHourTotalLevelBaseSessionCount = 1
+	var TotalLevelBaseSessionMinute_test = int64((((levelBaseRespondSession_test.FirstLevelSessionYearOfDay+365*levelBaseRespondSession_test.FirstLevelSessionYear)*24+levelBaseRespondSession_test.FirstLevelSessionHour)*60 + levelBaseRespondSession_test.FirstLevelSessionMinute) - (((levelBaseOldSession_test.FirstLevelSessionYearOfDay+365*levelBaseOldSession_test.FirstLevelSessionYear)*24+levelBaseOldSession_test.FirstLevelSessionHour)*60 + levelBaseOldSession_test.FirstLevelSessionMinute))
+	concrete.CalculateLevelBaseSessionFirstSixHour(&levelBaseRespondSession_test, &levelBaseOldSession_test, TotalLevelBaseSessionMinute_test)
 	fmt.Println(TotalLevelBaseSessionMinute)
-	//var ExpFirstTwelveHour  int64 = 1 + 6
-	var ExpFirstTwelveHour int64 = 0 + 6
+	var ExpFirstSixHour int64 = 18
+	assert.Equal(t, ExpFirstSixHour, levelBaseOldSession.FirstSixHourTotalLevelBaseSessionCount)
+}
+
+func Test_CalculateLevelBaseSessionFirstTwelveHour_In720Minutes(t *testing.T) {
+	var levelBaseOldSession_test = levelBaseOldSession
+	levelBaseOldSession_test.FirstLevelSessionYearOfDay = 346
+	levelBaseOldSession_test.FirstLevelSessionYear = 2021
+	levelBaseOldSession_test.FirstLevelSessionHour = 12
+	levelBaseOldSession_test.FirstLevelSessionMinute = 01
+	levelBaseOldSession_test.FirstTwelveHourTotalLevelBaseSessionCount = 20
+	var levelBaseRespondSession_test = levelBaseRespondSession
+	levelBaseRespondSession_test.FirstLevelSessionYearOfDay = 347
+	levelBaseRespondSession_test.FirstLevelSessionYear = 2021
+	levelBaseRespondSession_test.FirstLevelSessionHour = 00
+	levelBaseRespondSession_test.FirstLevelSessionMinute = 01
+	levelBaseRespondSession_test.FirstTwelveHourTotalLevelBaseSessionCount = 1
+	var TotalLevelBaseSessionMinute_test = int64((((levelBaseRespondSession_test.FirstLevelSessionYearOfDay+365*levelBaseRespondSession_test.FirstLevelSessionYear)*24+levelBaseRespondSession_test.FirstLevelSessionHour)*60 + levelBaseRespondSession_test.FirstLevelSessionMinute) - (((levelBaseOldSession_test.FirstLevelSessionYearOfDay+365*levelBaseOldSession_test.FirstLevelSessionYear)*24+levelBaseOldSession_test.FirstLevelSessionHour)*60 + levelBaseOldSession_test.FirstLevelSessionMinute))
+	concrete.CalculateLevelBaseSessionFirstTwelveHour(&levelBaseRespondSession_test, &levelBaseOldSession_test, TotalLevelBaseSessionMinute_test)
+	fmt.Println(TotalLevelBaseSessionMinute_test)
+	var ExpFirstTwelveHour int64 = 20+1
 	assert.Equal(t, ExpFirstTwelveHour, levelBaseOldSession.FirstTwelveHourTotalLevelBaseSessionCount)
 }
 
-func Test_CalculateLevelBaseSessionFirstDay(t *testing.T) {
-	concrete.CalculateLevelBaseSessionFirstDay(&levelBaseRespondSession, &levelBaseOldSession, TotalLevelBaseSessionMinute)
-	fmt.Println(TotalLevelBaseSessionMinute)
-	//var ExpFirstDay         int64 = 1 + 1
-	var ExpFirstDay int64 = 0 + 1
+func Test_CalculateLevelBaseSessionFirstTwelveHour_Out720Minutes(t *testing.T) {
+	var levelBaseOldSession_test = levelBaseOldSession
+	levelBaseOldSession_test.FirstLevelSessionYearOfDay = 346
+	levelBaseOldSession_test.FirstLevelSessionYear = 2021
+	levelBaseOldSession_test.FirstLevelSessionHour = 12
+	levelBaseOldSession_test.FirstLevelSessionMinute = 01
+	levelBaseOldSession_test.FirstTwelveHourTotalLevelBaseSessionCount = 20
+	var levelBaseRespondSession_test = levelBaseRespondSession
+	levelBaseRespondSession_test.FirstLevelSessionYearOfDay = 347
+	levelBaseRespondSession_test.FirstLevelSessionYear = 2021
+	levelBaseRespondSession_test.FirstLevelSessionHour = 00
+	levelBaseRespondSession_test.FirstLevelSessionMinute = 02
+	levelBaseRespondSession_test.FirstTwelveHourTotalLevelBaseSessionCount = 1
+	var TotalLevelBaseSessionMinute_test = int64((((levelBaseRespondSession_test.FirstLevelSessionYearOfDay+365*levelBaseRespondSession_test.FirstLevelSessionYear)*24+levelBaseRespondSession_test.FirstLevelSessionHour)*60 + levelBaseRespondSession_test.FirstLevelSessionMinute) - (((levelBaseOldSession_test.FirstLevelSessionYearOfDay+365*levelBaseOldSession_test.FirstLevelSessionYear)*24+levelBaseOldSession_test.FirstLevelSessionHour)*60 + levelBaseOldSession_test.FirstLevelSessionMinute))
+	concrete.CalculateLevelBaseSessionFirstTwelveHour(&levelBaseRespondSession_test, &levelBaseOldSession_test, TotalLevelBaseSessionMinute_test)
+	fmt.Println(TotalLevelBaseSessionMinute_test)
+	var ExpFirstTwelveHour int64 = 20
+	assert.Equal(t, ExpFirstTwelveHour, levelBaseOldSession.FirstTwelveHourTotalLevelBaseSessionCount)
+}
+
+func Test_CalculateLevelBaseSessionFirstDay_In1440Minutes(t *testing.T) {
+	var levelBaseOldSession_test = levelBaseOldSession
+	levelBaseOldSession_test.FirstLevelSessionYearOfDay = 346
+	levelBaseOldSession_test.FirstLevelSessionYear = 2021
+	levelBaseOldSession_test.FirstLevelSessionHour = 12
+	levelBaseOldSession_test.FirstLevelSessionMinute = 01
+	levelBaseOldSession_test.FirstDayTotalLevelBaseSessionCount = 30
+	var levelBaseRespondSession_test = levelBaseRespondSession
+	levelBaseRespondSession_test.FirstLevelSessionYearOfDay = 347
+	levelBaseRespondSession_test.FirstLevelSessionYear = 2021
+	levelBaseRespondSession_test.FirstLevelSessionHour = 12
+	levelBaseRespondSession_test.FirstLevelSessionMinute = 01
+	levelBaseRespondSession_test.FirstDayTotalLevelBaseSessionCount = 1
+	var TotalLevelBaseSessionMinute_test = int64((((levelBaseRespondSession_test.FirstLevelSessionYearOfDay+365*levelBaseRespondSession_test.FirstLevelSessionYear)*24+levelBaseRespondSession_test.FirstLevelSessionHour)*60 + levelBaseRespondSession_test.FirstLevelSessionMinute) - (((levelBaseOldSession_test.FirstLevelSessionYearOfDay+365*levelBaseOldSession_test.FirstLevelSessionYear)*24+levelBaseOldSession_test.FirstLevelSessionHour)*60 + levelBaseOldSession_test.FirstLevelSessionMinute))
+	concrete.CalculateLevelBaseSessionFirstDay(&levelBaseRespondSession_test, &levelBaseOldSession_test, TotalLevelBaseSessionMinute_test)
+	fmt.Println(TotalLevelBaseSessionMinute_test)
+	var ExpFirstDay int64 = 30 + 1
 	assert.Equal(t, ExpFirstDay, levelBaseOldSession.FirstDayTotalLevelBaseSessionCount)
 }
 
-func Test_CalculateLevelIndexBaseSession(t *testing.T) {
-	concrete.CalculateLevelIndexBaseSession(&levelBaseRespondSession, &levelBaseOldSession)
+func Test_CalculateLevelBaseSessionFirstDay_Out1440Minutes(t *testing.T) {
+	var levelBaseOldSession_test = levelBaseOldSession
+	levelBaseOldSession_test.FirstLevelSessionYearOfDay = 346
+	levelBaseOldSession_test.FirstLevelSessionYear = 2021
+	levelBaseOldSession_test.FirstLevelSessionHour = 12
+	levelBaseOldSession_test.FirstLevelSessionMinute = 01
+	levelBaseOldSession_test.FirstDayTotalLevelBaseSessionCount = 30
+	var levelBaseRespondSession_test = levelBaseRespondSession
+	levelBaseRespondSession_test.FirstLevelSessionYearOfDay = 347
+	levelBaseRespondSession_test.FirstLevelSessionYear = 2021
+	levelBaseRespondSession_test.FirstLevelSessionHour = 12
+	levelBaseRespondSession_test.FirstLevelSessionMinute = 02
+	levelBaseRespondSession_test.FirstDayTotalLevelBaseSessionCount = 1
+	var TotalLevelBaseSessionMinute_test = int64((((levelBaseRespondSession_test.FirstLevelSessionYearOfDay+365*levelBaseRespondSession_test.FirstLevelSessionYear)*24+levelBaseRespondSession_test.FirstLevelSessionHour)*60 + levelBaseRespondSession_test.FirstLevelSessionMinute) - (((levelBaseOldSession_test.FirstLevelSessionYearOfDay+365*levelBaseOldSession_test.FirstLevelSessionYear)*24+levelBaseOldSession_test.FirstLevelSessionHour)*60 + levelBaseOldSession_test.FirstLevelSessionMinute))
+	concrete.CalculateLevelBaseSessionFirstDay(&levelBaseRespondSession_test, &levelBaseOldSession_test, TotalLevelBaseSessionMinute_test)
+	fmt.Println(TotalLevelBaseSessionMinute_test)
+	var ExpFirstDay int64 = 30
+	assert.Equal(t, ExpFirstDay, levelBaseOldSession.FirstDayTotalLevelBaseSessionCount)
+}
+
+func Test_CalculateLevelIndexBaseSession_SecondSession(t *testing.T) {
+	var levelBaseOldSession_test = levelBaseOldSession
+	levelBaseOldSession_test.TotalLevelBaseSessionCount = 2
+	var levelBaseRespondSession_test = levelBaseRespondSession
+	levelBaseRespondSession_test.FirstLevelSessionLevelIndex = 35
+	levelBaseRespondSession_test.FirstLevelSessionDuration   = 23
+	concrete.CalculateLevelIndexBaseSession(&levelBaseRespondSession_test, &levelBaseOldSession_test)
+	fmt.Println(levelBaseOldSession.TotalLevelBaseSessionCount)
+	var ExpSecondLevelindex int64 =    levelBaseRespondSession_test.FirstLevelSessionLevelIndex         
+	var ExpSecondDuration int64 =      levelBaseRespondSession_test.FirstLevelSessionDuration       
+	var ExpThirdindex int64 =          0   
+	var ExpThirdDuration int64 =       0      
+	var ExpFourLevelindex int64 =      0       
+	var ExpFourDuration int64 =        0     
+	var ExpFiveLevelindex int64 =      0       
+	var ExpFiveDuration int64 =        0     
+	var ExpSixLevelindex int64 =       0      
+	var ExpSixDuration int64 =         0    
+	var ExpSevenLevelindex int64 =     0        
+	var ExpSevenDuration int64 =       0      
+	assert.Equal(t, ExpSecondLevelindex, levelBaseOldSession.SecondLevelSessionLevelIndex)
+	assert.Equal(t, ExpSecondDuration, levelBaseOldSession.SecondLevelSessionDuration)
+	assert.Equal(t, ExpThirdindex, levelBaseOldSession.ThirdLevelSessionLevelIndex)
+	assert.Equal(t, ExpThirdDuration, levelBaseOldSession.ThirdLevelSessionLevelIndex)
+	assert.Equal(t, ExpFourLevelindex, levelBaseOldSession.FourLevelSessionLevelIndex)
+	assert.Equal(t, ExpFourDuration, levelBaseOldSession.FourLevelSessionDuration)
+	assert.Equal(t, ExpFiveLevelindex, levelBaseOldSession.FiveLevelSessionLevelIndex)
+	assert.Equal(t, ExpFiveDuration, levelBaseOldSession.FiveLevelSessionDuration)
+	assert.Equal(t, ExpSixLevelindex, levelBaseOldSession.SixLevelSessionLevelIndex)
+	assert.Equal(t, ExpSixDuration, levelBaseOldSession.SixLevelSessionDuration)
+	assert.Equal(t, ExpSevenLevelindex, levelBaseOldSession.SevenLevelSessionLevelIndex)
+	assert.Equal(t, ExpSevenDuration, levelBaseOldSession.SevenLevelSessionDuration)
+}
+
+func Test_CalculateLevelIndexBaseSession_ThirdSession(t *testing.T) {
+	var levelBaseOldSession_test = levelBaseOldSession
+	levelBaseOldSession_test.TotalLevelBaseSessionCount = 3
+	var levelBaseRespondSession_test = levelBaseRespondSession
+	levelBaseRespondSession_test.FirstLevelSessionLevelIndex = 35
+	levelBaseRespondSession_test.FirstLevelSessionDuration   = 23
+	concrete.CalculateLevelIndexBaseSession(&levelBaseRespondSession_test, &levelBaseOldSession_test)
+	fmt.Println(levelBaseOldSession.TotalLevelBaseSessionCount)
+	var ExpSecondLevelindex int64 =    0         
+	var ExpSecondDuration int64 =      0     
+	var ExpThirdindex int64 =          levelBaseRespondSession_test.FirstLevelSessionLevelIndex   
+	var ExpThirdDuration int64 =       levelBaseRespondSession_test.FirstLevelSessionDuration        
+	var ExpFourLevelindex int64 =      0       
+	var ExpFourDuration int64 =        0     
+	var ExpFiveLevelindex int64 =      0       
+	var ExpFiveDuration int64 =        0     
+	var ExpSixLevelindex int64 =       0      
+	var ExpSixDuration int64 =         0    
+	var ExpSevenLevelindex int64 =     0        
+	var ExpSevenDuration int64 =       0      
+	assert.Equal(t, ExpSecondLevelindex, levelBaseOldSession.SecondLevelSessionLevelIndex)
+	assert.Equal(t, ExpSecondDuration, levelBaseOldSession.SecondLevelSessionDuration)
+	assert.Equal(t, ExpThirdindex, levelBaseOldSession.ThirdLevelSessionLevelIndex)
+	assert.Equal(t, ExpThirdDuration, levelBaseOldSession.ThirdLevelSessionLevelIndex)
+	assert.Equal(t, ExpFourLevelindex, levelBaseOldSession.FourLevelSessionLevelIndex)
+	assert.Equal(t, ExpFourDuration, levelBaseOldSession.FourLevelSessionDuration)
+	assert.Equal(t, ExpFiveLevelindex, levelBaseOldSession.FiveLevelSessionLevelIndex)
+	assert.Equal(t, ExpFiveDuration, levelBaseOldSession.FiveLevelSessionDuration)
+	assert.Equal(t, ExpSixLevelindex, levelBaseOldSession.SixLevelSessionLevelIndex)
+	assert.Equal(t, ExpSixDuration, levelBaseOldSession.SixLevelSessionDuration)
+	assert.Equal(t, ExpSevenLevelindex, levelBaseOldSession.SevenLevelSessionLevelIndex)
+	assert.Equal(t, ExpSevenDuration, levelBaseOldSession.SevenLevelSessionDuration)
+}
+
+func Test_CalculateLevelIndexBaseSession_FourthSession(t *testing.T) {
+	var levelBaseOldSession_test = levelBaseOldSession
+	levelBaseOldSession_test.TotalLevelBaseSessionCount = 4
+	var levelBaseRespondSession_test = levelBaseRespondSession
+	levelBaseRespondSession_test.FirstLevelSessionLevelIndex = 35
+	levelBaseRespondSession_test.FirstLevelSessionDuration   = 23
+	concrete.CalculateLevelIndexBaseSession(&levelBaseRespondSession_test, &levelBaseOldSession_test)
+	fmt.Println(levelBaseOldSession.TotalLevelBaseSessionCount)
+	var ExpSecondLevelindex int64 =    0         
+	var ExpSecondDuration int64 =      0     
+	var ExpThirdindex int64 =          0   
+	var ExpThirdDuration int64 =       0      
+	var ExpFourLevelindex int64 =      levelBaseRespondSession_test.FirstLevelSessionLevelIndex       
+	var ExpFourDuration int64 =        levelBaseRespondSession_test.FirstLevelSessionDuration       
+	var ExpFiveLevelindex int64 =      0       
+	var ExpFiveDuration int64 =        0     
+	var ExpSixLevelindex int64 =       0      
+	var ExpSixDuration int64 =         0    
+	var ExpSevenLevelindex int64 =     0        
+	var ExpSevenDuration int64 =       0      
+	assert.Equal(t, ExpSecondLevelindex, levelBaseOldSession.SecondLevelSessionLevelIndex)
+	assert.Equal(t, ExpSecondDuration, levelBaseOldSession.SecondLevelSessionDuration)
+	assert.Equal(t, ExpThirdindex, levelBaseOldSession.ThirdLevelSessionLevelIndex)
+	assert.Equal(t, ExpThirdDuration, levelBaseOldSession.ThirdLevelSessionLevelIndex)
+	assert.Equal(t, ExpFourLevelindex, levelBaseOldSession.FourLevelSessionLevelIndex)
+	assert.Equal(t, ExpFourDuration, levelBaseOldSession.FourLevelSessionDuration)
+	assert.Equal(t, ExpFiveLevelindex, levelBaseOldSession.FiveLevelSessionLevelIndex)
+	assert.Equal(t, ExpFiveDuration, levelBaseOldSession.FiveLevelSessionDuration)
+	assert.Equal(t, ExpSixLevelindex, levelBaseOldSession.SixLevelSessionLevelIndex)
+	assert.Equal(t, ExpSixDuration, levelBaseOldSession.SixLevelSessionDuration)
+	assert.Equal(t, ExpSevenLevelindex, levelBaseOldSession.SevenLevelSessionLevelIndex)
+	assert.Equal(t, ExpSevenDuration, levelBaseOldSession.SevenLevelSessionDuration)
+}
+
+func Test_CalculateLevelIndexBaseSession_FifthSession(t *testing.T) {
+	var levelBaseOldSession_test = levelBaseOldSession
+	levelBaseOldSession_test.TotalLevelBaseSessionCount = 5
+	var levelBaseRespondSession_test = levelBaseRespondSession
+	levelBaseRespondSession_test.FirstLevelSessionLevelIndex = 35
+	levelBaseRespondSession_test.FirstLevelSessionDuration   = 23
+	concrete.CalculateLevelIndexBaseSession(&levelBaseRespondSession_test, &levelBaseOldSession_test)
+	fmt.Println(levelBaseOldSession.TotalLevelBaseSessionCount)
+	var ExpSecondLevelindex int64 =    0         
+	var ExpSecondDuration int64 =      0     
+	var ExpThirdindex int64 =          0   
+	var ExpThirdDuration int64 =       0      
+	var ExpFourLevelindex int64 =      0       
+	var ExpFourDuration int64 =        0     
+	var ExpFiveLevelindex int64 =      levelBaseRespondSession_test.FirstLevelSessionLevelIndex       
+	var ExpFiveDuration int64 =        levelBaseRespondSession_test.FirstLevelSessionDuration       
+	var ExpSixLevelindex int64 =       0      
+	var ExpSixDuration int64 =         0    
+	var ExpSevenLevelindex int64 =     0        
+	var ExpSevenDuration int64 =       0      
+	assert.Equal(t, ExpSecondLevelindex, levelBaseOldSession.SecondLevelSessionLevelIndex)
+	assert.Equal(t, ExpSecondDuration, levelBaseOldSession.SecondLevelSessionDuration)
+	assert.Equal(t, ExpThirdindex, levelBaseOldSession.ThirdLevelSessionLevelIndex)
+	assert.Equal(t, ExpThirdDuration, levelBaseOldSession.ThirdLevelSessionLevelIndex)
+	assert.Equal(t, ExpFourLevelindex, levelBaseOldSession.FourLevelSessionLevelIndex)
+	assert.Equal(t, ExpFourDuration, levelBaseOldSession.FourLevelSessionDuration)
+	assert.Equal(t, ExpFiveLevelindex, levelBaseOldSession.FiveLevelSessionLevelIndex)
+	assert.Equal(t, ExpFiveDuration, levelBaseOldSession.FiveLevelSessionDuration)
+	assert.Equal(t, ExpSixLevelindex, levelBaseOldSession.SixLevelSessionLevelIndex)
+	assert.Equal(t, ExpSixDuration, levelBaseOldSession.SixLevelSessionDuration)
+	assert.Equal(t, ExpSevenLevelindex, levelBaseOldSession.SevenLevelSessionLevelIndex)
+	assert.Equal(t, ExpSevenDuration, levelBaseOldSession.SevenLevelSessionDuration)
+}
+
+func Test_CalculateLevelIndexBaseSession_SixthSession(t *testing.T) {
+	var levelBaseOldSession_test = levelBaseOldSession
+	levelBaseOldSession_test.TotalLevelBaseSessionCount = 6
+	var levelBaseRespondSession_test = levelBaseRespondSession
+	levelBaseRespondSession_test.FirstLevelSessionLevelIndex = 35
+	levelBaseRespondSession_test.FirstLevelSessionDuration   = 23
+	concrete.CalculateLevelIndexBaseSession(&levelBaseRespondSession_test, &levelBaseOldSession_test)
 	fmt.Println(levelBaseOldSession.TotalLevelBaseSessionCount)
 	var ExpSecondLevelindex int64 =    0         
 	var ExpSecondDuration int64 =      0     
@@ -296,10 +720,44 @@ func Test_CalculateLevelIndexBaseSession(t *testing.T) {
 	var ExpFourDuration int64 =        0     
 	var ExpFiveLevelindex int64 =      0       
 	var ExpFiveDuration int64 =        0     
-	var ExpSixLevelindex int64 =       levelBaseRespondSession.FirstLevelSessionLevelIndex      
-	var ExpSixDuration int64 =         levelBaseRespondSession.FirstLevelSessionDuration      
+	var ExpSixLevelindex int64 =       levelBaseRespondSession_test.FirstLevelSessionLevelIndex      
+	var ExpSixDuration int64 =         levelBaseRespondSession_test.FirstLevelSessionDuration      
 	var ExpSevenLevelindex int64 =     0        
 	var ExpSevenDuration int64 =       0      
+	assert.Equal(t, ExpSecondLevelindex, levelBaseOldSession.SecondLevelSessionLevelIndex)
+	assert.Equal(t, ExpSecondDuration, levelBaseOldSession.SecondLevelSessionDuration)
+	assert.Equal(t, ExpThirdindex, levelBaseOldSession.ThirdLevelSessionLevelIndex)
+	assert.Equal(t, ExpThirdDuration, levelBaseOldSession.ThirdLevelSessionLevelIndex)
+	assert.Equal(t, ExpFourLevelindex, levelBaseOldSession.FourLevelSessionLevelIndex)
+	assert.Equal(t, ExpFourDuration, levelBaseOldSession.FourLevelSessionDuration)
+	assert.Equal(t, ExpFiveLevelindex, levelBaseOldSession.FiveLevelSessionLevelIndex)
+	assert.Equal(t, ExpFiveDuration, levelBaseOldSession.FiveLevelSessionDuration)
+	assert.Equal(t, ExpSixLevelindex, levelBaseOldSession.SixLevelSessionLevelIndex)
+	assert.Equal(t, ExpSixDuration, levelBaseOldSession.SixLevelSessionDuration)
+	assert.Equal(t, ExpSevenLevelindex, levelBaseOldSession.SevenLevelSessionLevelIndex)
+	assert.Equal(t, ExpSevenDuration, levelBaseOldSession.SevenLevelSessionDuration)
+}
+
+func Test_CalculateLevelIndexBaseSession_SeventhSession(t *testing.T) {
+	var levelBaseOldSession_test = levelBaseOldSession
+	levelBaseOldSession_test.TotalLevelBaseSessionCount = 7
+	var levelBaseRespondSession_test = levelBaseRespondSession
+	levelBaseRespondSession_test.FirstLevelSessionLevelIndex = 35
+	levelBaseRespondSession_test.FirstLevelSessionDuration   = 23
+	concrete.CalculateLevelIndexBaseSession(&levelBaseRespondSession_test, &levelBaseOldSession_test)
+	fmt.Println(levelBaseOldSession.TotalLevelBaseSessionCount)
+	var ExpSecondLevelindex int64 =    0         
+	var ExpSecondDuration int64 =      0     
+	var ExpThirdindex int64 =          0   
+	var ExpThirdDuration int64 =       0      
+	var ExpFourLevelindex int64 =      0       
+	var ExpFourDuration int64 =        0     
+	var ExpFiveLevelindex int64 =      0       
+	var ExpFiveDuration int64 =        0     
+	var ExpSixLevelindex int64 =       0      
+	var ExpSixDuration int64 =         0    
+	var ExpSevenLevelindex int64 =     levelBaseRespondSession_test.FirstLevelSessionLevelIndex        
+	var ExpSevenDuration int64 =       levelBaseRespondSession_test.FirstLevelSessionDuration        
 	assert.Equal(t, ExpSecondLevelindex, levelBaseOldSession.SecondLevelSessionLevelIndex)
 	assert.Equal(t, ExpSecondDuration, levelBaseOldSession.SecondLevelSessionDuration)
 	assert.Equal(t, ExpThirdindex, levelBaseOldSession.ThirdLevelSessionLevelIndex)

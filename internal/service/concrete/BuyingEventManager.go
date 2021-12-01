@@ -132,7 +132,7 @@ func (b *buyingEventManager) UpdateBuyingEvent(modelResponse *model.BuyingEventR
 	oldModel.LevelIndex = modelResponse.LevelIndex
 	oldModel.TotalBuyingCount = oldModel.TotalBuyingCount + modelResponse.TotalBuyingCount
 	oldModel.TotalBuyingDay = (modelResponse.FirstBuyingYearOfDay - oldModel.FirstBuyingYearOfDay) + 365*(modelResponse.FirstBuyingYear-oldModel.FirstBuyingYear)
-	oldModel.TotalBuyingHour = ((modelResponse.FirstBuyingYearOfDay+365*modelResponse.FirstBuyingYear)*24 + modelResponse.TotalBuyingHour) - ((oldModel.FirstBuyingYearOfDay+365*oldModel.FirstBuyingYear)*24 + oldModel.TotalBuyingHour)
+	oldModel.TotalBuyingHour = ((modelResponse.FirstBuyingYearOfDay+365*modelResponse.FirstBuyingYear)*24 + modelResponse.FirstBuyingHour) - ((oldModel.FirstBuyingYearOfDay+365*oldModel.FirstBuyingYear)*24 + oldModel.FirstBuyingHour)
 	CalculateSecondBuying(modelResponse, oldModel)
 	CalculateThirdBuying(modelResponse, oldModel)
 	CalculateFourthBuying(modelResponse, oldModel)
