@@ -24,11 +24,11 @@ func GameSessionEveryLoginManagerConstructor() *gameSessionEveryLoginManager {
 
 func (g *gameSessionEveryLoginManager) ConvertRawModelToResponseModel(data *[]byte) (v interface{}, s bool, m string) {
 	firstModel := model.GameSessionEveryLoginModel{}
-	Err := (*g.IJsonParser).DecodeJson(data, &firstModel)
-	if Err != nil {
+	convertErr := (*g.IJsonParser).DecodeJson(data, &firstModel)
+	if convertErr != nil {
 		(*g.ILog).SendErrorLog("GameSessionEveryLoginManager", "ConvertRawModelToResponseModel",
-			"byte array to GameSessionEveryLoginModel", "Json Parser Decode Err: ", Err.Error())
-		return &model.GameSessionEveryLoginRespondModel{}, false, Err.Error()
+			"byte array to GameSessionEveryLoginModel", "Json Parser Decode Err: ", convertErr.Error())
+		return &model.GameSessionEveryLoginRespondModel{}, false, convertErr.Error()
 	}
 	hour := int64(firstModel.SessionFinishTime.Hour())
 	yearOfDay := int64(firstModel.SessionFinishTime.YearDay())
@@ -122,12 +122,12 @@ func (g *gameSessionEveryLoginManager) ConvertRawModelToResponseModel(data *[]by
 		modelResponse.ClientId, modelResponse.ProjectId)
 
 	oldModel, err := (*g.IGameSessionEveryLoginDal).GetGameSessionEveryLoginById(modelResponse.ClientId)
-	if err != nil {
+	if err != nil && err.Error() != "null data error" {
 		(*g.ILog).SendErrorLog("GameSessionEveryLoginManager", "ConvertRawModelToResponseModel",
 			"GameSessionEveryLoginDal_GetGameSessionEveryLoginById", err.Error())
 	}
 	switch {
-	case err.Error() == "null data error":
+	case err != nil && err.Error() == "null data error":
 
 		logErr := (*g.IGameSessionEveryLoginDal).Add(&modelResponse)
 		if logErr != nil {

@@ -27,11 +27,11 @@ func BuyingEventManagerConstructor() *buyingEventManager {
 
 func (b *buyingEventManager) ConvertRawModelToResponseModel(data *[]byte) (v interface{}, s bool, m string) {
 	firstModel := model.BuyingEventModel{}
-	Err := (*b.IJsonParser).DecodeJson(data, &firstModel)
-	if Err != nil {
+	convertErr := (*b.IJsonParser).DecodeJson(data, &firstModel)
+	if convertErr != nil {
 		(*b.ILog).SendErrorLog("BuyingEventManager", "ConvertRawModelToResponseModel",
-			"byte array to BuyingEventModel", "Json Parser Decode Err: ", Err.Error())
-		return &model.BuyingEventRespondModel{}, false, Err.Error()
+			"byte array to BuyingEventModel", "Json Parser Decode Err: ", convertErr.Error())
+		return &model.BuyingEventRespondModel{}, false, convertErr.Error()
 	}
 	hour := int64(firstModel.TrigerdTime.Hour())
 	day := int64(firstModel.TrigerdTime.Weekday())
@@ -94,12 +94,12 @@ func (b *buyingEventManager) ConvertRawModelToResponseModel(data *[]byte) (v int
 	defer (*b.ILog).SendInfoLog("BuyingEventManager", "ConvertRawModelToResponseModel",
 		modelResponse.ClientId, modelResponse.ProjectId)
 	oldModel, err := (*b.IBuyingEventDal).GetBuyingEventById(modelResponse.ClientId)
-	if err != nil {
+	if err != nil && err.Error() != "null data error" {
 		(*b.ILog).SendErrorLog("BuyingEventManager", "ConvertRawModelToResponseModel",
 			"BuyingEventDal_GetBuyingEventById", err.Error())
 	}
 	switch {
-	case err.Error() == "null data error":
+	case  err != nil && err.Error() == "null data error":
 
 		logErr := (*b.IBuyingEventDal).Add(&modelResponse)
 		if logErr != nil {

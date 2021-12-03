@@ -28,11 +28,11 @@ func LocationManagerConstructor() *locationManager {
 func (l *locationManager) AddLocation(data *[]byte) (v interface{}, s bool, m string) {
 
 	firstmodel := model.LocationModel{}
-	Err := (*l.IJsonParser).DecodeJson(data, &firstmodel)
-	if Err != nil {
+	convertErr := (*l.IJsonParser).DecodeJson(data, &firstmodel)
+	if convertErr != nil {
 		(*l.ILog).SendErrorLog("LocationManager", "AddLocation",
-			"byte array to LocationModel", "Json Parser Decode Err: ", Err.Error())
-		return &model.LocationResponseModel{}, false, Err.Error()
+			"byte array to LocationModel", "Json Parser Decode Err: ", convertErr.Error())
+		return &model.LocationResponseModel{}, false, convertErr.Error()
 	}
 	modelResponse := model.LocationResponseModel{}
 	modelResponse.ProjectId = firstmodel.ProjectId

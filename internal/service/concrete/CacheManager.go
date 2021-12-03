@@ -52,7 +52,7 @@ func (c *CacheManager) ManageCache(tableName string, key string) (v int64, s boo
 		}
 		//bilgi yok ise yenisini yarat ve cache'i güncelle
 		var max, maxErr = (*c.ITypeStandardizationDal).GetMaxByValue(tableName)
-		if maxErr != nil{
+		if maxErr != nil {
 			(*c.ILog).SendErrorLog("CacheManager",
 				"ManageCache",
 				"ITypeStandardizationDal_GetMaxByValue", maxErr.Error())

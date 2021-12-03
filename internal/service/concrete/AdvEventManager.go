@@ -27,11 +27,11 @@ func AdvEventManagerConstructor() *advEventManager {
 
 func (a *advEventManager) ConvertRawModelToResponseModel(data *[]byte) (v interface{}, s bool, m string) {
 	firstModel := model.AdvEventModel{}
-	Err := (*a.IJsonParser).DecodeJson(data, &firstModel)
-	if Err != nil {
+	convertErr := (*a.IJsonParser).DecodeJson(data, &firstModel)
+	if convertErr != nil {
 		(*a.ILog).SendErrorLog("AdvEventManager", "ConvertRawModelToResponseModel",
-			"byte array to AdvEventModel", "Json Parser Decode Err: ", Err.Error())
-		return nil, false, Err.Error()
+			"byte array to AdvEventModel", "Json Parser Decode Err: ", convertErr.Error())
+		return nil, false, convertErr.Error()
 	}
 	hour := int64(firstModel.TrigerdTime.Hour())
 	day := int64(firstModel.TrigerdTime.Weekday())
@@ -109,12 +109,12 @@ func (a *advEventManager) ConvertRawModelToResponseModel(data *[]byte) (v interf
 		modelResponse.ClientId, modelResponse.ProjectId)
 
 	oldModel, err := (*a.IAdvEventDal).GetAdvEventById(modelResponse.ClientId)
-	if err != nil {
+	if err != nil && err.Error() != "null data error"{
 		(*a.ILog).SendErrorLog("AdvEventManager", "ConvertRawModelToResponseModel",
 			"AdvEventDal_GetAdvEventById", err.Error())
 	}
 	switch {
-	case err.Error() == "null data error":
+	case  err != nil && err.Error() == "null data error":
 
 		logErr := (*a.IAdvEventDal).Add(&modelResponse)
 		if logErr != nil {

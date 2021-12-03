@@ -15,61 +15,9 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var levelBaseSession = model.LevelBaseSessionDataModel{
-	ProjectId:  "Test",
-	ClientId:   "Test",
-	CustomerId: "Test",
-	SessionStartTime: time.Date(
-		2021, 11, 6, 18, 33, 58, 651387237, time.UTC),
-	SessionFinishTime: time.Date(
-		2021, 11, 6, 19, 34, 58, 651387237, time.UTC),
-	SessionTimeMinute: 15,
-	LevelIndex:        25,
-	LevelName:         "25",
-}
+var levelBaseSession = model.LevelBaseSessionDataModel{}
 
 var levelBaseRespondSession = model.LevelBaseSessionRespondModel{
-	ProjectId:                                  "Test",
-	ClientId:                                   "Test",
-	CustomerId:                                 "Test",
-	TotalLevelBaseSessionMinute:                1,
-	TotalLevelBaseSessionCount:                 1,
-	FirstLevelSessionLevelIndex:                int64(levelBaseSession.LevelIndex),
-	FirstLevelSessionDuration:                  int64(levelBaseSession.SessionTimeMinute),
-	FirstLevelSessionYearOfDay:                 int64(levelBaseSession.SessionFinishTime.YearDay()),
-	FirstLevelSessionYear:                      int64(levelBaseSession.SessionFinishTime.Year()),
-	FirstLevelSessionWeekDay:                   int64(levelBaseSession.SessionFinishTime.Weekday()),
-	FirstLevelSessionHour:                      int64(levelBaseSession.SessionFinishTime.Hour()),
-	FirstLevelSessionMinute:                    int64(levelBaseSession.SessionFinishTime.Minute()),
-	SecondLevelSessionLevelIndex:               0,
-	SecondLevelSessionDuration:                 0,
-	ThirdLevelSessionLevelIndex:                0,
-	ThirdLevelSessionDuration:                  0,
-	FourLevelSessionLevelIndex:                 0,
-	FourLevelSessionDuration:                   0,
-	FiveLevelSessionLevelIndex:                 0,
-	FiveLevelSessionDuration:                   0,
-	SixLevelSessionLevelIndex:                  0,
-	SixLevelSessionDuration:                    0,
-	SevenLevelSessionLevelIndex:                0,
-	SevenLevelSessionDuration:                  0,
-	FirstQuarterHourTotalLevelBaseSessionCount: 1,
-	FirstHalfHourTotalLEvelBaseSessionCount:    1,
-	FirstHourTotalLevelBaseSessionCount:        1,
-	FirstTwoHourTotalLevelBaseSessionCount:     1,
-	FirstThreeHourTotalLevelBaseSessionCount:   1,
-	FirstSixHourTotalLevelBaseSessionCount:     1,
-	FirstTwelveHourTotalLevelBaseSessionCount:  1,
-	FirstDayTotalLevelBaseSessionCount:         1,
-	PenultimateLevelSessionLevelIndex:          0,
-	PenultimateLevelSessionLevelDuration:       0,
-	LastLevelSessionLevelIndex:                 0,
-	LastLevelSessionLevelDuration:              0,
-	LastLevelSessionYearOfDay:                  0,
-	LastLevelSessionYear:                       0,
-	LastLevelSessionWeekDay:                    0,
-	LastLevelSessionHour:                       0,
-	LastLevelSessionMinute:                     0,
 }
 
 var levelBaseOldSession1 = model.LevelBaseSessionDataModel{
@@ -100,97 +48,13 @@ var levelBaseOldSession2 = model.LevelBaseSessionDataModel{
 
 var TotalLevelBaseSessionOldMinute = int64((((levelBaseOldSession2.SessionFinishTime.YearDay()+365*levelBaseOldSession2.SessionFinishTime.Year())*24+levelBaseOldSession2.SessionFinishTime.Hour())*60 + levelBaseOldSession2.SessionFinishTime.Minute()) - (((levelBaseOldSession1.SessionFinishTime.YearDay()+365*levelBaseOldSession1.SessionFinishTime.Year())*24+levelBaseOldSession1.SessionFinishTime.Hour())*60 + levelBaseOldSession1.SessionFinishTime.Minute()))
 
-var levelBaseOldSession = model.LevelBaseSessionRespondModel{
-	ProjectId:                                  "Test",
-	ClientId:                                   "Test",
-	CustomerId:                                 "Test",
-	TotalLevelBaseSessionMinute:                TotalLevelBaseSessionOldMinute,
-	TotalLevelBaseSessionCount:                 3,
-	FirstLevelSessionLevelIndex:                int64(levelBaseOldSession1.LevelIndex),
-	FirstLevelSessionDuration:                  int64(levelBaseOldSession1.SessionTimeMinute),
-	FirstLevelSessionYearOfDay:                 int64(levelBaseOldSession1.SessionFinishTime.YearDay()),
-	FirstLevelSessionYear:                      int64(levelBaseOldSession1.SessionFinishTime.Year()),
-	FirstLevelSessionWeekDay:                   int64(levelBaseOldSession1.SessionFinishTime.Weekday()),
-	FirstLevelSessionHour:                      int64(levelBaseOldSession1.SessionFinishTime.Hour()),
-	FirstLevelSessionMinute:                    int64(levelBaseOldSession1.SessionFinishTime.Minute()),
-	SecondLevelSessionLevelIndex:               0,
-	SecondLevelSessionDuration:                 0,
-	ThirdLevelSessionLevelIndex:                0,
-	ThirdLevelSessionDuration:                  0,
-	FourLevelSessionLevelIndex:                 0,
-	FourLevelSessionDuration:                   0,
-	FiveLevelSessionLevelIndex:                 0,
-	FiveLevelSessionDuration:                   0,
-	SixLevelSessionLevelIndex:                  0,
-	SixLevelSessionDuration:                    0,
-	SevenLevelSessionLevelIndex:                0,
-	SevenLevelSessionDuration:                  0,
-	FirstQuarterHourTotalLevelBaseSessionCount: 2,
-	FirstHalfHourTotalLEvelBaseSessionCount:    3,
-	FirstHourTotalLevelBaseSessionCount:        1,
-	FirstTwoHourTotalLevelBaseSessionCount:     1,
-	FirstThreeHourTotalLevelBaseSessionCount:   4,
-	FirstSixHourTotalLevelBaseSessionCount:     1,
-	FirstTwelveHourTotalLevelBaseSessionCount:  6,
-	FirstDayTotalLevelBaseSessionCount:         1,
-	PenultimateLevelSessionLevelIndex:          0,
-	PenultimateLevelSessionLevelDuration:       0,
-	LastLevelSessionLevelIndex:                 int64(levelBaseOldSession2.LevelIndex),
-	LastLevelSessionLevelDuration:              int64(levelBaseOldSession2.SessionTimeMinute),
-	LastLevelSessionYearOfDay:                  int64(levelBaseOldSession2.SessionFinishTime.YearDay()),
-	LastLevelSessionYear:                       int64(levelBaseOldSession2.SessionFinishTime.Year()),
-	LastLevelSessionWeekDay:                    int64(levelBaseOldSession2.SessionFinishTime.Weekday()),
-	LastLevelSessionHour:                       int64(levelBaseOldSession2.SessionFinishTime.Hour()),
-	LastLevelSessionMinute:                     int64(levelBaseOldSession2.SessionFinishTime.Minute()),
-}
+var levelBaseOldSession = model.LevelBaseSessionRespondModel{}
 
 var TotalLevelBaseSessionMinute = int64((((levelBaseRespondSession.FirstLevelSessionYearOfDay+365*levelBaseRespondSession.FirstLevelSessionYear)*24+levelBaseRespondSession.FirstLevelSessionHour)*60 + levelBaseRespondSession.FirstLevelSessionMinute) - (((levelBaseOldSession.FirstLevelSessionYearOfDay+365*levelBaseOldSession.FirstLevelSessionYear)*24+levelBaseOldSession.FirstLevelSessionHour)*60 + levelBaseOldSession.FirstLevelSessionMinute))
 
 
 
-var levelBaseUpdateSession = model.LevelBaseSessionRespondModel{
-	ProjectId:                                  "Test",
-	ClientId:                                   "Test",
-	CustomerId:                                 "Test",
-	TotalLevelBaseSessionMinute:                TotalLevelBaseSessionMinute,
-	TotalLevelBaseSessionCount:                 levelBaseOldSession.TotalLevelBaseSessionCount +levelBaseRespondSession.TotalLevelBaseSessionMinute,
-	FirstLevelSessionLevelIndex:                int64(levelBaseOldSession1.LevelIndex),
-	FirstLevelSessionDuration:                  int64(levelBaseOldSession1.SessionTimeMinute),
-	FirstLevelSessionYearOfDay:                 int64(levelBaseOldSession1.SessionFinishTime.YearDay()),
-	FirstLevelSessionYear:                      int64(levelBaseOldSession1.SessionFinishTime.Year()),
-	FirstLevelSessionWeekDay:                   int64(levelBaseOldSession1.SessionFinishTime.Weekday()),
-	FirstLevelSessionHour:                      int64(levelBaseOldSession1.SessionFinishTime.Hour()),
-	FirstLevelSessionMinute:                    int64(levelBaseOldSession1.SessionFinishTime.Minute()),
-	SecondLevelSessionLevelIndex:               0,
-	SecondLevelSessionDuration:                 0,
-	ThirdLevelSessionLevelIndex:                0,
-	ThirdLevelSessionDuration:                  0,
-	FourLevelSessionLevelIndex:                 levelBaseRespondSession.FirstLevelSessionLevelIndex,
-	FourLevelSessionDuration:                   levelBaseRespondSession.FirstLevelSessionDuration,
-	FiveLevelSessionLevelIndex:                 0,
-	FiveLevelSessionDuration:                   0,
-	SixLevelSessionLevelIndex:                  0,
-	SixLevelSessionDuration:                    0,
-	SevenLevelSessionLevelIndex:                0,
-	SevenLevelSessionDuration:                  0,
-	FirstQuarterHourTotalLevelBaseSessionCount: 2,
-	FirstHalfHourTotalLEvelBaseSessionCount:    3,
-	FirstHourTotalLevelBaseSessionCount:        1 + 1,
-	FirstTwoHourTotalLevelBaseSessionCount:     1 + 1,
-	FirstThreeHourTotalLevelBaseSessionCount:   4 + 1,
-	FirstSixHourTotalLevelBaseSessionCount:     1 + 1,
-	FirstTwelveHourTotalLevelBaseSessionCount:  6 + 1,
-	FirstDayTotalLevelBaseSessionCount:         1 + 1,
-	PenultimateLevelSessionLevelIndex:          int64(levelBaseOldSession2.LevelIndex),
-	PenultimateLevelSessionLevelDuration:       int64(levelBaseOldSession2.SessionTimeMinute),
-	LastLevelSessionLevelIndex:                 levelBaseRespondSession.FirstLevelSessionLevelIndex,
-	LastLevelSessionLevelDuration:              levelBaseRespondSession.FirstLevelSessionDuration,
-	LastLevelSessionYearOfDay:                  levelBaseRespondSession.FirstLevelSessionYearOfDay,
-	LastLevelSessionYear:                       levelBaseRespondSession.FirstLevelSessionYear   ,
-	LastLevelSessionWeekDay:                    levelBaseRespondSession.FirstLevelSessionWeekDay ,
-	LastLevelSessionHour:                       levelBaseRespondSession.FirstLevelSessionHour   ,
-	LastLevelSessionMinute:                     levelBaseRespondSession.FirstLevelSessionMinute ,
-}
+var levelBaseUpdateSession = model.LevelBaseSessionRespondModel{}
 
 func Test_UpdateLevelBaseSession_UpdatedSuccess(t *testing.T) {
 
@@ -202,9 +66,91 @@ func Test_UpdateLevelBaseSession_UpdatedSuccess(t *testing.T) {
 	IoC.Logger = testLog
 	var manager = concrete.LevelBaseSessionManagerConstructor()
 	var levelBaseOldSession_test = levelBaseOldSession
-	var levelBaseRespondSession_test = levelBaseRespondSession
-	var levelBaseUpdateSession_test = levelBaseUpdateSession
+	levelBaseOldSession_test.ProjectId                               =   "Test"
+	levelBaseOldSession_test.ClientId                                =   "Test"
+	levelBaseOldSession_test.CustomerId                              =   "Test"
+	levelBaseOldSession_test.TotalLevelBaseSessionMinute             =   TotalLevelBaseSessionOldMinute
+	levelBaseOldSession_test.TotalLevelBaseSessionCount              =   3
+	levelBaseOldSession_test.FirstLevelSessionLevelIndex             =   int64(levelBaseOldSession1.LevelIndex)
+	levelBaseOldSession_test.FirstLevelSessionDuration               =   int64(levelBaseOldSession1.SessionTimeMinute)
+	levelBaseOldSession_test.FirstLevelSessionYearOfDay              =   int64(levelBaseOldSession1.SessionFinishTime.YearDay())
+	levelBaseOldSession_test.FirstLevelSessionYear                   =   int64(levelBaseOldSession1.SessionFinishTime.Year())
+	levelBaseOldSession_test.FirstLevelSessionWeekDay                =   int64(levelBaseOldSession1.SessionFinishTime.Weekday())
+	levelBaseOldSession_test.FirstLevelSessionHour                   =   int64(levelBaseOldSession1.SessionFinishTime.Hour())
+	levelBaseOldSession_test.FirstLevelSessionMinute                 =   int64(levelBaseOldSession1.SessionFinishTime.Minute())
+	levelBaseOldSession_test.FirstQuarterHourTotalLevelBaseSessionCount   =  2
+	levelBaseOldSession_test.FirstHalfHourTotalLEvelBaseSessionCount      =  3
+	levelBaseOldSession_test.FirstHourTotalLevelBaseSessionCount          =  1
+	levelBaseOldSession_test.FirstTwoHourTotalLevelBaseSessionCount       =  1
+	levelBaseOldSession_test.FirstThreeHourTotalLevelBaseSessionCount     =  4
+	levelBaseOldSession_test.FirstSixHourTotalLevelBaseSessionCount       =  1
+	levelBaseOldSession_test.FirstTwelveHourTotalLevelBaseSessionCount    =  6
+	levelBaseOldSession_test.FirstDayTotalLevelBaseSessionCount           =  1
+	levelBaseOldSession_test.PenultimateLevelSessionLevelIndex            =  0
+	levelBaseOldSession_test.PenultimateLevelSessionLevelDuration         =  0
+	levelBaseOldSession_test.LastLevelSessionLevelIndex                   =  int64(levelBaseOldSession2.LevelIndex)
+	levelBaseOldSession_test.LastLevelSessionLevelDuration                =  int64(levelBaseOldSession2.SessionTimeMinute)
+	levelBaseOldSession_test.LastLevelSessionYearOfDay                    =  int64(levelBaseOldSession2.SessionFinishTime.YearDay())
+	levelBaseOldSession_test.LastLevelSessionYear                         =  int64(levelBaseOldSession2.SessionFinishTime.Year())
+	levelBaseOldSession_test.LastLevelSessionWeekDay                      =  int64(levelBaseOldSession2.SessionFinishTime.Weekday())
+	levelBaseOldSession_test.LastLevelSessionHour                         =  int64(levelBaseOldSession2.SessionFinishTime.Hour())
+	levelBaseOldSession_test.LastLevelSessionMinute                       =  int64(levelBaseOldSession2.SessionFinishTime.Minute())
 
+	var levelBaseRespondSession_test = levelBaseRespondSession
+	levelBaseRespondSession_test.ProjectId                              =    "Test"
+	levelBaseRespondSession_test.ClientId                               =    "Test"
+	levelBaseRespondSession_test.CustomerId                             =    "Test"
+	levelBaseRespondSession_test.TotalLevelBaseSessionMinute            =    1
+	levelBaseRespondSession_test.TotalLevelBaseSessionCount             =    1
+	levelBaseRespondSession_test.FirstLevelSessionLevelIndex            =    int64(levelBaseSession.LevelIndex)
+	levelBaseRespondSession_test.FirstLevelSessionDuration              =    int64(levelBaseSession.SessionTimeMinute)
+	levelBaseRespondSession_test.FirstLevelSessionYearOfDay             =    int64(levelBaseSession.SessionFinishTime.YearDay())
+	levelBaseRespondSession_test.FirstLevelSessionYear                  =    int64(levelBaseSession.SessionFinishTime.Year())
+	levelBaseRespondSession_test.FirstLevelSessionWeekDay               =    int64(levelBaseSession.SessionFinishTime.Weekday())
+	levelBaseRespondSession_test.FirstLevelSessionHour                  =    int64(levelBaseSession.SessionFinishTime.Hour())
+	levelBaseRespondSession_test.FirstLevelSessionMinute                =    int64(levelBaseSession.SessionFinishTime.Minute())
+	levelBaseRespondSession_test.FirstQuarterHourTotalLevelBaseSessionCount  = 1
+	levelBaseRespondSession_test.FirstHalfHourTotalLEvelBaseSessionCount     = 1
+	levelBaseRespondSession_test.FirstHourTotalLevelBaseSessionCount         = 1
+	levelBaseRespondSession_test.FirstTwoHourTotalLevelBaseSessionCount      = 1
+	levelBaseRespondSession_test.FirstThreeHourTotalLevelBaseSessionCount    = 1
+	levelBaseRespondSession_test.FirstSixHourTotalLevelBaseSessionCount      = 1
+	levelBaseRespondSession_test.FirstTwelveHourTotalLevelBaseSessionCount   = 1
+	levelBaseRespondSession_test.FirstDayTotalLevelBaseSessionCount          = 1
+
+	var TotalLevelBaseSessionMinute_test = int64((((levelBaseRespondSession_test.FirstLevelSessionYearOfDay+365*levelBaseRespondSession_test.FirstLevelSessionYear)*24+levelBaseRespondSession_test.FirstLevelSessionHour)*60 + levelBaseRespondSession_test.FirstLevelSessionMinute) - (((levelBaseOldSession_test.FirstLevelSessionYearOfDay+365*levelBaseOldSession_test.FirstLevelSessionYear)*24+levelBaseOldSession_test.FirstLevelSessionHour)*60 + levelBaseOldSession_test.FirstLevelSessionMinute))
+	var levelBaseUpdateSession_test = levelBaseUpdateSession
+	levelBaseUpdateSession_test.ProjectId                               =   "Test"
+	levelBaseUpdateSession_test.ClientId                                =   "Test"
+	levelBaseUpdateSession_test.CustomerId                              =   "Test"
+	levelBaseUpdateSession_test.TotalLevelBaseSessionMinute             =   TotalLevelBaseSessionMinute_test
+	levelBaseUpdateSession_test.TotalLevelBaseSessionCount              =   levelBaseOldSession.TotalLevelBaseSessionCount +levelBaseRespondSession.TotalLevelBaseSessionMinute
+	levelBaseUpdateSession_test.FirstLevelSessionLevelIndex             =   int64(levelBaseOldSession1.LevelIndex)
+	levelBaseUpdateSession_test.FirstLevelSessionDuration               =   int64(levelBaseOldSession1.SessionTimeMinute)
+	levelBaseUpdateSession_test.FirstLevelSessionYearOfDay              =   int64(levelBaseOldSession1.SessionFinishTime.YearDay())
+	levelBaseUpdateSession_test.FirstLevelSessionYear                   =   int64(levelBaseOldSession1.SessionFinishTime.Year())
+	levelBaseUpdateSession_test.FirstLevelSessionWeekDay                =   int64(levelBaseOldSession1.SessionFinishTime.Weekday())
+	levelBaseUpdateSession_test.FirstLevelSessionHour                   =   int64(levelBaseOldSession1.SessionFinishTime.Hour())
+	levelBaseUpdateSession_test.FirstLevelSessionMinute                 =   int64(levelBaseOldSession1.SessionFinishTime.Minute())
+	levelBaseUpdateSession_test.FourLevelSessionLevelIndex       =          levelBaseRespondSession.FirstLevelSessionLevelIndex
+	levelBaseUpdateSession_test.FourLevelSessionDuration         =          levelBaseRespondSession.FirstLevelSessionDuration
+	levelBaseUpdateSession_test.FirstQuarterHourTotalLevelBaseSessionCount       =   2
+	levelBaseUpdateSession_test.FirstHalfHourTotalLEvelBaseSessionCount          =   3
+	levelBaseUpdateSession_test.FirstHourTotalLevelBaseSessionCount              =   1 + 1
+	levelBaseUpdateSession_test.FirstTwoHourTotalLevelBaseSessionCount           =   1 + 1
+	levelBaseUpdateSession_test.FirstThreeHourTotalLevelBaseSessionCount         =   4 + 1
+	levelBaseUpdateSession_test.FirstSixHourTotalLevelBaseSessionCount           =   1 + 1
+	levelBaseUpdateSession_test.FirstTwelveHourTotalLevelBaseSessionCount        =   6 + 1
+	levelBaseUpdateSession_test.FirstDayTotalLevelBaseSessionCount               =   1 + 1
+	levelBaseUpdateSession_test.PenultimateLevelSessionLevelIndex                =   int64(levelBaseOldSession2.LevelIndex)
+	levelBaseUpdateSession_test.PenultimateLevelSessionLevelDuration             =   int64(levelBaseOldSession2.SessionTimeMinute)
+	levelBaseUpdateSession_test.LastLevelSessionLevelIndex                       =   levelBaseRespondSession.FirstLevelSessionLevelIndex
+	levelBaseUpdateSession_test.LastLevelSessionLevelDuration                    =   levelBaseRespondSession.FirstLevelSessionDuration
+	levelBaseUpdateSession_test.LastLevelSessionYearOfDay                        =   levelBaseRespondSession.FirstLevelSessionYearOfDay
+	levelBaseUpdateSession_test.LastLevelSessionYear                             =   levelBaseRespondSession.FirstLevelSessionYear   
+	levelBaseUpdateSession_test.LastLevelSessionWeekDay                          =   levelBaseRespondSession.FirstLevelSessionWeekDay 
+	levelBaseUpdateSession_test.LastLevelSessionHour                             =   levelBaseRespondSession.FirstLevelSessionHour   
+	levelBaseUpdateSession_test.LastLevelSessionMinute                           =   levelBaseRespondSession.FirstLevelSessionMinute 
 
 	fmt.Println(TotalLevelBaseSessionMinute)
 	testLevelBaseDal.On("UpdateLevelBaseSessionById", levelBaseOldSession_test.ClientId, &levelBaseOldSession_test).Return(nil)
@@ -224,9 +170,40 @@ func Test_ConvertRawModelToResponseModel_AddSucces(t *testing.T){
 	var manager = concrete.LevelBaseSessionManagerConstructor()
 
 	var levelBaseModel_test = levelBaseSession
+	levelBaseModel_test.ProjectId  = "Test"
+	levelBaseModel_test.ClientId   = "Test"
+	levelBaseModel_test.CustomerId = "Test"
+	levelBaseModel_test.SessionStartTime = time.Date(
+		2021, 11, 6, 18, 33, 58, 651387237, time.UTC)
+	levelBaseModel_test.SessionFinishTime = time.Date(
+		2021, 11, 6, 19, 34, 58, 651387237, time.UTC)
+	levelBaseModel_test.SessionTimeMinute = 15
+	levelBaseModel_test.LevelIndex    =    25
+	levelBaseModel_test.LevelName     =   "25"
 
 	var levelBaseOldSession_test = levelBaseOldSession
+
 	var levelBaseRespondSession_test = levelBaseRespondSession
+	levelBaseRespondSession_test.ProjectId                              =    "Test"
+	levelBaseRespondSession_test.ClientId                               =    "Test"
+	levelBaseRespondSession_test.CustomerId                             =    "Test"
+	levelBaseRespondSession_test.TotalLevelBaseSessionMinute            =    1
+	levelBaseRespondSession_test.TotalLevelBaseSessionCount             =    1
+	levelBaseRespondSession_test.FirstLevelSessionLevelIndex            =    int64(levelBaseSession.LevelIndex)
+	levelBaseRespondSession_test.FirstLevelSessionDuration              =    int64(levelBaseSession.SessionTimeMinute)
+	levelBaseRespondSession_test.FirstLevelSessionYearOfDay             =    int64(levelBaseSession.SessionFinishTime.YearDay())
+	levelBaseRespondSession_test.FirstLevelSessionYear                  =    int64(levelBaseSession.SessionFinishTime.Year())
+	levelBaseRespondSession_test.FirstLevelSessionWeekDay               =    int64(levelBaseSession.SessionFinishTime.Weekday())
+	levelBaseRespondSession_test.FirstLevelSessionHour                  =    int64(levelBaseSession.SessionFinishTime.Hour())
+	levelBaseRespondSession_test.FirstLevelSessionMinute                =    int64(levelBaseSession.SessionFinishTime.Minute())
+	levelBaseRespondSession_test.FirstQuarterHourTotalLevelBaseSessionCount  = 1
+	levelBaseRespondSession_test.FirstHalfHourTotalLEvelBaseSessionCount     = 1
+	levelBaseRespondSession_test.FirstHourTotalLevelBaseSessionCount         = 1
+	levelBaseRespondSession_test.FirstTwoHourTotalLevelBaseSessionCount      = 1
+	levelBaseRespondSession_test.FirstThreeHourTotalLevelBaseSessionCount    = 1
+	levelBaseRespondSession_test.FirstSixHourTotalLevelBaseSessionCount      = 1
+	levelBaseRespondSession_test.FirstTwelveHourTotalLevelBaseSessionCount   = 1
+	levelBaseRespondSession_test.FirstDayTotalLevelBaseSessionCount          = 1
 	
 	var levelBaseModel_test_byte, _ = json.EncodeJson(levelBaseModel_test)
 

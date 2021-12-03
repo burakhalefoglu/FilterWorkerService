@@ -15,222 +15,13 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var buyingModel = model.BuyingEventModel{
-	ProjectId:     "Test",
-	ClientId:      "Test",
-	CustomerId:    "Test",
-	LevelName:     "",
-	LevelIndex:    1,
-	InWhatMinutes: 5,
-	ProductType:   "TestProduct",
-	TrigerdTime: time.Date(
-		2021, 11, 5, 16, 11, 36, 651387237, time.UTC),
-}
+var buyingModel = model.BuyingEventModel{}
 
-var newBuyingModel = model.BuyingEventRespondModel{
-	ProjectId:                    "Test",
-	ClientId:                     "Test",
-	CustomerId:                   "Test",
-	LevelIndex:                   int64(buyingModel.LevelIndex),
-	TotalBuyingCount:             1,
-	TotalBuyingDay:               1,
-	TotalBuyingHour:              0,
-	FirstBuyingYearOfDay:         int64(buyingModel.TrigerdTime.YearDay()),
-	FirstBuyingYear:              int64(buyingModel.TrigerdTime.Year()),
-	FirstBuyingHour:              int64(buyingModel.TrigerdTime.Hour()),
-	FirstBuyingMinute:            int64(buyingModel.InWhatMinutes),
-	FirstBuyingProductType:       0,
-	SecondBuyingYearOfDay:        0,
-	SecondBuyingHour:             0,
-	SecondBuyingMinute:           0,
-	SecondBuyingProductType:      0,
-	ThirdBuyingYearOfDay:         0,
-	ThirdBuyingHour:              0,
-	ThirdBuyingMinute:            0,
-	ThirdBuyingProductType:       0,
-	FourthBuyingYearOfDay:        0,
-	FourthBuyingHour:             0,
-	FourthBuyingMinute:           0,
-	FourthBuyingProductType:      0,
-	FifthBuyingYearOfDay:         0,
-	FifthBuyingHour:              0,
-	FifthBuyingMinute:            0,
-	FifthBuyingProductType:       0,
-	PenultimateBuyingYearOfDay:   0,
-	PenultimateBuyingHour:        0,
-	PenultimateBuyingMinute:      0,
-	PenultimateBuyingProductType: 0,
-	LastBuyingYearOfDay:          0,
-	LastBuyingYear:               0,
-	LastBuyingHour:               0,
-	LastBuyingMinute:             0,
-	LastBuyingProductType:        0,
-	FirstDayBuyingCount:          1,
-	SecondDayBuyingCount:         0,
-	ThirdDayBuyingCount:          0,
-	FourthDayBuyingCount:         0,
-	FifthDayBuyingCount:          0,
-	SixthDayBuyingCount:          0,
-	SeventhDayBuyingCount:        0,
-	PenultimateDayBuyingCount:    0,
-	LastDayBuyingCount:           0,
-	LastMinusFirstDayBuyingCount: -1,
-	SundayBuyingCount:            0,
-	MondayBuyingCount:            0,
-	TuesdayBuyingCount:           0,
-	WednesdayBuyingCount:         0,
-	ThursdayBuyingCount:          0,
-	FridayBuyingCount:            0,
-	SaturdayBuyingCount:          0,
-	AmBuyingCount:                0,
-	PmBuyingCount:                0,
-	Buying0To5HourCount:          0,
-	Buying6To11HourCount:         0,
-	Buying12To17HourCount:        0,
-	Buying18To23HourCount:        0,
-	BuyingDayAverageBuyingCount:  1,
-	LevelBasedAverageBuyingCount: 0,
-}
+var newBuyingModel = model.BuyingEventRespondModel{}
 
-var then = time.Date(
-	2021, 11, 5, 20, 34, 58, 651387237, time.UTC)
+var oldBuyingModel = model.BuyingEventRespondModel{}
 
-var then2 = time.Date(
-	2021, 11, 7, 11, 45, 07, 651387237, time.UTC)
-
-var oldBuyingModel = model.BuyingEventRespondModel{
-	ProjectId:                    "Test",
-	ClientId:                     "Test",
-	CustomerId:                   "Test",
-	LevelIndex:                   5,
-	TotalBuyingCount:             2,
-	TotalBuyingDay:               2,
-	TotalBuyingHour:              0,
-	FirstBuyingYearOfDay:         int64(then.YearDay()),
-	FirstBuyingYear:              int64(then.Year()),
-	FirstBuyingHour:              int64(then.Hour()),
-	FirstBuyingMinute:            int64(buyingModel.InWhatMinutes),
-	FirstBuyingProductType:       0,
-	SecondBuyingYearOfDay:        0,
-	SecondBuyingHour:             0,
-	SecondBuyingMinute:           0,
-	SecondBuyingProductType:      0,
-	ThirdBuyingYearOfDay:         0,
-	ThirdBuyingHour:              0,
-	ThirdBuyingMinute:            0,
-	ThirdBuyingProductType:       0,
-	FourthBuyingYearOfDay:        0,
-	FourthBuyingHour:             0,
-	FourthBuyingMinute:           0,
-	FourthBuyingProductType:      0,
-	FifthBuyingYearOfDay:         0,
-	FifthBuyingHour:              0,
-	FifthBuyingMinute:            0,
-	FifthBuyingProductType:       0,
-	PenultimateBuyingYearOfDay:   0,
-	PenultimateBuyingHour:        0,
-	PenultimateBuyingMinute:      0,
-	PenultimateBuyingProductType: 0,
-	LastBuyingYearOfDay:          int64(then2.YearDay()),
-	LastBuyingYear:               int64(then2.Year()),
-	LastBuyingHour:               int64(then2.Hour()),
-	LastBuyingMinute:             int64(buyingModel.InWhatMinutes),
-	LastBuyingProductType:        0,
-	FirstDayBuyingCount:          10,
-	SecondDayBuyingCount:         0,
-	ThirdDayBuyingCount:          0,
-	FourthDayBuyingCount:         0,
-	FifthDayBuyingCount:          0,
-	SixthDayBuyingCount:          0,
-	SeventhDayBuyingCount:        0,
-	PenultimateDayBuyingCount:    45,
-	LastDayBuyingCount:           30,
-	LastMinusFirstDayBuyingCount: -20,
-	SundayBuyingCount:            8,
-	MondayBuyingCount:            5,
-	TuesdayBuyingCount:           2,
-	WednesdayBuyingCount:         3,
-	ThursdayBuyingCount:          4,
-	FridayBuyingCount:            1,
-	SaturdayBuyingCount:          7,
-	AmBuyingCount:                6,
-	PmBuyingCount:                3,
-	Buying0To5HourCount:          2,
-	Buying6To11HourCount:         9,
-	Buying12To17HourCount:        0,
-	Buying18To23HourCount:        11,
-	BuyingDayAverageBuyingCount:  37,
-	LevelBasedAverageBuyingCount: 45,
-}
-
-var TotalBuyingCount = newBuyingModel.TotalBuyingCount + oldBuyingModel.TotalBuyingCount
-var TotalBuyingDay = (newBuyingModel.FirstBuyingYearOfDay + 365*newBuyingModel.FirstBuyingYear) - (oldBuyingModel.FirstBuyingYearOfDay + 365*oldBuyingModel.FirstBuyingYear)
-var FirstDayBuyingCount = oldBuyingModel.FirstDayBuyingCount + newBuyingModel.FirstDayBuyingCount
-
-var updateBuyingModel = model.BuyingEventRespondModel{
-	ProjectId:                    "Test",
-	ClientId:                     "Test",
-	CustomerId:                   "Test",
-	LevelIndex:                   newBuyingModel.LevelIndex,
-	TotalBuyingCount:             newBuyingModel.TotalBuyingCount + oldBuyingModel.TotalBuyingCount,
-	TotalBuyingDay:               (newBuyingModel.FirstBuyingYearOfDay + 365*newBuyingModel.FirstBuyingYear) - (oldBuyingModel.FirstBuyingYearOfDay + 365*oldBuyingModel.FirstBuyingYear),
-	TotalBuyingHour:              0,
-	FirstBuyingYearOfDay:         int64(then.YearDay()),
-	FirstBuyingYear:              int64(then.Year()),
-	FirstBuyingHour:              int64(then.Hour()),
-	FirstBuyingMinute:            int64(buyingModel.InWhatMinutes),
-	FirstBuyingProductType:       0,
-	SecondBuyingYearOfDay:        0,
-	SecondBuyingHour:             0,
-	SecondBuyingMinute:           0,
-	SecondBuyingProductType:      0,
-	ThirdBuyingYearOfDay:         newBuyingModel.FirstBuyingYearOfDay,
-	ThirdBuyingHour:              newBuyingModel.FirstBuyingHour,
-	ThirdBuyingMinute:            0,
-	ThirdBuyingProductType:       0,
-	FourthBuyingYearOfDay:        0,
-	FourthBuyingHour:             0,
-	FourthBuyingMinute:           0,
-	FourthBuyingProductType:      0,
-	FifthBuyingYearOfDay:         0,
-	FifthBuyingHour:              0,
-	FifthBuyingMinute:            0,
-	FifthBuyingProductType:       0,
-	PenultimateBuyingYearOfDay:   int64(then2.YearDay()),
-	PenultimateBuyingHour:        int64(then2.Hour()),
-	PenultimateBuyingMinute:      0,
-	PenultimateBuyingProductType: 0,
-	LastBuyingYearOfDay:          newBuyingModel.FirstBuyingYearOfDay,
-	LastBuyingYear:               newBuyingModel.FirstBuyingYear,
-	LastBuyingHour:               newBuyingModel.FirstBuyingHour,
-	LastBuyingMinute:             int64(buyingModel.InWhatMinutes),
-	LastBuyingProductType:        0,
-	FirstDayBuyingCount:          oldBuyingModel.FirstDayBuyingCount + newBuyingModel.FirstDayBuyingCount,
-	SecondDayBuyingCount:         0,
-	ThirdDayBuyingCount:          0,
-	FourthDayBuyingCount:         0,
-	FifthDayBuyingCount:          0,
-	SixthDayBuyingCount:          0,
-	SeventhDayBuyingCount:        0,
-	PenultimateDayBuyingCount:    oldBuyingModel.PenultimateDayBuyingCount,
-	LastDayBuyingCount:           oldBuyingModel.LastDayBuyingCount,
-	LastMinusFirstDayBuyingCount: oldBuyingModel.LastDayBuyingCount - FirstDayBuyingCount,
-	SundayBuyingCount:            newBuyingModel.SundayBuyingCount + oldBuyingModel.SundayBuyingCount,
-	MondayBuyingCount:            newBuyingModel.MondayBuyingCount + oldBuyingModel.MondayBuyingCount,
-	TuesdayBuyingCount:           newBuyingModel.TuesdayBuyingCount + oldBuyingModel.TuesdayBuyingCount,
-	WednesdayBuyingCount:         newBuyingModel.WednesdayBuyingCount + oldBuyingModel.WednesdayBuyingCount,
-	ThursdayBuyingCount:          newBuyingModel.ThursdayBuyingCount + oldBuyingModel.ThursdayBuyingCount,
-	FridayBuyingCount:            newBuyingModel.FridayBuyingCount + oldBuyingModel.FridayBuyingCount,
-	SaturdayBuyingCount:          newBuyingModel.SaturdayBuyingCount + oldBuyingModel.SaturdayBuyingCount,
-	AmBuyingCount:                newBuyingModel.AmBuyingCount + oldBuyingModel.AmBuyingCount,
-	PmBuyingCount:                newBuyingModel.PmBuyingCount + oldBuyingModel.PmBuyingCount,
-	Buying0To5HourCount:          newBuyingModel.Buying0To5HourCount + oldBuyingModel.Buying0To5HourCount,
-	Buying6To11HourCount:         newBuyingModel.Buying6To11HourCount + oldBuyingModel.Buying6To11HourCount,
-	Buying12To17HourCount:        newBuyingModel.Buying12To17HourCount + oldBuyingModel.Buying12To17HourCount,
-	Buying18To23HourCount:        newBuyingModel.Buying18To23HourCount + oldBuyingModel.Buying18To23HourCount,
-	BuyingDayAverageBuyingCount:  float64(TotalBuyingCount) / float64(TotalBuyingDay),
-	LevelBasedAverageBuyingCount: float64(TotalBuyingCount) / float64(newBuyingModel.LevelIndex),
-}
+var updateBuyingModel = model.BuyingEventRespondModel{}
 
 func Test_UpdateBuyingEvent_UpdateSuccess(t *testing.T) {
 
@@ -243,10 +34,126 @@ func Test_UpdateBuyingEvent_UpdateSuccess(t *testing.T) {
 	IoC.Logger = testLog
 	IoC.CacheService = testCache
 	var manager = concrete.BuyingEventManagerConstructor()
-	//var buyingModel_test = buyingModel
+	var buyingModel_test = buyingModel
+	buyingModel_test.ProjectId     = "Test"
+	buyingModel_test.ClientId      = "Test"
+	buyingModel_test.CustomerId    = "Test"
+	buyingModel_test.LevelName     = ""
+	buyingModel_test.LevelIndex    = 1
+	buyingModel_test.InWhatMinutes  = 5
+	buyingModel_test.ProductType   = "TestProduct"
+	buyingModel_test.TrigerdTime = time.Date(
+		2021, 11, 5, 16, 11, 36, 651387237, time.UTC)
+
+	var then = time.Date(
+	2021, 11, 5, 20, 34, 58, 651387237, time.UTC)
+	var then2 = time.Date(
+	2021, 11, 7, 11, 45, 07, 651387237, time.UTC)
 	var oldBuyingModel_test = oldBuyingModel
+	oldBuyingModel_test.ProjectId               =     "Test"
+	oldBuyingModel_test.ClientId                =     "Test"
+	oldBuyingModel_test.CustomerId              =     "Test"
+	oldBuyingModel_test.LevelIndex             =      5
+	oldBuyingModel_test.TotalBuyingCount       =      2
+	oldBuyingModel_test.TotalBuyingDay         =      2
+	oldBuyingModel_test.TotalBuyingHour        =      0
+	oldBuyingModel_test.FirstBuyingYearOfDay   =      int64(then.YearDay())
+	oldBuyingModel_test.FirstBuyingYear        =      int64(then.Year())
+	oldBuyingModel_test.FirstBuyingHour        =      int64(then.Hour())
+	oldBuyingModel_test.FirstBuyingMinute      =      int64(buyingModel.InWhatMinutes)
+	oldBuyingModel_test.LastBuyingYearOfDay     =     int64(then2.YearDay())
+	oldBuyingModel_test.LastBuyingYear          =     int64(then2.Year())
+	oldBuyingModel_test.LastBuyingHour          =     int64(then2.Hour())
+	oldBuyingModel_test.LastBuyingMinute        =     int64(buyingModel.InWhatMinutes)
+	oldBuyingModel_test.LastBuyingProductType   =     0
+	oldBuyingModel_test.FirstDayBuyingCount     =     10
+	oldBuyingModel_test.PenultimateDayBuyingCount    =  45
+	oldBuyingModel_test.LastDayBuyingCount           =  30
+	oldBuyingModel_test.LastMinusFirstDayBuyingCount =  -20
+	oldBuyingModel_test.SundayBuyingCount            =  8
+	oldBuyingModel_test.MondayBuyingCount            =  5
+	oldBuyingModel_test.TuesdayBuyingCount           =  2
+	oldBuyingModel_test.WednesdayBuyingCount         =  3
+	oldBuyingModel_test.ThursdayBuyingCount          =  4
+	oldBuyingModel_test.FridayBuyingCount            =  1
+	oldBuyingModel_test.SaturdayBuyingCount          =  7
+	oldBuyingModel_test.AmBuyingCount                =  6
+	oldBuyingModel_test.PmBuyingCount                =  3
+	oldBuyingModel_test.Buying0To5HourCount          =  2
+	oldBuyingModel_test.Buying6To11HourCount         =  9
+	oldBuyingModel_test.Buying12To17HourCount        =  0
+	oldBuyingModel_test.Buying18To23HourCount        =  11
+	oldBuyingModel_test.BuyingDayAverageBuyingCount  =  37
+	oldBuyingModel_test.LevelBasedAverageBuyingCount =  45
+
 	var newBuyingModel_test = newBuyingModel
+	newBuyingModel_test.LevelIndex              =     int64(buyingModel_test.LevelIndex)
+	newBuyingModel_test.TotalBuyingCount        =     1
+	newBuyingModel_test.TotalBuyingDay          =     1
+	newBuyingModel_test.TotalBuyingHour         =     0
+	newBuyingModel_test.FirstBuyingYearOfDay    =     int64(buyingModel_test.TrigerdTime.YearDay())
+	newBuyingModel_test.FirstBuyingYear         =     int64(buyingModel_test.TrigerdTime.Year())
+	newBuyingModel_test.FirstBuyingHour         =     int64(buyingModel_test.TrigerdTime.Hour())
+	newBuyingModel_test.FirstBuyingMinute       =     int64(buyingModel_test.InWhatMinutes)
+	newBuyingModel_test.FirstBuyingProductType = 19
+	newBuyingModel_test.LastMinusFirstDayBuyingCount = -1
+	newBuyingModel_test.FridayBuyingCount = 1
+	newBuyingModel_test.PmBuyingCount = 1
+	newBuyingModel_test.Buying12To17HourCount = 1
+	newBuyingModel_test.FirstBuyingProductType = 19
+	newBuyingModel_test.FirstBuyingYearOfDay  =       int64(buyingModel_test.TrigerdTime.YearDay())
+	newBuyingModel_test.FirstBuyingYear       =       int64(buyingModel_test.TrigerdTime.Year())
+	newBuyingModel_test.FirstBuyingHour       =       int64(buyingModel_test.TrigerdTime.Hour())
+	newBuyingModel_test.FirstBuyingMinute     =       int64(buyingModel_test.InWhatMinutes)
+	newBuyingModel_test.BuyingDayAverageBuyingCount = 1
+	newBuyingModel_test.LastMinusFirstDayBuyingCount = -1
+	newBuyingModel_test.FirstDayBuyingCount = 1
+
 	var updateBuyingModel_test = updateBuyingModel
+	var TotalBuyingCount = newBuyingModel_test.TotalBuyingCount + oldBuyingModel_test.TotalBuyingCount
+	var TotalBuyingDay = (newBuyingModel_test.FirstBuyingYearOfDay + 365*newBuyingModel_test.FirstBuyingYear) - (oldBuyingModel_test.FirstBuyingYearOfDay + 365*oldBuyingModel_test.FirstBuyingYear)
+	var FirstDayBuyingCount = oldBuyingModel_test.FirstDayBuyingCount + newBuyingModel_test.FirstDayBuyingCount
+	updateBuyingModel_test.ProjectId               =     "Test"
+	updateBuyingModel_test.ClientId                =     "Test"
+	updateBuyingModel_test.CustomerId              =     "Test"
+	updateBuyingModel_test.LevelIndex              =     newBuyingModel_test.LevelIndex
+	updateBuyingModel_test.FirstBuyingYearOfDay    =     int64(then.YearDay())
+	updateBuyingModel_test.FirstBuyingYear         =     int64(then.Year())
+	updateBuyingModel_test.FirstBuyingHour         =     int64(then.Hour())
+	updateBuyingModel_test.FirstBuyingMinute       =     int64(buyingModel.InWhatMinutes)
+	updateBuyingModel_test.ThirdBuyingYearOfDay    =     newBuyingModel_test.FirstBuyingYearOfDay
+	updateBuyingModel_test.ThirdBuyingHour         =     newBuyingModel_test.FirstBuyingHour
+	updateBuyingModel_test.ThirdBuyingMinute        =    0
+	updateBuyingModel_test.ThirdBuyingProductType   =    0
+	updateBuyingModel_test.PenultimateBuyingYearOfDay   = int64(then2.YearDay())
+	updateBuyingModel_test.PenultimateBuyingHour        = int64(then2.Hour())
+	updateBuyingModel_test.PenultimateBuyingMinute      = 0
+	updateBuyingModel_test.PenultimateBuyingProductType = 0
+	updateBuyingModel_test.LastBuyingYearOfDay          = newBuyingModel_test.FirstBuyingYearOfDay
+	updateBuyingModel_test.LastBuyingYear               = newBuyingModel_test.FirstBuyingYear
+	updateBuyingModel_test.LastBuyingHour               = newBuyingModel_test.FirstBuyingHour
+	updateBuyingModel_test.LastBuyingMinute             = int64(buyingModel.InWhatMinutes)
+	updateBuyingModel_test.LastBuyingProductType        = 0
+	updateBuyingModel_test.FirstDayBuyingCount          = oldBuyingModel_test.FirstDayBuyingCount + newBuyingModel_test.FirstDayBuyingCount
+	updateBuyingModel_test.PenultimateDayBuyingCount     = oldBuyingModel_test.PenultimateDayBuyingCount
+	updateBuyingModel_test.LastDayBuyingCount            = oldBuyingModel_test.LastDayBuyingCount
+	updateBuyingModel_test.LastMinusFirstDayBuyingCount  = oldBuyingModel_test.LastDayBuyingCount - FirstDayBuyingCount
+	updateBuyingModel_test.SundayBuyingCount             = newBuyingModel_test.SundayBuyingCount + oldBuyingModel_test.SundayBuyingCount
+	updateBuyingModel_test.MondayBuyingCount             = newBuyingModel_test.MondayBuyingCount + oldBuyingModel_test.MondayBuyingCount
+	updateBuyingModel_test.TuesdayBuyingCount            = newBuyingModel_test.TuesdayBuyingCount + oldBuyingModel_test.TuesdayBuyingCount
+	updateBuyingModel_test.WednesdayBuyingCount          = newBuyingModel_test.WednesdayBuyingCount + oldBuyingModel_test.WednesdayBuyingCount
+	updateBuyingModel_test.ThursdayBuyingCount           = newBuyingModel_test.ThursdayBuyingCount + oldBuyingModel_test.ThursdayBuyingCount
+	updateBuyingModel_test.FridayBuyingCount             = newBuyingModel_test.FridayBuyingCount + oldBuyingModel_test.FridayBuyingCount
+	updateBuyingModel_test.SaturdayBuyingCount           = newBuyingModel_test.SaturdayBuyingCount + oldBuyingModel_test.SaturdayBuyingCount
+	updateBuyingModel_test.AmBuyingCount                 = newBuyingModel_test.AmBuyingCount + oldBuyingModel_test.AmBuyingCount
+	updateBuyingModel_test.PmBuyingCount                 = newBuyingModel_test.PmBuyingCount + oldBuyingModel_test.PmBuyingCount
+	updateBuyingModel_test.Buying0To5HourCount           = newBuyingModel_test.Buying0To5HourCount + oldBuyingModel_test.Buying0To5HourCount
+	updateBuyingModel_test.Buying6To11HourCount          = newBuyingModel_test.Buying6To11HourCount + oldBuyingModel_test.Buying6To11HourCount
+	updateBuyingModel_test.Buying12To17HourCount         = newBuyingModel_test.Buying12To17HourCount + oldBuyingModel_test.Buying12To17HourCount
+	updateBuyingModel_test.Buying18To23HourCount         = newBuyingModel_test.Buying18To23HourCount + oldBuyingModel_test.Buying18To23HourCount
+	updateBuyingModel_test.BuyingDayAverageBuyingCount   = float64(TotalBuyingCount) / float64(TotalBuyingDay)
+	updateBuyingModel_test.LevelBasedAverageBuyingCount  = float64(TotalBuyingCount) / float64(newBuyingModel.LevelIndex)
+
 
 	testBuyingDal.On("UpdateBuyingEventById", updateBuyingModel_test.ClientId, &updateBuyingModel_test).Return(nil)
 
@@ -269,10 +176,30 @@ func Test_ConvertRawModelToResponseModel_AddSuccess(t *testing.T) {
 	IoC.CacheService = testCache
 	var manager = concrete.BuyingEventManagerConstructor()
 	var buyingModel_test = buyingModel
+	buyingModel_test.ProjectId     = "Test"
+	buyingModel_test.ClientId      = "Test"
+	buyingModel_test.CustomerId    = "Test"
+	buyingModel_test.LevelName     = ""
+	buyingModel_test.LevelIndex    = 1
+	buyingModel_test.InWhatMinutes  = 5
+	buyingModel_test.ProductType   = "TestProduct"
 	buyingModel_test.TrigerdTime = time.Date(
 		2021, 11, 5, 16, 11, 36, 651387237, time.UTC)
 	var oldBuyingModel_test = oldBuyingModel
+	oldBuyingModel_test.ProjectId               =     "Test"
+	oldBuyingModel_test.ClientId                =     "Test"
+	oldBuyingModel_test.CustomerId              =     "Test"
 	var newBuyingModel_test = newBuyingModel
+	newBuyingModel_test.LevelIndex              =     int64(buyingModel_test.LevelIndex)
+	newBuyingModel_test.TotalBuyingCount        =     1
+	newBuyingModel_test.TotalBuyingDay          =     1
+	newBuyingModel_test.TotalBuyingHour         =     0
+	newBuyingModel_test.FirstBuyingYearOfDay    =     int64(buyingModel_test.TrigerdTime.YearDay())
+	newBuyingModel_test.FirstBuyingYear         =     int64(buyingModel_test.TrigerdTime.Year())
+	newBuyingModel_test.FirstBuyingHour         =     int64(buyingModel_test.TrigerdTime.Hour())
+	newBuyingModel_test.FirstBuyingMinute       =     int64(buyingModel_test.InWhatMinutes)
+	newBuyingModel_test.FirstBuyingProductType = 19
+	newBuyingModel_test.LastMinusFirstDayBuyingCount = -1
 	newBuyingModel_test.FridayBuyingCount = 1
 	newBuyingModel_test.PmBuyingCount = 1
 	newBuyingModel_test.Buying12To17HourCount = 1
@@ -281,6 +208,9 @@ func Test_ConvertRawModelToResponseModel_AddSuccess(t *testing.T) {
 	newBuyingModel_test.FirstBuyingYear       =       int64(buyingModel_test.TrigerdTime.Year())
 	newBuyingModel_test.FirstBuyingHour       =       int64(buyingModel_test.TrigerdTime.Hour())
 	newBuyingModel_test.FirstBuyingMinute     =       int64(buyingModel_test.InWhatMinutes)
+	newBuyingModel_test.BuyingDayAverageBuyingCount = 1
+	newBuyingModel_test.LastMinusFirstDayBuyingCount = -1
+	newBuyingModel_test.FirstDayBuyingCount = 1
 	testBuyingDal.On("GetBuyingEventById", newBuyingModel_test.ClientId).Return(&oldBuyingModel_test,
 		errors.New("null data error"))
 	testCache.On("ManageCache", "ProductType", buyingModel_test.ProductType).Return(int64(19), true, "")
@@ -295,8 +225,6 @@ func Test_ConvertRawModelToResponseModel_AddSuccess(t *testing.T) {
 	assert.Equal(t, true, success)
 	assert.Equal(t, true, s)
 	assert.Equal(t, "Added", m)
-	//assert.Equal(t, &newBuyingModel, v)
-
 }
 
 func Test_CalculateBuyingLevelBasedAvgBuyingCount_ZeroLevelIndex(t *testing.T) {
@@ -829,10 +757,6 @@ func Test_CalculateSecondBuying_TotalBuyingCountEqual2(t *testing.T) {
 	newBuyingModel_test.FirstBuyingProductType = 3
 	concrete.CalculateSecondBuying(&newBuyingModel_test, &oldBuyingModel_test)
 
-	// oldBuyingModel_test.SecondBuyingYearOfDay =   newBuyingModel_test.FirstBuyingYearOfDay
-	// oldBuyingModel_test.SecondBuyingHour =        newBuyingModel_test.FirstBuyingHour
-	// oldBuyingModel_test.SecondBuyingMinute =      newBuyingModel_test.FirstBuyingMinute
-	// oldBuyingModel_test.SecondBuyingProductType = newBuyingModel_test.FirstBuyingProductType
 	assert.Equal(t, 3558, oldBuyingModel_test.SecondBuyingYearOfDay)
 	assert.Equal(t, 238, oldBuyingModel_test.SecondBuyingHour)
 	assert.Equal(t, 198, oldBuyingModel_test.SecondBuyingMinute)
@@ -856,10 +780,6 @@ func Test_CalculateSecondBuying_TotalBuyingCountNotEqual2(t *testing.T) {
 
 	concrete.CalculateSecondBuying(&newBuyingModel_test, &oldBuyingModel_test)
 
-	// oldBuyingModel_test.SecondBuyingYearOfDay =   newBuyingModel_test.FirstBuyingYearOfDay
-	// oldBuyingModel_test.SecondBuyingHour =        newBuyingModel_test.FirstBuyingHour
-	// oldBuyingModel_test.SecondBuyingMinute =      newBuyingModel_test.FirstBuyingMinute
-	// oldBuyingModel_test.SecondBuyingProductType = newBuyingModel_test.FirstBuyingProductType
 	assert.Equal(t, 248, oldBuyingModel_test.SecondBuyingYearOfDay)
 	assert.Equal(t, 16, oldBuyingModel_test.SecondBuyingHour)
 	assert.Equal(t, 36, oldBuyingModel_test.SecondBuyingMinute)
@@ -879,10 +799,6 @@ func Test_CalculateThirdBuying_TotalBuyingCountEqual3(t *testing.T) {
 
 	concrete.CalculateThirdBuying(&newBuyingModel_test, &oldBuyingModel_test)
 
-	// oldBuyingModel_test.ThirdBuyingYearOfDay =   newBuyingModel_test.FirstBuyingYearOfDay
-	// oldBuyingModel_test.ThirdBuyingHour =        newBuyingModel_test.FirstBuyingHour
-	// oldBuyingModel_test.ThirdBuyingMinute =      newBuyingModel_test.FirstBuyingMinute
-	// oldBuyingModel_test.ThirdBuyingProductType = newBuyingModel_test.FirstBuyingProductType
 	assert.Equal(t, 146, oldBuyingModel_test.ThirdBuyingYearOfDay)
 	assert.Equal(t, 8, oldBuyingModel_test.ThirdBuyingHour)
 	assert.Equal(t, 48, oldBuyingModel_test.ThirdBuyingMinute)
@@ -906,10 +822,6 @@ func Test_CalculateThirdBuying_TotalBuyingCountNotEqual3(t *testing.T) {
 
 	concrete.CalculateThirdBuying(&newBuyingModel_test, &oldBuyingModel_test)
 
-	// oldBuyingModel_test.ThirdBuyingYearOfDay =   newBuyingModel_test.FirstBuyingYearOfDay
-	// oldBuyingModel_test.ThirdBuyingHour =        newBuyingModel_test.FirstBuyingHour
-	// oldBuyingModel_test.ThirdBuyingMinute =      newBuyingModel_test.FirstBuyingMinute
-	// oldBuyingModel_test.ThirdBuyingProductType = newBuyingModel_test.FirstBuyingProductType
 	assert.Equal(t, 333, oldBuyingModel_test.ThirdBuyingYearOfDay)
 	assert.Equal(t, 21, oldBuyingModel_test.ThirdBuyingHour)
 	assert.Equal(t, 36, oldBuyingModel_test.ThirdBuyingMinute)
@@ -932,10 +844,6 @@ func Test_CalculateFourthBuying_TotalBuyingCountEqual4(t *testing.T) {
 	newBuyingModel_test.FirstBuyingProductType = 3
 	concrete.CalculateFourthBuying(&newBuyingModel_test, &oldBuyingModel_test)
 
-	// oldBuyingModel_test.FourthBuyingYearOfDay =   newBuyingModel_test.FirstBuyingYearOfDay
-	// oldBuyingModel_test.FourthBuyingHour =        newBuyingModel_test.FirstBuyingHour
-	// oldBuyingModel_test.FourthBuyingMinute =      newBuyingModel_test.FirstBuyingMinute
-	// oldBuyingModel_test.FourthBuyingProductType = newBuyingModel_test.FirstBuyingProductType
 	assert.Equal(t, 355, oldBuyingModel_test.FourthBuyingYearOfDay)
 	assert.Equal(t, 23, oldBuyingModel_test.FourthBuyingHour)
 	assert.Equal(t, 48, oldBuyingModel_test.FourthBuyingMinute)
@@ -959,10 +867,6 @@ func Test_CalculateFourthBuying_TotalBuyingCountNotEqual4(t *testing.T) {
 
 	concrete.CalculateFourthBuying(&newBuyingModel_test, &oldBuyingModel_test)
 
-	// oldBuyingModel_test.FourthBuyingYearOfDay =   newBuyingModel_test.FirstBuyingYearOfDay
-	// oldBuyingModel_test.FourthBuyingHour =        newBuyingModel_test.FirstBuyingHour
-	// oldBuyingModel_test.FourthBuyingMinute =      newBuyingModel_test.FirstBuyingMinute
-	// oldBuyingModel_test.FourthBuyingProductType = newBuyingModel_test.FirstBuyingProductType
 	assert.Equal(t, 248, oldBuyingModel_test.FourthBuyingYearOfDay)
 	assert.Equal(t, 6, oldBuyingModel_test.FourthBuyingHour)
 	assert.Equal(t, 36, oldBuyingModel_test.FourthBuyingMinute)
@@ -986,10 +890,6 @@ func Test_CalculateFifthBuying_TotalBuyingCountEqual5(t *testing.T) {
 
 	concrete.CalculateFifthBuying(&newBuyingModel_test, &oldBuyingModel_test)
 
-	// oldBuyingModel_test.FifthBuyingYearOfDay =   newBuyingModel_test.FirstBuyingYearOfDay
-	// oldBuyingModel_test.FifthBuyingHour =        newBuyingModel_test.FirstBuyingHour
-	// oldBuyingModel_test.FifthBuyingMinute =      newBuyingModel_test.FirstBuyingMinute
-	// oldBuyingModel_test.FifthBuyingProductType = newBuyingModel_test.FirstBuyingProductType
 	assert.Equal(t, 355, oldBuyingModel_test.FifthBuyingYearOfDay)
 	assert.Equal(t, 23, oldBuyingModel_test.FifthBuyingHour)
 	assert.Equal(t, 48, oldBuyingModel_test.FifthBuyingMinute)
@@ -1013,10 +913,6 @@ func Test_CalculateFifthBuying_TotalBuyingCountNotEqual5(t *testing.T) {
 
 	concrete.CalculateFifthBuying(&newBuyingModel_test, &oldBuyingModel_test)
 
-	// oldBuyingModel_test.FourthBuyingYearOfDay =   newBuyingModel_test.FirstBuyingYearOfDay
-	// oldBuyingModel_test.FourthBuyingHour =        newBuyingModel_test.FirstBuyingHour
-	// oldBuyingModel_test.FourthBuyingMinute =      newBuyingModel_test.FirstBuyingMinute
-	// oldBuyingModel_test.FourthBuyingProductType = newBuyingModel_test.FirstBuyingProductType
 	assert.Equal(t, 248, oldBuyingModel_test.FifthBuyingYearOfDay)
 	assert.Equal(t,  6, oldBuyingModel_test.FifthBuyingHour)
 	assert.Equal(t,  36, oldBuyingModel_test.FifthBuyingMinute)

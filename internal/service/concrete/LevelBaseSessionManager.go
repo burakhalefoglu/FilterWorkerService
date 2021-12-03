@@ -24,11 +24,11 @@ func LevelBaseSessionManagerConstructor() *levelBaseSessionManager {
 
 func (l *levelBaseSessionManager) ConvertRawModelToResponseModel(data *[]byte) (v interface{}, s bool, m string) {
 	firstModel := model.LevelBaseSessionDataModel{}
-	Err := (*l.IJsonParser).DecodeJson(data, &firstModel)
-	if Err != nil {
+	convertErr := (*l.IJsonParser).DecodeJson(data, &firstModel)
+	if convertErr != nil {
 		(*l.ILog).SendErrorLog("LevelBaseSessionManager", "ConvertRawModelToResponseModel",
-			"byte array to LevelBaseSessionDataModel", "Json Parser Decode Err: ", Err.Error())
-		return &model.LevelBaseSessionRespondModel{}, false, Err.Error()
+			"byte array to LevelBaseSessionDataModel", "Json Parser Decode Err: ", convertErr.Error())
+		return &model.LevelBaseSessionRespondModel{}, false, convertErr.Error()
 	}
 	hour := int64(firstModel.SessionFinishTime.Hour())
 	yearOfDay := int64(firstModel.SessionFinishTime.YearDay())
@@ -81,12 +81,12 @@ func (l *levelBaseSessionManager) ConvertRawModelToResponseModel(data *[]byte) (
 		modelResponse.ClientId, modelResponse.ProjectId)
 
 	oldModel, err := (*l.ILevelBaseSessionDal).GetLevelBaseSessionById(modelResponse.ClientId)
-	if err != nil {
+	if err != nil && err.Error() != "null data error" {
 		(*l.ILog).SendErrorLog("LevelBaseSessionManager", "ConvertRawModelToResponseModel",
 			"LevelBaseSessionDal_GetLevelBaseSessionById", err.Error())
 	}
 	switch {
-	case err.Error() == "null data error":
+	case  err != nil && err.Error() == "null data error":
 
 		logErr := (*l.ILevelBaseSessionDal).Add(&modelResponse)
 		if logErr != nil {

@@ -14,269 +14,13 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var sessionModel = model.GameSessionEveryLoginModel{
-	ProjectId:  "Test",
-	ClientId:   "Test",
-	CustomerId: "Test",
-	SessionStartTime: time.Date(
-		2021, 11, 7, 22, 34, 36, 651387237, time.UTC),
-	SessionFinishTime: time.Date(
-		2021, 11, 8, 18, 34, 36, 651387237, time.UTC),
-	SessionTimeMinute: 33,
-}
+var sessionModel = model.GameSessionEveryLoginModel{}
 
-var sessionRespondModel = model.GameSessionEveryLoginRespondModel{
-	ProjectId:                                               "Test",
-	ClientId:                                                "Test",
-	CustomerId:                                              "Test",
-	FirstSessionYearOfDay:                                   int64(sessionModel.SessionFinishTime.YearDay()),
-	FirstSessionYear:                                        int64(sessionModel.SessionFinishTime.Year()),
-	FirstSessionWeekDay:                                     int64(sessionModel.SessionFinishTime.Weekday()),
-	FirstSessionHour:                                        int64(sessionModel.SessionFinishTime.Hour()),
-	FirstSessionDuration:                                    int64(sessionModel.SessionTimeMinute),
-	FirstSessionMinute:                                      int64(sessionModel.SessionFinishTime.Minute()),
-	SecondSessionHour:                                       0,
-	SecondSessionDuration:                                   0,
-	SecondSessionMinute:                                     0,
-	ThirdSessionHour:                                        0,
-	ThirdSessionDuration:                                    0,
-	ThirdSessinMinute:                                       0,
-	PenultimateSessionHour:                                  0,
-	PenultimateSessionDuration:                              0,
-	PenultimateSessionMinute:                                0,
-	LastSessionYearOfDay:                                    0,
-	LastSessionYear:                                         0,
-	LastSessionHour:                                         0,
-	LastSessionDuration:                                     0,
-	LastSessionMinute:                                       0,
-	LastDurationMinusPenultimateDuration:                    0,
-	FirstHalfHourTotalSessionCount:                          1,
-	FirstHalfHourTotalSessionDuration:                       int64(sessionModel.SessionTimeMinute),
-	FirstHourTotalSessionCount:                              1,
-	FirstHourTotalSessionDuration:                           int64(sessionModel.SessionTimeMinute),
-	FirstTwoHourTotalSessionCount:                           1,
-	FirstTwoHourTotalSessionDuration:                        int64(sessionModel.SessionTimeMinute),
-	FirstThreeHourTotalSessionCount:                         1,
-	FirstThreeHourTotalSessionDuration:                      int64(sessionModel.SessionTimeMinute),
-	FirstSixHourTotalSessionCount:                           1,
-	FirstSixHourTotalSessionDuration:                        int64(sessionModel.SessionTimeMinute),
-	FirstTwelveHourTotalSessionCount:                        1,
-	FirstTwelveHourTotalSessionDuration:                     int64(sessionModel.SessionTimeMinute),
-	TotalSessionDay:                                         1,
-	TotalSessionHour:                                        1,
-	TotalSessionMinute:                                      int64(sessionModel.SessionTimeMinute),
-	TotalSessionDuration:                                    int64(sessionModel.SessionTimeMinute),
-	TotalSessionCount:                                       1,
-	FirstDayTotalSessionCount:                               1,
-	FirstDayTotalSessionDuration:                            int64(sessionModel.SessionTimeMinute),
-	SecondDayTotalSessionCount:                              0,
-	SecondDayTotalSessionDuration:                           0,
-	ThirdDayTotalSessionCount:                               0,
-	ThirdDayTotalSessionDuration:                            0,
-	FourthDayTotalSessionCount:                              0,
-	FourthDayTotalSessionDuration:                           0,
-	FifthDayTotalSessionCount:                               0,
-	FifthDayTotalSessionDuration:                            0,
-	SixthDayTotalSessionCount:                               0,
-	SixthDayTotalSessionDuration:                            0,
-	SeventhDayTotalSessionCount:                             0,
-	SeventhDayTotalSessionDuration:                          0,
-	MinSessionDuration:                                      int64(sessionModel.SessionTimeMinute),
-	MaxSessionDuration:                                      int64(sessionModel.SessionTimeMinute),
-	DailyAvegareSessionCount:                                1,
-	DailyAverageSessionDuration:                             float64(sessionModel.SessionTimeMinute),
-	SessionBasedAvegareSessionDuration:                      float64(sessionModel.SessionTimeMinute),
-	DailyAvegareSessionCountMinusFirstDaySessionCount:       0,
-	DailyAvegareSessionDurationMinusFirstDaySessionDuration: 0,
-	SessionBasedAvegareSessionDurationMinusFirstSessionDuration: 0,
-	SessionBasedAvegareSessionDurationMinusLastSessionDuration:  float64(sessionModel.SessionTimeMinute),
-	SundaySessionCount:     0,
-	MondaySessionCount:     1,
-	TuesdaySessionCount:    0,
-	WednesdaySessionCount:  0,
-	ThursdaySessionCount:   0,
-	FridaySessionCount:     0,
-	SaturdaySessionCount:   0,
-	AmSessionCount:         0,
-	PmSessionCount:         1,
-	Session0To5HourCount:   0,
-	Session6To11HourCount:  0,
-	Session12To17HourCount: 0,
-	Session18To23HourCount: 1,
-}
+var sessionRespondModel = model.GameSessionEveryLoginRespondModel{}
 
-var first = time.Date(
-	2021, 11, 6, 18, 34, 58, 651387237, time.UTC)
+var sessionOldModel = model.GameSessionEveryLoginRespondModel{}
 
-var first2 = time.Date(
-	2021, 11, 7, 18, 34, 58, 651387237, time.UTC)
-
-var sessionOldModel = model.GameSessionEveryLoginRespondModel{
-	ProjectId:                                               "Test",
-	ClientId:                                                "Test",
-	CustomerId:                                              "Test",
-	FirstSessionYearOfDay:                                   int64(first.YearDay()),
-	FirstSessionYear:                                        int64(first.Year()),
-	FirstSessionWeekDay:                                     int64(first.Weekday()),
-	FirstSessionHour:                                        int64(first.Hour()),
-	FirstSessionDuration:                                    int64(sessionModel.SessionTimeMinute),
-	FirstSessionMinute:                                      int64(first.Minute()),
-	SecondSessionHour:                                       0,
-	SecondSessionDuration:                                   0,
-	SecondSessionMinute:                                     0,
-	ThirdSessionHour:                                        0,
-	ThirdSessionDuration:                                    0,
-	ThirdSessinMinute:                                       0,
-	PenultimateSessionHour:                                  0,
-	PenultimateSessionDuration:                              0,
-	PenultimateSessionMinute:                                0,
-	LastSessionYearOfDay:                                    int64(first2.YearDay()),
-	LastSessionYear:                                         int64(first2.Year()),
-	LastSessionHour:                                         int64(first2.Hour()),
-	LastSessionDuration:                                     int64(sessionModel.SessionTimeMinute),
-	LastSessionMinute:                                       int64(first2.Minute()),
-	LastDurationMinusPenultimateDuration:                    0,
-	FirstHalfHourTotalSessionCount:                          0,
-	FirstHalfHourTotalSessionDuration:                       0,
-	FirstHourTotalSessionCount:                              0,
-	FirstHourTotalSessionDuration:                           0,
-	FirstTwoHourTotalSessionCount:                           0,
-	FirstTwoHourTotalSessionDuration:                        0,
-	FirstThreeHourTotalSessionCount:                         0,
-	FirstThreeHourTotalSessionDuration:                      0,
-	FirstSixHourTotalSessionCount:                           0,
-	FirstSixHourTotalSessionDuration:                        0,
-	FirstTwelveHourTotalSessionCount:                        0,
-	FirstTwelveHourTotalSessionDuration:                     0,
-	TotalSessionDay:                                         1,
-	TotalSessionHour:                                        24,
-	TotalSessionMinute:                                      1440,
-	TotalSessionDuration:                                    18,
-	TotalSessionCount:                                       2,
-	FirstDayTotalSessionCount:                               3,
-	FirstDayTotalSessionDuration:                            18,
-	SecondDayTotalSessionCount:                              0,
-	SecondDayTotalSessionDuration:                           0,
-	ThirdDayTotalSessionCount:                               0,
-	ThirdDayTotalSessionDuration:                            0,
-	FourthDayTotalSessionCount:                              0,
-	FourthDayTotalSessionDuration:                           0,
-	FifthDayTotalSessionCount:                               0,
-	FifthDayTotalSessionDuration:                            0,
-	SixthDayTotalSessionCount:                               0,
-	SixthDayTotalSessionDuration:                            0,
-	SeventhDayTotalSessionCount:                             0,
-	SeventhDayTotalSessionDuration:                          0,
-	MinSessionDuration:                                      19,
-	MaxSessionDuration:                                      29,
-	DailyAvegareSessionCount:                                1,
-	DailyAverageSessionDuration:                             float64(sessionModel.SessionTimeMinute),
-	SessionBasedAvegareSessionDuration:                      float64(sessionModel.SessionTimeMinute),
-	DailyAvegareSessionCountMinusFirstDaySessionCount:       0,
-	DailyAvegareSessionDurationMinusFirstDaySessionDuration: 0,
-	SessionBasedAvegareSessionDurationMinusFirstSessionDuration: 0,
-	SessionBasedAvegareSessionDurationMinusLastSessionDuration:  float64(sessionModel.SessionTimeMinute),
-	SundaySessionCount:     2,
-	MondaySessionCount:     9,
-	TuesdaySessionCount:    8,
-	WednesdaySessionCount:  0,
-	ThursdaySessionCount:   0,
-	FridaySessionCount:     1,
-	SaturdaySessionCount:   0,
-	AmSessionCount:         0,
-	PmSessionCount:         1,
-	Session0To5HourCount:   5,
-	Session6To11HourCount:  0,
-	Session12To17HourCount: 1,
-	Session18To23HourCount: 87,
-}
-
-var TotalSessionHour int64 = ((sessionRespondModel.FirstSessionYearOfDay+365*sessionRespondModel.FirstSessionYear)*24 + sessionRespondModel.FirstSessionHour) - ((sessionOldModel.FirstSessionYearOfDay+365*sessionOldModel.FirstSessionYear)*24 + sessionOldModel.FirstSessionHour)
-var TotalSessionMinute int64 = (((sessionRespondModel.FirstSessionYearOfDay+365*sessionRespondModel.FirstSessionYear)*24+sessionRespondModel.FirstSessionHour)*60 + sessionRespondModel.FirstSessionMinute) - (((sessionOldModel.FirstSessionYearOfDay+365*sessionOldModel.FirstSessionYear)*24+sessionOldModel.FirstSessionHour)*60 + sessionOldModel.FirstSessionMinute)
-var TotalSessionDay = int64(sessionRespondModel.FirstSessionYearOfDay-sessionOldModel.FirstSessionYearOfDay) + 365*(sessionRespondModel.FirstSessionYear-sessionOldModel.FirstSessionYear) + 1
-var TotalSessionDuration int64 = sessionRespondModel.TotalSessionDuration + sessionOldModel.TotalSessionDuration
-var TotalSessionCount int64 = sessionRespondModel.TotalSessionCount + sessionOldModel.TotalSessionCount
-var SessionBasedAvegareSessionDuration = float64(TotalSessionDuration) / float64(TotalSessionCount)
-
-var sessionUpdateModel = model.GameSessionEveryLoginRespondModel{
-	ProjectId:                                               "Test",
-	ClientId:                                                "Test",
-	CustomerId:                                              "Test",
-	FirstSessionYearOfDay:                                   int64(first.YearDay()),
-	FirstSessionYear:                                        int64(first.Year()),
-	FirstSessionWeekDay:                                     int64(first.Weekday()),
-	FirstSessionHour:                                        int64(first.Hour()),
-	FirstSessionDuration:                                    int64(sessionModel.SessionTimeMinute),
-	FirstSessionMinute:                                      int64(first.Minute()),
-	SecondSessionHour:                                       0,
-	SecondSessionDuration:                                   0,
-	SecondSessionMinute:                                     0,
-	ThirdSessionHour:                                        sessionRespondModel.FirstSessionHour,
-	ThirdSessionDuration:                                    sessionRespondModel.FirstSessionDuration,
-	ThirdSessinMinute:                                       sessionRespondModel.FirstSessionMinute,
-	PenultimateSessionHour:                                  sessionOldModel.LastSessionHour,
-	PenultimateSessionDuration:                              sessionOldModel.LastSessionDuration,
-	PenultimateSessionMinute:                                sessionOldModel.LastSessionMinute,
-	LastSessionYearOfDay:                                    sessionRespondModel.FirstSessionYearOfDay,
-	LastSessionYear:                                         sessionRespondModel.FirstSessionYear,
-	LastSessionHour:                                         sessionRespondModel.FirstSessionHour,
-	LastSessionDuration:                                     sessionRespondModel.FirstSessionDuration,
-	LastSessionMinute:                                       sessionRespondModel.FirstSessionMinute,
-	LastDurationMinusPenultimateDuration:                    sessionRespondModel.FirstSessionDuration - sessionOldModel.LastSessionDuration,
-	FirstHalfHourTotalSessionCount:                          0,
-	FirstHalfHourTotalSessionDuration:                       0,
-	FirstHourTotalSessionCount:                              0,
-	FirstHourTotalSessionDuration:                           0,
-	FirstTwoHourTotalSessionCount:                           0,
-	FirstTwoHourTotalSessionDuration:                        0,
-	FirstThreeHourTotalSessionCount:                         0,
-	FirstThreeHourTotalSessionDuration:                      0,
-	FirstSixHourTotalSessionCount:                           0,
-	FirstSixHourTotalSessionDuration:                        0,
-	FirstTwelveHourTotalSessionCount:                        0,
-	FirstTwelveHourTotalSessionDuration:                     0,
-	TotalSessionDay:                                         TotalSessionDay,
-	TotalSessionHour:                                        TotalSessionHour,
-	TotalSessionMinute:                                      TotalSessionMinute,
-	TotalSessionDuration:                                    sessionRespondModel.TotalSessionDuration + sessionOldModel.TotalSessionDuration,
-	TotalSessionCount:                                       sessionRespondModel.TotalSessionCount + sessionOldModel.TotalSessionCount,
-	FirstDayTotalSessionCount:                               sessionOldModel.FirstDayTotalSessionCount,
-	FirstDayTotalSessionDuration:                            sessionOldModel.FirstDayTotalSessionDuration,
-	SecondDayTotalSessionCount:                              sessionRespondModel.FirstDayTotalSessionCount,
-	SecondDayTotalSessionDuration:                           sessionRespondModel.FirstDayTotalSessionDuration,
-	ThirdDayTotalSessionCount:                               0,
-	ThirdDayTotalSessionDuration:                            0,
-	FourthDayTotalSessionCount:                              0,
-	FourthDayTotalSessionDuration:                           0,
-	FifthDayTotalSessionCount:                               0,
-	FifthDayTotalSessionDuration:                            0,
-	SixthDayTotalSessionCount:                               0,
-	SixthDayTotalSessionDuration:                            0,
-	SeventhDayTotalSessionCount:                             0,
-	SeventhDayTotalSessionDuration:                          0,
-	MinSessionDuration:                                      int64(19),
-	MaxSessionDuration:                                      int64(33),
-	DailyAvegareSessionCount:                                float64(TotalSessionCount) / float64(TotalSessionDay),
-	DailyAverageSessionDuration:                             float64(TotalSessionDuration) / float64(TotalSessionDay),
-	SessionBasedAvegareSessionDuration:                      float64(TotalSessionDuration) / float64(TotalSessionCount),
-	DailyAvegareSessionCountMinusFirstDaySessionCount:       float64(TotalSessionCount)/float64(TotalSessionDay) - float64(sessionOldModel.FirstDayTotalSessionCount),
-	DailyAvegareSessionDurationMinusFirstDaySessionDuration: float64(TotalSessionDuration)/float64(TotalSessionDay) - float64(sessionOldModel.FirstDayTotalSessionDuration),
-	SessionBasedAvegareSessionDurationMinusFirstSessionDuration: SessionBasedAvegareSessionDuration - float64(sessionOldModel.FirstSessionDuration),
-	SessionBasedAvegareSessionDurationMinusLastSessionDuration:  SessionBasedAvegareSessionDuration - float64(sessionRespondModel.FirstSessionDuration),
-	SundaySessionCount:     sessionOldModel.SundaySessionCount + sessionRespondModel.SundaySessionCount,
-	MondaySessionCount:     sessionOldModel.MondaySessionCount + sessionRespondModel.MondaySessionCount,
-	TuesdaySessionCount:    sessionOldModel.TuesdaySessionCount + sessionRespondModel.TuesdaySessionCount,
-	WednesdaySessionCount:  sessionOldModel.WednesdaySessionCount + sessionRespondModel.WednesdaySessionCount,
-	ThursdaySessionCount:   sessionOldModel.ThursdaySessionCount + sessionRespondModel.ThursdaySessionCount,
-	FridaySessionCount:     sessionOldModel.FridaySessionCount + sessionRespondModel.FridaySessionCount,
-	SaturdaySessionCount:   sessionOldModel.SaturdaySessionCount + sessionRespondModel.SaturdaySessionCount,
-	AmSessionCount:         sessionOldModel.AmSessionCount + sessionRespondModel.AmSessionCount,
-	PmSessionCount:         sessionOldModel.PmSessionCount + sessionRespondModel.PmSessionCount,
-	Session0To5HourCount:   sessionOldModel.Session0To5HourCount + sessionRespondModel.Session0To5HourCount,
-	Session6To11HourCount:  sessionOldModel.Session6To11HourCount + sessionRespondModel.Session6To11HourCount,
-	Session12To17HourCount: sessionOldModel.Session12To17HourCount + sessionRespondModel.Session12To17HourCount,
-	Session18To23HourCount: sessionOldModel.Session18To23HourCount + sessionRespondModel.Session18To23HourCount,
-}
+var sessionUpdateModel = model.GameSessionEveryLoginRespondModel{}
 
 func Test_UpdateGameSession_UpdateSuccess(t *testing.T) {
 	var testSessionDal = new(repository.MockGameSessionEveryLoginDal)
@@ -288,10 +32,177 @@ func Test_UpdateGameSession_UpdateSuccess(t *testing.T) {
 	IoC.Logger = testLog
 	IoC.CacheService = testCache
 	var manager = concrete.GameSessionEveryLoginManagerConstructor()
+	var first = time.Date(
+	2021, 11, 6, 18, 34, 58, 651387237, time.UTC)
+    var first2 = time.Date(
+	2021, 11, 7, 18, 34, 58, 651387237, time.UTC)
 	var sessionOldModel_test = sessionOldModel
-	var sessionUpdateModel_test = sessionUpdateModel
+	sessionOldModel_test.ProjectId                                 =              "Test"
+	sessionOldModel_test.ClientId                                  =              "Test"
+	sessionOldModel_test.CustomerId                                =              "Test"
+	sessionOldModel_test.FirstSessionYearOfDay                     =              int64(first.YearDay())
+	sessionOldModel_test.FirstSessionYear                          =              int64(first.Year())
+	sessionOldModel_test.FirstSessionWeekDay                       =              int64(first.Weekday())
+	sessionOldModel_test.FirstSessionHour                          =              int64(first.Hour())
+	sessionOldModel_test.FirstSessionDuration                      =              int64(sessionModel.SessionTimeMinute)
+	sessionOldModel_test.FirstSessionMinute                        =              int64(first.Minute())
+	sessionOldModel_test.LastSessionYearOfDay                       =             int64(first2.YearDay())
+	sessionOldModel_test.LastSessionYear                            =             int64(first2.Year())
+	sessionOldModel_test.LastSessionHour                            =             int64(first2.Hour())
+	sessionOldModel_test.LastSessionDuration                        =             int64(sessionModel.SessionTimeMinute)
+	sessionOldModel_test.LastSessionMinute                          =             int64(first2.Minute())
+	sessionOldModel_test.TotalSessionDay                            =             1
+	sessionOldModel_test.TotalSessionHour                           =             24
+	sessionOldModel_test.TotalSessionMinute                         =             1440
+	sessionOldModel_test.TotalSessionDuration                       =             18
+	sessionOldModel_test.TotalSessionCount                          =             2
+	sessionOldModel_test.FirstDayTotalSessionCount                  =             3
+	sessionOldModel_test.FirstDayTotalSessionDuration               =             18
+	sessionOldModel_test.MinSessionDuration                         =             19
+	sessionOldModel_test.MaxSessionDuration                        =             29
+	sessionOldModel_test.DailyAvegareSessionCount                   =             1
+	sessionOldModel_test.DailyAverageSessionDuration               =             float64(sessionModel.SessionTimeMinute)
+	sessionOldModel_test.SessionBasedAvegareSessionDuration         =             float64(sessionModel.SessionTimeMinute)
+	sessionOldModel_test.DailyAvegareSessionCountMinusFirstDaySessionCount =       0
+	sessionOldModel_test.DailyAvegareSessionDurationMinusFirstDaySessionDuration = 0
+	sessionOldModel_test.SessionBasedAvegareSessionDurationMinusFirstSessionDuration = 0
+	sessionOldModel_test.SessionBasedAvegareSessionDurationMinusLastSessionDuration = float64(sessionModel.SessionTimeMinute)
+	sessionOldModel_test.SundaySessionCount     =  2
+	sessionOldModel_test.MondaySessionCount     =  9
+	sessionOldModel_test.TuesdaySessionCount    =  8
+	sessionOldModel_test.WednesdaySessionCount  =  0
+	sessionOldModel_test.ThursdaySessionCount   =  0
+	sessionOldModel_test.FridaySessionCount     =  1
+	sessionOldModel_test.SaturdaySessionCount   =  0
+	sessionOldModel_test.AmSessionCount         =  0
+	sessionOldModel_test.PmSessionCount         =  1
+	sessionOldModel_test.Session0To5HourCount    = 5
+	sessionOldModel_test.Session6To11HourCount   = 0
+	sessionOldModel_test.Session12To17HourCount  = 1
+	sessionOldModel_test.Session18To23HourCount  = 87
+
+	var sessionModel_test = sessionModel
+	sessionModel_test.ProjectId  = "Test"
+	sessionModel_test.ClientId   = "Test"
+	sessionModel_test.CustomerId = "Test"
+	sessionModel_test.SessionStartTime = time.Date(
+		2021, 11, 7, 22, 34, 36, 651387237, time.UTC)
+	sessionModel_test.SessionFinishTime = time.Date(
+		2021, 11, 8, 18, 34, 36, 651387237, time.UTC)
+	sessionModel_test.SessionTimeMinute = 33
 	var sessionRespondModel_test = sessionRespondModel
-	testSessionDal.On("UpdateGameSessionEveryLoginById", sessionOldModel_test.ClientId, &sessionUpdateModel_test).Return(nil)
+	sessionRespondModel_test.ProjectId                                =               "Test"
+	sessionRespondModel_test.ClientId                                 =               "Test"
+	sessionRespondModel_test.CustomerId                               =               "Test"
+	sessionRespondModel_test.FirstSessionYearOfDay                    =               int64(sessionModel_test.SessionFinishTime.YearDay())
+	sessionRespondModel_test.FirstSessionYear                         =               int64(sessionModel_test.SessionFinishTime.Year())
+	sessionRespondModel_test.FirstSessionWeekDay                      =               int64(sessionModel_test.SessionFinishTime.Weekday())
+	sessionRespondModel_test.FirstSessionHour                         =               int64(sessionModel_test.SessionFinishTime.Hour())
+	sessionRespondModel_test.FirstSessionDuration                     =               int64(sessionModel_test.SessionTimeMinute)
+	sessionRespondModel_test.FirstSessionMinute                       =               int64(sessionModel_test.SessionFinishTime.Minute())
+	sessionRespondModel_test.FirstHalfHourTotalSessionCount                   =       1
+	sessionRespondModel_test.FirstHalfHourTotalSessionDuration                =       int64(sessionModel_test.SessionTimeMinute)
+	sessionRespondModel_test.FirstHourTotalSessionCount                       =       1
+	sessionRespondModel_test.FirstHourTotalSessionDuration                    =       int64(sessionModel_test.SessionTimeMinute)
+	sessionRespondModel_test.FirstTwoHourTotalSessionCount                    =       1
+	sessionRespondModel_test.FirstTwoHourTotalSessionDuration                 =       int64(sessionModel_test.SessionTimeMinute)
+	sessionRespondModel_test.FirstThreeHourTotalSessionCount                  =       1
+	sessionRespondModel_test.FirstThreeHourTotalSessionDuration               =       int64(sessionModel_test.SessionTimeMinute)
+	sessionRespondModel_test.FirstSixHourTotalSessionCount                    =       1
+	sessionRespondModel_test.FirstSixHourTotalSessionDuration                 =       int64(sessionModel_test.SessionTimeMinute)
+	sessionRespondModel_test.FirstTwelveHourTotalSessionCount                 =       1
+	sessionRespondModel_test.FirstTwelveHourTotalSessionDuration              =       int64(sessionModel_test.SessionTimeMinute)
+	sessionRespondModel_test.TotalSessionDay                                  =       1
+	sessionRespondModel_test.TotalSessionHour                                 =       1
+	sessionRespondModel_test.TotalSessionMinute                               =       int64(sessionModel_test.SessionTimeMinute)
+	sessionRespondModel_test.TotalSessionDuration                             =       int64(sessionModel_test.SessionTimeMinute)
+	sessionRespondModel_test.TotalSessionCount                                =       1
+	sessionRespondModel_test.FirstDayTotalSessionCount                        =       1
+	sessionRespondModel_test.FirstDayTotalSessionDuration                     =       int64(sessionModel_test.SessionTimeMinute)
+	sessionRespondModel_test.MinSessionDuration                                =      int64(sessionModel_test.SessionTimeMinute)
+	sessionRespondModel_test.MaxSessionDuration                                =      int64(sessionModel_test.SessionTimeMinute)
+	sessionRespondModel_test.DailyAvegareSessionCount                          =      1
+	sessionRespondModel_test.DailyAverageSessionDuration                       =     float64(sessionModel_test.SessionTimeMinute)
+	sessionRespondModel_test.SessionBasedAvegareSessionDuration                =      float64(sessionModel_test.SessionTimeMinute)
+	sessionRespondModel_test.DailyAvegareSessionCountMinusFirstDaySessionCount =       0
+	sessionRespondModel_test.DailyAvegareSessionDurationMinusFirstDaySessionDuration = 0
+	sessionRespondModel_test.SessionBasedAvegareSessionDurationMinusFirstSessionDuration = 0
+	sessionRespondModel_test.SessionBasedAvegareSessionDurationMinusLastSessionDuration  = float64(sessionModel_test.SessionTimeMinute)
+	sessionRespondModel_test.SundaySessionCount     =  0
+	sessionRespondModel_test.MondaySessionCount     =  1
+	sessionRespondModel_test.TuesdaySessionCount    =  0
+	sessionRespondModel_test.WednesdaySessionCount  =  0
+	sessionRespondModel_test.ThursdaySessionCount   =  0
+	sessionRespondModel_test.FridaySessionCount     =  0
+	sessionRespondModel_test.SaturdaySessionCount   =  0
+	sessionRespondModel_test.AmSessionCount        =  0
+	sessionRespondModel_test.PmSessionCount         =  1
+	sessionRespondModel_test.Session0To5HourCount   =  0
+	sessionRespondModel_test.Session6To11HourCount  =  0
+	sessionRespondModel_test.Session12To17HourCount  =  0
+	sessionRespondModel_test.Session18To23HourCount  =  1
+
+	var TotalSessionHour int64 = ((sessionRespondModel_test.FirstSessionYearOfDay+365*sessionRespondModel_test.FirstSessionYear)*24 + sessionRespondModel_test.FirstSessionHour) - ((sessionOldModel_test.FirstSessionYearOfDay+365*sessionOldModel_test.FirstSessionYear)*24 + sessionOldModel_test.FirstSessionHour)
+	var TotalSessionMinute int64 = (((sessionRespondModel_test.FirstSessionYearOfDay+365*sessionRespondModel_test.FirstSessionYear)*24+sessionRespondModel_test.FirstSessionHour)*60 + sessionRespondModel_test.FirstSessionMinute) - (((sessionOldModel_test.FirstSessionYearOfDay+365*sessionOldModel_test.FirstSessionYear)*24+sessionOldModel_test.FirstSessionHour)*60 + sessionOldModel_test.FirstSessionMinute)
+	var TotalSessionDay = int64(sessionRespondModel_test.FirstSessionYearOfDay-sessionOldModel_test.FirstSessionYearOfDay) + 365*(sessionRespondModel_test.FirstSessionYear-sessionOldModel_test.FirstSessionYear) + 1
+	var TotalSessionDuration int64 = sessionRespondModel_test.TotalSessionDuration + sessionOldModel_test.TotalSessionDuration
+	var TotalSessionCount int64 = sessionRespondModel_test.TotalSessionCount + sessionOldModel_test.TotalSessionCount
+	var SessionBasedAvegareSessionDuration = float64(TotalSessionDuration) / float64(TotalSessionCount)
+
+	var sessionUpdateModel_test = sessionUpdateModel
+	sessionUpdateModel_test.ProjectId                             =                  "Test"
+	sessionUpdateModel_test.ClientId                              =                  "Test"
+	sessionUpdateModel_test.CustomerId                            =                  "Test"
+	sessionUpdateModel_test.FirstSessionYearOfDay                 =                  int64(first.YearDay())
+	sessionUpdateModel_test.FirstSessionYear                      =                  int64(first.Year())
+	sessionUpdateModel_test.FirstSessionWeekDay                   =                  int64(first.Weekday())
+	sessionUpdateModel_test.FirstSessionHour                      =                  int64(first.Hour())
+	sessionUpdateModel_test.FirstSessionDuration                  =                  int64(sessionModel.SessionTimeMinute)
+	sessionUpdateModel_test.FirstSessionMinute                    =                  int64(first.Minute())
+	sessionUpdateModel_test.ThirdSessionHour                       =                sessionRespondModel_test.FirstSessionHour
+	sessionUpdateModel_test.ThirdSessionDuration                   =                sessionRespondModel_test.FirstSessionDuration
+	sessionUpdateModel_test.ThirdSessinMinute                      =                sessionRespondModel_test.FirstSessionMinute
+	sessionUpdateModel_test.PenultimateSessionHour                 =                sessionOldModel_test.LastSessionHour
+	sessionUpdateModel_test.PenultimateSessionDuration             =                sessionOldModel_test.LastSessionDuration
+	sessionUpdateModel_test.PenultimateSessionMinute               =                sessionOldModel_test.LastSessionMinute
+	sessionUpdateModel_test.LastSessionYearOfDay                   =                sessionRespondModel_test.FirstSessionYearOfDay
+	sessionUpdateModel_test.LastSessionYear                        =                sessionRespondModel_test.FirstSessionYear
+	sessionUpdateModel_test.LastSessionHour                        =                sessionRespondModel_test.FirstSessionHour
+	sessionUpdateModel_test.LastSessionDuration                    =                sessionRespondModel_test.FirstSessionDuration
+	sessionUpdateModel_test.LastSessionMinute                      =                sessionRespondModel_test.FirstSessionMinute
+	sessionUpdateModel_test.LastDurationMinusPenultimateDuration   =                sessionRespondModel_test.FirstSessionDuration - sessionOldModel_test.LastSessionDuration
+	sessionUpdateModel_test.TotalSessionDay                        =                 TotalSessionDay
+	sessionUpdateModel_test.TotalSessionHour                       =                 TotalSessionHour
+	sessionUpdateModel_test.TotalSessionMinute                     =                 TotalSessionMinute
+	sessionUpdateModel_test.TotalSessionDuration                   =                 sessionRespondModel_test.TotalSessionDuration + sessionOldModel_test.TotalSessionDuration
+	sessionUpdateModel_test.TotalSessionCount                      =                 sessionRespondModel_test.TotalSessionCount + sessionOldModel_test.TotalSessionCount
+	sessionUpdateModel_test.FirstDayTotalSessionCount              =                 sessionOldModel_test.FirstDayTotalSessionCount
+	sessionUpdateModel_test.FirstDayTotalSessionDuration           =                 sessionOldModel_test.FirstDayTotalSessionDuration
+	sessionUpdateModel_test.SecondDayTotalSessionCount             =                 sessionRespondModel_test.FirstDayTotalSessionCount
+	sessionUpdateModel_test.SecondDayTotalSessionDuration          =                 sessionRespondModel_test.FirstDayTotalSessionDuration
+	sessionUpdateModel_test.MinSessionDuration                                   =   int64(19)
+	sessionUpdateModel_test.MaxSessionDuration                                   =   int64(33)
+	sessionUpdateModel_test.DailyAvegareSessionCount                             =   float64(TotalSessionCount) / float64(TotalSessionDay)
+	sessionUpdateModel_test.DailyAverageSessionDuration                          =   float64(TotalSessionDuration) / float64(TotalSessionDay)
+	sessionUpdateModel_test.SessionBasedAvegareSessionDuration                   =   float64(TotalSessionDuration) / float64(TotalSessionCount)
+	sessionUpdateModel_test.DailyAvegareSessionCountMinusFirstDaySessionCount    =   float64(TotalSessionCount)/float64(TotalSessionDay) - float64(sessionOldModel_test.FirstDayTotalSessionCount)
+	sessionUpdateModel_test.DailyAvegareSessionDurationMinusFirstDaySessionDuration = float64(TotalSessionDuration)/float64(TotalSessionDay) - float64(sessionOldModel_test.FirstDayTotalSessionDuration)
+	sessionUpdateModel_test.SessionBasedAvegareSessionDurationMinusFirstSessionDuration = SessionBasedAvegareSessionDuration - float64(sessionOldModel_test.FirstSessionDuration)
+	sessionUpdateModel_test.SessionBasedAvegareSessionDurationMinusLastSessionDuration =  SessionBasedAvegareSessionDuration - float64(sessionRespondModel_test.FirstSessionDuration)
+	sessionUpdateModel_test.SundaySessionCount       = sessionOldModel_test.SundaySessionCount + sessionRespondModel_test.SundaySessionCount
+	sessionUpdateModel_test.MondaySessionCount       =  sessionOldModel_test.MondaySessionCount + sessionRespondModel_test.MondaySessionCount
+	sessionUpdateModel_test.TuesdaySessionCount      =     sessionOldModel_test.TuesdaySessionCount + sessionRespondModel_test.TuesdaySessionCount
+	sessionUpdateModel_test.WednesdaySessionCount    =     sessionOldModel_test.WednesdaySessionCount + sessionRespondModel_test.WednesdaySessionCount
+	sessionUpdateModel_test.ThursdaySessionCount     =     sessionOldModel_test.ThursdaySessionCount + sessionRespondModel_test.ThursdaySessionCount
+	sessionUpdateModel_test.FridaySessionCount       =     sessionOldModel_test.FridaySessionCount + sessionRespondModel_test.FridaySessionCount
+	sessionUpdateModel_test.SaturdaySessionCount     =     sessionOldModel_test.SaturdaySessionCount + sessionRespondModel_test.SaturdaySessionCount
+	sessionUpdateModel_test.AmSessionCount          =      sessionOldModel_test.AmSessionCount + sessionRespondModel_test.AmSessionCount
+	sessionUpdateModel_test.PmSessionCount          =      sessionOldModel_test.PmSessionCount + sessionRespondModel_test.PmSessionCount
+	sessionUpdateModel_test.Session0To5HourCount    =      sessionOldModel_test.Session0To5HourCount + sessionRespondModel_test.Session0To5HourCount
+	sessionUpdateModel_test.Session6To11HourCount   =      sessionOldModel_test.Session6To11HourCount + sessionRespondModel_test.Session6To11HourCount
+	sessionUpdateModel_test.Session12To17HourCount  =   sessionOldModel_test.Session12To17HourCount + sessionRespondModel_test.Session12To17HourCount
+	sessionUpdateModel_test.Session18To23HourCount  =  sessionOldModel_test.Session18To23HourCount + sessionRespondModel_test.Session18To23HourCount
+    testSessionDal.On("UpdateGameSessionEveryLoginById", sessionOldModel_test.ClientId, &sessionUpdateModel_test).Return(nil)
 	var v, s, m = manager.UpdateGameSession(&sessionRespondModel_test, &sessionOldModel_test)
 	assert.Equal(t, true, s)
 	assert.Equal(t, nil, m)
@@ -310,9 +221,65 @@ func Test_ConvertRawModelToResponseModel_AddS(t *testing.T) {
 	var manager = concrete.GameSessionEveryLoginManagerConstructor()
 	var sessionOldModel_test = sessionOldModel
 	var sessionModel_test = sessionModel
-	//var sessionUpdateModel_test = sessionUpdateModel
+	sessionModel_test.ProjectId  = "Test"
+	sessionModel_test.ClientId   = "Test"
+	sessionModel_test.CustomerId = "Test"
+	sessionModel_test.SessionStartTime = time.Date(
+		2021, 11, 7, 22, 34, 36, 651387237, time.UTC)
+	sessionModel_test.SessionFinishTime = time.Date(
+		2021, 11, 8, 18, 34, 36, 651387237, time.UTC)
+	sessionModel_test.SessionTimeMinute = 33
 	var sessionRespondModel_test = sessionRespondModel
-
+	sessionRespondModel_test.ProjectId                                =               "Test"
+	sessionRespondModel_test.ClientId                                 =               "Test"
+	sessionRespondModel_test.CustomerId                               =               "Test"
+	sessionRespondModel_test.FirstSessionYearOfDay                    =               int64(sessionModel_test.SessionFinishTime.YearDay())
+	sessionRespondModel_test.FirstSessionYear                         =               int64(sessionModel_test.SessionFinishTime.Year())
+	sessionRespondModel_test.FirstSessionWeekDay                      =               int64(sessionModel_test.SessionFinishTime.Weekday())
+	sessionRespondModel_test.FirstSessionHour                         =               int64(sessionModel_test.SessionFinishTime.Hour())
+	sessionRespondModel_test.FirstSessionDuration                     =               int64(sessionModel_test.SessionTimeMinute)
+	sessionRespondModel_test.FirstSessionMinute                       =               int64(sessionModel_test.SessionFinishTime.Minute())
+	sessionRespondModel_test.FirstHalfHourTotalSessionCount                   =       1
+	sessionRespondModel_test.FirstHalfHourTotalSessionDuration                =       int64(sessionModel_test.SessionTimeMinute)
+	sessionRespondModel_test.FirstHourTotalSessionCount                       =       1
+	sessionRespondModel_test.FirstHourTotalSessionDuration                    =       int64(sessionModel_test.SessionTimeMinute)
+	sessionRespondModel_test.FirstTwoHourTotalSessionCount                    =       1
+	sessionRespondModel_test.FirstTwoHourTotalSessionDuration                 =       int64(sessionModel_test.SessionTimeMinute)
+	sessionRespondModel_test.FirstThreeHourTotalSessionCount                  =       1
+	sessionRespondModel_test.FirstThreeHourTotalSessionDuration               =       int64(sessionModel_test.SessionTimeMinute)
+	sessionRespondModel_test.FirstSixHourTotalSessionCount                    =       1
+	sessionRespondModel_test.FirstSixHourTotalSessionDuration                 =       int64(sessionModel_test.SessionTimeMinute)
+	sessionRespondModel_test.FirstTwelveHourTotalSessionCount                 =       1
+	sessionRespondModel_test.FirstTwelveHourTotalSessionDuration              =       int64(sessionModel_test.SessionTimeMinute)
+	sessionRespondModel_test.TotalSessionDay                                  =       1
+	sessionRespondModel_test.TotalSessionHour                                 =       1
+	sessionRespondModel_test.TotalSessionMinute                               =       int64(sessionModel_test.SessionTimeMinute)
+	sessionRespondModel_test.TotalSessionDuration                             =       int64(sessionModel_test.SessionTimeMinute)
+	sessionRespondModel_test.TotalSessionCount                                =       1
+	sessionRespondModel_test.FirstDayTotalSessionCount                        =       1
+	sessionRespondModel_test.FirstDayTotalSessionDuration                     =       int64(sessionModel_test.SessionTimeMinute)
+	sessionRespondModel_test.MinSessionDuration                                =      int64(sessionModel_test.SessionTimeMinute)
+	sessionRespondModel_test.MaxSessionDuration                                =      int64(sessionModel_test.SessionTimeMinute)
+	sessionRespondModel_test.DailyAvegareSessionCount                          =      1
+	sessionRespondModel_test.DailyAverageSessionDuration                       =     float64(sessionModel_test.SessionTimeMinute)
+	sessionRespondModel_test.SessionBasedAvegareSessionDuration                =      float64(sessionModel_test.SessionTimeMinute)
+	sessionRespondModel_test.DailyAvegareSessionCountMinusFirstDaySessionCount =       0
+	sessionRespondModel_test.DailyAvegareSessionDurationMinusFirstDaySessionDuration = 0
+	sessionRespondModel_test.SessionBasedAvegareSessionDurationMinusFirstSessionDuration = 0
+	sessionRespondModel_test.SessionBasedAvegareSessionDurationMinusLastSessionDuration  = float64(sessionModel_test.SessionTimeMinute)
+	sessionRespondModel_test.SundaySessionCount     =  0
+	sessionRespondModel_test.MondaySessionCount     =  1
+	sessionRespondModel_test.TuesdaySessionCount    =  0
+	sessionRespondModel_test.WednesdaySessionCount  =  0
+	sessionRespondModel_test.ThursdaySessionCount   =  0
+	sessionRespondModel_test.FridaySessionCount     =  0
+	sessionRespondModel_test.SaturdaySessionCount   =  0
+	sessionRespondModel_test.AmSessionCount        =  0
+	sessionRespondModel_test.PmSessionCount         =  1
+	sessionRespondModel_test.Session0To5HourCount   =  0
+	sessionRespondModel_test.Session6To11HourCount  =  0
+	sessionRespondModel_test.Session12To17HourCount  =  0
+	sessionRespondModel_test.Session18To23HourCount  =  1
 	gameByte, _ := json.EncodeJson(sessionModel_test)
 	testSessionDal.On("GetGameSessionEveryLoginById", sessionRespondModel_test.ClientId).Return(&sessionOldModel_test,
 		errors.New("null data error"))

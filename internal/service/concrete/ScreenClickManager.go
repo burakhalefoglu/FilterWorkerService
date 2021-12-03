@@ -26,11 +26,11 @@ func ScreenClickManagerConstructor() *screenClickManager {
 
 func (sc *screenClickManager) ConvertRawModelToResponseModel(data *[]byte) (v interface{}, s bool, m string) {
 	firstModel := model.ScreenClickModel{}
-	Err := (*sc.IJsonParser).DecodeJson(data, &firstModel)
-	if Err != nil {
+	convertErr := (*sc.IJsonParser).DecodeJson(data, &firstModel)
+	if convertErr != nil {
 		(*sc.ILog).SendErrorLog("ScreenClickManager", "ConvertRawModelToResponseModel",
-			"byte array to ScreenClickModel", "Json Parser Decode Err: ", Err.Error())
-		return &model.ScreenClickRespondModel{},false, Err.Error()
+			"byte array to ScreenClickModel", "Json Parser Decode Err: ", convertErr.Error())
+		return &model.ScreenClickRespondModel{},false, convertErr.Error()
 	}
 	hour := int64(firstModel.CreationAt.Hour())
 	yearOfDay := int64(firstModel.CreationAt.YearDay())
@@ -142,12 +142,12 @@ func (sc *screenClickManager) ConvertRawModelToResponseModel(data *[]byte) (v in
 	defer (*sc.ILog).SendInfoLog("ScreenClickManager", "ConvertRawModelToResponseModel",
 		modelResponse.ClientId, modelResponse.ProjectId)
 	oldModel, err := (*sc.IScreenClickDal).GetScreenClickById(modelResponse.ClientId)
-	if err != nil {
+	if err != nil && err.Error() != "null data error" {
 		(*sc.ILog).SendErrorLog("ScreenClickManager", "ConvertRawModelToResponseModel",
 			"ScreenClickDal_GetScreenClickById", err.Error())
 	}
 	switch {
-	case err.Error() == "null data error":
+	case err != nil && err.Error() == "null data error":
 
 		logErr := (*sc.IScreenClickDal).Add(&modelResponse)
 		if logErr != nil {
@@ -219,7 +219,7 @@ func (sc *screenClickManager) UpdateScreenClick(modelResponse *model.ScreenClick
 	CalculateClickTwoHour(modelResponse, oldModel, oldModel.TotalClickMinute)
 	CalculateClickThreeHour(modelResponse, oldModel, oldModel.TotalClickMinute)
 	CalculateClickSixHour(modelResponse, oldModel, oldModel.TotalClickMinute)
-	CalculateClickTwentyHour(modelResponse, oldModel, oldModel.TotalClickMinute)
+	CalculateClickTwelveHour(modelResponse, oldModel, oldModel.TotalClickMinute)
 
 	oldModel.TotalStartXCor = oldModel.TotalStartXCor + modelResponse.TotalStartXCor
 	oldModel.TotalStartYCor = oldModel.TotalStartYCor + modelResponse.TotalStartYCor
@@ -287,7 +287,7 @@ func CalculateClickSixHour(modelResponse *model.ScreenClickRespondModel, oldMode
 	}
 }
 
-func CalculateClickTwentyHour(modelResponse *model.ScreenClickRespondModel, oldModel *model.ScreenClickRespondModel, total_session_minute int64) {
+func CalculateClickTwelveHour(modelResponse *model.ScreenClickRespondModel, oldModel *model.ScreenClickRespondModel, total_session_minute int64) {
 	switch  {
 	case total_session_minute<=720:
 		oldModel.FirstTwelveHourTouchCount = oldModel.FirstTwelveHourTouchCount + modelResponse.FirstTouchCount

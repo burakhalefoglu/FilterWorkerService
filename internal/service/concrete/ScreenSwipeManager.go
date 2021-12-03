@@ -24,11 +24,11 @@ func ScreenSwipeManagerConstructor() *screenSwipeManager {
 
 func (sc *screenSwipeManager) ConvertRawModelToResponseModel(data *[]byte) (v interface{},s bool, m string) {
 	firstModel := model.ScreenSwipeModel{}
-	Err := (*sc.IJsonParser).DecodeJson(data, &firstModel)
-	if Err != nil {
+	convertErr := (*sc.IJsonParser).DecodeJson(data, &firstModel)
+	if convertErr != nil {
 		(*sc.ILog).SendErrorLog("ScreenSwipeManager", "ConvertRawModelToResponseModel",
-			"byte array to ScreenSwipeModel", "Json Parser Decode Err: ", Err.Error())
-		return &model.ScreenSwipeRespondModel{},false, Err.Error()
+			"byte array to ScreenSwipeModel", "Json Parser Decode Err: ", convertErr.Error())
+		return &model.ScreenSwipeRespondModel{},false, convertErr.Error()
 	}
 	hour := int64(firstModel.CreationAt.Hour())
 	yearOfDay := int64(firstModel.CreationAt.YearDay())
@@ -101,15 +101,6 @@ func (sc *screenSwipeManager) ConvertRawModelToResponseModel(data *[]byte) (v in
 
 	DetermineSwipeDirection(&modelResponse, swipeDirection)
 
-	//modelResponse.TotalSwipeUpCount
-	//modelResponse.TotalSwipeDownCount
-	//modelResponse.TotalSwipeRightCount
-	//modelResponse.TotalSwipeLeftCount
-
-	// modelResponse.FirstDayTotalSwipeUpCount
-	// modelResponse.FirstDayTotalSwipeDownCount
-	// modelResponse.FirstDayTotalSwipeRightCount
-	// modelResponse.FirstDayTotalSwipeLeftCount
 	modelResponse.FirstDaySwipeTotalStartXCor = firstModel.SwipeStartXCor
 	modelResponse.FirstDaySwipeTotalStartYCor = firstModel.SwipeStartYCor
 	modelResponse.FirstDaySwipeTotalFinishXCor = firstModel.SwipeFinishXCor
@@ -177,12 +168,12 @@ func (sc *screenSwipeManager) ConvertRawModelToResponseModel(data *[]byte) (v in
 	defer (*sc.ILog).SendInfoLog("ScreenSwipeManager", "ConvertRawModelToResponseModel",
 		modelResponse.ClientId, modelResponse.ProjectId)
 	oldModel, err := (*sc.IScreenSwipeDal).GetScreenSwipeById(modelResponse.ClientId)
-	if err != nil {
+	if err != nil && err.Error() != "null data error" {
 		(*sc.ILog).SendErrorLog("ScreenSwipeManager", "ConvertRawModelToResponseModel",
 			"ScreenSwipeDal_GetScreenSwipeById", err.Error())
 	}
 	switch {
-	case err.Error() == "null data error":
+	case err != nil && err.Error() == "null data error":
 
 		logErr := (*sc.IScreenSwipeDal).Add(&modelResponse)
 		if logErr != nil {
@@ -239,7 +230,7 @@ func (sc *screenSwipeManager) UpdateScreenSwipe(modelResponse *model.ScreenSwipe
 	oldModel.LastSwipeHour = modelResponse.FirstSwipeHour
 	oldModel.LastSwipeWeekDay = modelResponse.FirstSwipeWeekDay
 	oldModel.LastSwipeMinute = modelResponse.FirstSwipeMinute
-	CalculateFirstSwipeDay(modelResponse, oldModel, oldModel.TotalSwipeHour)
+	CalculateSwipeFirstDay(modelResponse, oldModel, oldModel.TotalSwipeHour)
 	CalculateSwipeSecondDay(modelResponse, oldModel, oldModel.TotalSwipeHour)
 	CalculateSwipeThirdDay(modelResponse, oldModel, oldModel.TotalSwipeHour)
 	CalculateSwipeFourthDay(modelResponse, oldModel, oldModel.TotalSwipeHour)
@@ -266,7 +257,7 @@ func (sc *screenSwipeManager) UpdateScreenSwipe(modelResponse *model.ScreenSwipe
 	return oldModel,true, nil
 }
 
-func CalculateFirstSwipeDay(modelResponse *model.ScreenSwipeRespondModel, oldModel *model.ScreenSwipeRespondModel, total_swipe_hour int64) {
+func CalculateSwipeFirstDay(modelResponse *model.ScreenSwipeRespondModel, oldModel *model.ScreenSwipeRespondModel, total_swipe_hour int64) {
 	switch {
 	case total_swipe_hour <= 24:
 		oldModel.FirstDayTotalSwipeUpCount = oldModel.FirstDayTotalSwipeUpCount + modelResponse.FirstDayTotalSwipeUpCount

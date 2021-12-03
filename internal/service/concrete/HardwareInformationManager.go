@@ -28,11 +28,11 @@ func HardwareInformationManagerConstructor() *hardwareInformationManager {
 func (h *hardwareInformationManager) AddHardwareInformation(data *[]byte) (v interface{}, s bool, m string) {
 	// Todo : 1 Model karşılanacak
 	firstmodel := model.HardwareInformationModel{}
-	Err := (*h.IJsonParser).DecodeJson(data, &firstmodel)
-	if Err != nil {
+	convertErr := (*h.IJsonParser).DecodeJson(data, &firstmodel)
+	if convertErr != nil {
 		(*h.ILog).SendErrorLog("HardwareInformationManager", "AddHardwareInformation",
-			"byte array to HardwareInformationModel", "Json Parser Decode Err: ", Err.Error())
-		return &model.HardwareInformationResponseModel{}, false, Err.Error()
+			"byte array to HardwareInformationModel", "Json Parser Decode Err: ", convertErr.Error())
+		return &model.HardwareInformationResponseModel{}, false, convertErr.Error()
 	}
 	// Todo: 2 Filtreler Buraya Yazılacak
 	modelResponse := model.HardwareInformationResponseModel{}
