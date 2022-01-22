@@ -2,10 +2,10 @@ package kafkago
 
 import (
 	"FilterWorkerService/internal/IoC"
+	"FilterWorkerService/pkg/helper"
 	"FilterWorkerService/pkg/logger"
 	"context"
 	"log"
-	"os"
 	"sync"
 	"time"
 
@@ -22,9 +22,8 @@ func KafkaGoConstructor() *kafkaGo {
 	return &kafkaGo{Log: &IoC.Logger}
 }
 
-
 func (k *kafkaGo) Produce(key *[]byte, value *[]byte, topic string) (err error) {
-	writer, _ := writerConfigure([]string{os.Getenv("KAFKA_BROKER")}, uuid.New().String(), topic)
+	writer, _ := writerConfigure([]string{helper.ResolvePath("KAFKA_HOST", "KAFKA_PORT")}, uuid.New().String(), topic)
 	message := kafka.Message{
 		Key:   *key,
 		Value: *value,
@@ -35,21 +34,20 @@ func (k *kafkaGo) Produce(key *[]byte, value *[]byte, topic string) (err error) 
 	return err
 }
 
-
-func (k *kafkaGo) Consume(topic string, groupId string, wg *sync.WaitGroup,callback func(data *[]byte) (interface{}, bool, string)) {
-	reader, _ := readerConfigure([]string{os.Getenv("KAFKA_BROKER")}, groupId, topic)
-	log.Println("Consumer Started: ",topic, groupId)
+func (k *kafkaGo) Consume(topic string, groupId string, wg *sync.WaitGroup, callback func(data *[]byte) (interface{}, bool, string)) {
+	reader, _ := readerConfigure([]string{helper.ResolvePath("KAFKA_HOST", "KAFKA_PORT")}, groupId, topic)
+	log.Println("Consumer Started: ", topic, groupId)
 	defer func(reader *kafka.Reader) {
 		err := reader.Close()
 		if err != nil {
-			(*k.Log).SendErrorLog("kafkaGo", "Consume", "failed to reader.Close() messages:" + err.Error())
+			(*k.Log).SendErrorLog("kafkaGo", "Consume", "failed to reader.Close() messages:"+err.Error())
 		}
 	}(reader)
 	(*k.Log).SendInfoLog("kafkaGo", "Consume", reader.Stats().ClientID)
 	for {
 		m, err := reader.FetchMessage(context.Background())
 		if err != nil {
-			(*k.Log).SendFatalLog("kafkaGo", "Consume", "error while receiving message: " + err.Error())
+			(*k.Log).SendFatalLog("kafkaGo", "Consume", "error while receiving message: "+err.Error())
 			continue
 		}
 		(*k.Log).SendInfoLog("kafkaGo", "Consume", topic, groupId)
@@ -62,7 +60,6 @@ func (k *kafkaGo) Consume(topic string, groupId string, wg *sync.WaitGroup,callb
 	}
 	wg.Done()
 }
-
 
 func writerConfigure(kafkaBrokerUrls []string, clientId string, topic string) (w *kafka.Writer, err error) {
 	dialer := &kafka.Dialer{

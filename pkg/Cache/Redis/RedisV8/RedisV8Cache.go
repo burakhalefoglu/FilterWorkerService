@@ -1,6 +1,7 @@
 package RedisV8
 
 import (
+	"FilterWorkerService/pkg/helper"
 	"FilterWorkerService/pkg/logger"
 	"context"
 	"errors"
@@ -20,7 +21,7 @@ func RedisCacheConstructor(log *logger.ILog) *redisCache {
 
 func createClient(log *logger.ILog) *redis.Client {
 	client := redis.NewClient(&redis.Options{
-		Addr:     os.Getenv("REDIS_CONN"),
+		Addr:     helper.ResolvePath("REDIS_HOST", "REDIS_PORT"),
 		Password: os.Getenv("REDIS_PASS"), // no password set
 		DB:       0,                       // use default DB
 	})

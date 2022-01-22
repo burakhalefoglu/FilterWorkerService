@@ -1,0 +1,71 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: filter-worker
+  namespace: development
+spec:
+  replicas: 7
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 2
+      maxSurge: 2
+  selector:
+    matchLabels:
+      app: filter-worker
+  template:
+    metadata:
+      labels:
+        app: filter-worker
+    spec:
+      nodeSelector:
+        dedicated: deamond
+      containers:
+        - name: filter-worker
+          image: CONTAINER_IMAGE
+          imagePullPolicy: Always
+          env:
+            - name: REDIS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: redis-host
+            - name: REDIS_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: redis-password
+            - name: KAFKA_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: kafka-host
+            - name: LOGSTASH_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: logstash-host
+            - name: MONGODB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: mongo-host
+            - name: MONGODB_USER
+              value: root
+            - name: MONGODB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: mongodb-root-password
+          args:
+            - /bin/sh
+            - -c
+            - touch /tmp/healthy; sleep 30; rm -rf /tmp/healthy; sleep 600
+          livenessProbe:
+            exec:
+              command:
+                - cat
+                - /tmp/healthy
+            initialDelaySeconds: 5
+            periodSeconds: 5
