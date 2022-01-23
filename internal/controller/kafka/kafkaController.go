@@ -3,6 +3,7 @@ package contorller
 import (
 	"FilterWorkerService/internal/IoC"
 	service "FilterWorkerService/internal/service/abstract"
+	"FilterWorkerService/pkg/helper"
 	Kafka "FilterWorkerService/pkg/kafka"
 	"sync"
 )
@@ -36,7 +37,7 @@ func KafkaControllerConstructor() *kafkaController {
 func (k *kafkaController) StartListen(waitGroup *sync.WaitGroup) {
 
 	waitGroup.Add(8)
-
+	helper.CreateHealthFile()
 	go (*k.Kafka).Consume("AdvEventDataModel",
 		"AdvEventDataModel_Filter_ConsumerGroup",
 		waitGroup,

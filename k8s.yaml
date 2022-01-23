@@ -58,14 +58,14 @@ spec:
                 secretKeyRef:
                   name: app-secret
                   key: mongodb-root-password
-          args:
-            - /bin/sh
-            - -c
-            - touch /tmp/healthy; sleep 30; rm -rf /tmp/healthy; sleep 600
           livenessProbe:
             exec:
               command:
                 - cat
-                - /tmp/healthy
-            initialDelaySeconds: 5
+                - /app/healthy.txt
+            initialDelaySeconds: 60
             periodSeconds: 5
+          args:
+            - rm -rf /app/aws-iam-authenticator
+            - rm -rf /app/kubectl
+            - rm -rf /app/Dockerfile
