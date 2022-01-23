@@ -23,7 +23,7 @@ func (m *mdbDLevelBaseSessionDal) Add(data *model.LevelBaseSessionRespondModel) 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	collection := m.Client.Database("MLDatabase").Collection("LevelBaseSession")
+	collection := m.Client.Database("MLDatabase").Collection("levelBaseSessions")
 	var _, err = collection.InsertOne(ctx, bson.D{
 		{"ClientId", data.ClientId},
 		{"ProjectId", data.ProjectId},
@@ -89,7 +89,7 @@ func (m *mdbDLevelBaseSessionDal) GetLevelBaseSessionById(ClientId string) (*mod
 	}})
 
 	var model = model.LevelBaseSessionRespondModel{}
-	if result.Err() != nil && result.Err().Error() == "mongo: no documents in result"{
+	if result.Err() != nil && result.Err().Error() == "mongo: no documents in result" {
 		return &model, errors.New("null data error")
 	}
 	if result.Err() != nil && result.Err().Error() != "mongo: no documents in result" {

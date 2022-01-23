@@ -22,7 +22,7 @@ func MdbDScreenClickDalConstructor() *mdbDScreenClickDal {
 func (m *mdbDScreenClickDal) Add(data *model.ScreenClickRespondModel) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	collection := m.Client.Database("MLDatabase").Collection("ScreenClickModel")
+	collection := m.Client.Database("MLDatabase").Collection("screenClickModels")
 	var _, err = collection.InsertOne(ctx, bson.D{
 		{"ClientId", data.ClientId},
 		{"ProjectId", data.ProjectId},
@@ -129,7 +129,7 @@ func (m *mdbDScreenClickDal) GetScreenClickById(ClientId string) (*model.ScreenC
 		"ClientId", ClientId,
 	}})
 	var model = model.ScreenClickRespondModel{}
-	if result.Err() != nil && result.Err().Error() == "mongo: no documents in result"{
+	if result.Err() != nil && result.Err().Error() == "mongo: no documents in result" {
 		return &model, errors.New("null data error")
 	}
 	if result.Err() != nil && result.Err().Error() != "mongo: no documents in result" {

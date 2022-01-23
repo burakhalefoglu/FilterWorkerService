@@ -23,7 +23,7 @@ func (m *mdbDAdvEventDal) Add(data *model.AdvEventRespondModel) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	collection := m.Client.Database("MLDatabase").Collection("AdvEventModel")
+	collection := m.Client.Database("MLDatabase").Collection("advEventModels")
 	var _, err = collection.InsertOne(ctx, bson.D{
 		{"ClientId", data.ClientId},
 		{"ProjectId", data.ProjectId},
@@ -37,7 +37,7 @@ func (m *mdbDAdvEventDal) Add(data *model.AdvEventRespondModel) error {
 		{"AverageAdvDailyClickCount", data.AverageAdvDailyClickCount},
 		{"FirstAdvYearOfDay", data.FirstAdvYearOfDay},
 		{"FirstAdvYear", data.FirstAdvYear},
-		{"FirstWeekDay",data.FirstWeekDay},
+		{"FirstWeekDay", data.FirstWeekDay},
 		{"FirstAdvClickHour", data.FirstAdvClickHour},
 		{"FirstADvClickMinute", data.FirstADvClickMinute},
 		{"FirstAdvType", data.FirstAdvType},
@@ -114,7 +114,7 @@ func (m *mdbDAdvEventDal) GetAdvEventById(ClientId string) (*model.AdvEventRespo
 	}})
 
 	var model = model.AdvEventRespondModel{}
-	if result.Err() != nil && result.Err().Error() == "mongo: no documents in result"{
+	if result.Err() != nil && result.Err().Error() == "mongo: no documents in result" {
 		return &model, errors.New("null data error")
 	}
 	if result.Err() != nil && result.Err().Error() != "mongo: no documents in result" {
@@ -143,7 +143,7 @@ func (m *mdbDAdvEventDal) UpdateAdvEventById(ClientId string, data *model.AdvEve
 		{"AverageAdvDailyClickCount", data.AverageAdvDailyClickCount},
 		{"FirstAdvYearOfDay", data.FirstAdvYearOfDay},
 		{"FirstAdvYear", data.FirstAdvYear},
-		{"FirstWeekDay",data.FirstWeekDay},
+		{"FirstWeekDay", data.FirstWeekDay},
 		{"FirstAdvClickHour", data.FirstAdvClickHour},
 		{"FirstADvClickMinute", data.FirstADvClickMinute},
 		{"FirstAdvType", data.FirstAdvType},

@@ -22,7 +22,7 @@ func MdbDGameSessionEveryLoginDalConstructor() *mdbdDGameSessionEveryLoginDal {
 func (m *mdbdDGameSessionEveryLoginDal) Add(data *model.GameSessionEveryLoginRespondModel) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	collection := m.Client.Database("MLDatabase").Collection("GameSessionEveryLoginModel")
+	collection := m.Client.Database("MLDatabase").Collection("gameSessionEveryLoginModels")
 	var _, err = collection.InsertOne(ctx, bson.D{
 		{"ClientId", data.ClientId},
 		{"ProjectId", data.ProjectId},

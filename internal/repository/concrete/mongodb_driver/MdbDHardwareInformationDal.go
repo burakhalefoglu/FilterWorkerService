@@ -21,7 +21,7 @@ func MdbDHardwareInformationDalConstructor() *mdbDHardwareInformationDal {
 func (m *mdbDHardwareInformationDal) Add(data *model.HardwareInformationResponseModel) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	collection := m.Client.Database("MLDatabase").Collection("HardwareInformationModel")
+	collection := m.Client.Database("MLDatabase").Collection("hardwareInformationModels")
 	var _, err = collection.InsertOne(ctx, bson.D{
 		{"ClientId", data.ClientId},
 		{"ProjectId", data.ProjectId},
