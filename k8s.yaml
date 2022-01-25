@@ -3,9 +3,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: filter-worker
-  namespace: development
+  namespace: worker-app-dev
 spec:
-  replicas: 2
+  replicas: 4
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -27,44 +27,47 @@ spec:
           imagePullPolicy: Always
           resources:
             requests:
-              memory: "500M"
-              cpu: "250m"
+              memory: "250M"
+              cpu: "0.1"
             limits:
-              memory: "1000M"
-              cpu: "0.5"
+              memory: "500M"
+              cpu: "0.2"
           env:
             - name: REDIS_HOST
               valueFrom:
                 configMapKeyRef:
-                  name: app-config
+                  name: worker-app-config
                   key: redis-host
             - name: REDIS_PASS
               valueFrom:
                 secretKeyRef:
-                  name: app-secret
+                  name: worker-app-secret
                   key: redis-password
             - name: KAFKA_HOST
               valueFrom:
                 configMapKeyRef:
-                  name: app-config
+                  name: worker-app-config
                   key: kafka-host
             - name: LOGSTASH_HOST
               valueFrom:
                 configMapKeyRef:
-                  name: app-config
+                  name: worker-app-config
                   key: logstash-host
             - name: MONGODB_HOST
               valueFrom:
                 configMapKeyRef:
-                  name: app-config
+                  name: worker-app-config
                   key: mongo-host
             - name: MONGODB_USER
-              value: root
+              valueFrom:
+                configMapKeyRef:
+                  name: worker-app-config
+                  key: mongodb-ml-db-user
             - name: MONGODB_PASS
               valueFrom:
                 secretKeyRef:
-                  name: app-secret
-                  key: mongodb-root-password
+                  name: worker-app-secret
+                  key: mongodb-ml-db-pass
           livenessProbe:
             exec:
               command:
