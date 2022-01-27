@@ -20,7 +20,7 @@ spec:
         app: filter-worker
     spec:
       nodeSelector:
-        dedicated: deamond
+        dedicated: spot
       containers:
         - name: filter-worker
           image: CONTAINER_IMAGE
