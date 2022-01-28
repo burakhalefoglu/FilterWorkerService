@@ -5,7 +5,7 @@ metadata:
   name: filter-worker
   namespace: worker-app-dev
 spec:
-  replicas: 4
+  replicas: 2
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -20,18 +20,18 @@ spec:
         app: filter-worker
     spec:
       nodeSelector:
-        dedicated: deamond
+        dedicated: spot
       containers:
         - name: filter-worker
           image: CONTAINER_IMAGE
           imagePullPolicy: Always
           resources:
             requests:
-              memory: "250M"
-              cpu: "0.1"
+              memory: "50M"
+              cpu: "0.01"
             limits:
-              memory: "500M"
-              cpu: "0.2"
+              memory: "100M"
+              cpu: "0.02"
           env:
             - name: REDIS_HOST
               valueFrom:
