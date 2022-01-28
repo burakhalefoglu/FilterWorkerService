@@ -6,10 +6,12 @@ import (
 	IController "FilterWorkerService/internal/controller"
 	contorller "FilterWorkerService/internal/controller/kafka"
 	"FilterWorkerService/pkg/helper"
-	"github.com/joho/godotenv"
 	"log"
 	"runtime"
 	"sync"
+	"time"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
@@ -21,8 +23,15 @@ func main() {
 		return
 	}
 
-	wg := sync.WaitGroup{}
+	for {
+		startConsumer()
+		time.Sleep(time.Second * 5)
+	}
 
+}
+
+func startConsumer() {
+	wg := sync.WaitGroup{}
 	IoC.InjectContainers(golobby.InjectionConstructor())
 	IController.StartInsertListener(&wg, contorller.KafkaControllerConstructor())
 	wg.Wait()

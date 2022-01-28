@@ -38,6 +38,7 @@ func (k *kafkaGo) Consume(topic string, groupId string, wg *sync.WaitGroup, call
 	reader, _ := readerConfigure([]string{helper.ResolvePath("KAFKA_HOST", "KAFKA_PORT")}, groupId, topic)
 	log.Println("Consumer Started: ", topic, groupId)
 	defer func(reader *kafka.Reader) {
+		wg.Done()
 		err := reader.Close()
 		if err != nil {
 			(*k.Log).SendErrorLog("kafkaGo", "Consume", "failed to reader.Close() messages:"+err.Error())
@@ -54,11 +55,10 @@ func (k *kafkaGo) Consume(topic string, groupId string, wg *sync.WaitGroup, call
 		_, isSuccess, _ := callback(&m.Value)
 		if isSuccess {
 			if err := reader.CommitMessages(context.Background(), m); err != nil {
-				//(*k.Log).SendFatalLog("kafkaGo", "Consume", "failed to commit messages:" + err.Error())
+				(*k.Log).SendFatalLog("kafkaGo", "Consume", "failed to commit messages:"+err.Error())
 			}
 		}
 	}
-	wg.Done()
 }
 
 func writerConfigure(kafkaBrokerUrls []string, clientId string, topic string) (w *kafka.Writer, err error) {
