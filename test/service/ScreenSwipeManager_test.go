@@ -5,7 +5,6 @@ import (
 	"FilterWorkerService/internal/model"
 	"FilterWorkerService/internal/service/concrete"
 	"FilterWorkerService/pkg/jsonParser/gojson"
-	"FilterWorkerService/test/Mock/Log"
 	"FilterWorkerService/test/Mock/repository"
 	"errors"
 	"testing"
@@ -318,11 +317,9 @@ var swipeUpdatedModel = model.ScreenSwipeRespondModel{
 func Test_UpdateScreenSwipe_Success(t *testing.T) {
 
 	var testSwipeDal = new(repository.MockScreenSwipeDal)
-	var testLog = new(Log.MockLogger)
 	var json = gojson.GoJsonConstructor()
 	IoC.JsonParser = json
 	IoC.ScreenSwipeDal = testSwipeDal
-	IoC.Logger = testLog
 	var manager = concrete.ScreenSwipeManagerConstructor()
 	var swipeModel_test = swipeModel
 	var swipeOldModel_test = swipeOldModel
@@ -390,11 +387,9 @@ func Test_UpdateScreenSwipe_Success(t *testing.T) {
 
 func Test_ConvertRawModelToResponseModel_Add(t *testing.T) {
 	var testSwipeDal = new(repository.MockScreenSwipeDal)
-	var testLog = new(Log.MockLogger)
 	var json = gojson.GoJsonConstructor()
 	IoC.JsonParser = json
 	IoC.ScreenSwipeDal = testSwipeDal
-	IoC.Logger = testLog
 	var manager = concrete.ScreenSwipeManagerConstructor()
 	var swipeModel_test = swipeModel
 	var swipeOldModel_test = swipeOldModel

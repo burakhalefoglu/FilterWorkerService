@@ -5,13 +5,12 @@ import (
 	"FilterWorkerService/internal/model"
 	"FilterWorkerService/internal/service/concrete"
 	"FilterWorkerService/pkg/jsonParser/gojson"
-	"FilterWorkerService/test/Mock/Log"
 	"FilterWorkerService/test/Mock/repository"
 	"FilterWorkerService/test/Mock/service"
 	"errors"
+	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
-	"github.com/stretchr/testify/assert"
 )
 
 var sessionModel = model.GameSessionEveryLoginModel{}
@@ -25,11 +24,9 @@ var sessionUpdateModel = model.GameSessionEveryLoginRespondModel{}
 func Test_UpdateGameSession_UpdateSuccess(t *testing.T) {
 	var testSessionDal = new(repository.MockGameSessionEveryLoginDal)
 	var testCache = new(service.MockCacheService)
-	var testLog = new(Log.MockLogger)
 	var json = gojson.GoJsonConstructor()
 	IoC.JsonParser = json
 	IoC.GameSessionEveryLoginDal = testSessionDal
-	IoC.Logger = testLog
 	IoC.CacheService = testCache
 	var manager = concrete.GameSessionEveryLoginManagerConstructor()
 	var first = time.Date(
@@ -212,11 +209,9 @@ func Test_UpdateGameSession_UpdateSuccess(t *testing.T) {
 func Test_ConvertRawModelToResponseModel_AddS(t *testing.T) {
 	var testSessionDal = new(repository.MockGameSessionEveryLoginDal)
 	var testCache = new(service.MockCacheService)
-	var testLog = new(Log.MockLogger)
 	var json = gojson.GoJsonConstructor()
 	IoC.JsonParser = json
 	IoC.GameSessionEveryLoginDal = testSessionDal
-	IoC.Logger = testLog
 	IoC.CacheService = testCache
 	var manager = concrete.GameSessionEveryLoginManagerConstructor()
 	var sessionOldModel_test = sessionOldModel

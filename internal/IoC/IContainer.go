@@ -6,7 +6,6 @@ import (
 	cache "FilterWorkerService/pkg/Cache"
 	Ijsonparser "FilterWorkerService/pkg/jsonParser"
 	IKafka "FilterWorkerService/pkg/kafka"
-	"FilterWorkerService/pkg/logger"
 )
 
 type IContainer interface {
@@ -37,5 +36,4 @@ var TypeStandardizationDal repository.ITypeStandardizationDal
 var CacheService service.ICacheService
 var Kafka IKafka.IKafka
 var RedisCache cache.ICache
-var Logger logger.ILog
 var JsonParser Ijsonparser.IJsonParser

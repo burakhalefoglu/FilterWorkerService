@@ -6,14 +6,13 @@ import (
 	IHardwareInformationDal "FilterWorkerService/internal/repository/abstract"
 	ICacheService "FilterWorkerService/internal/service/abstract"
 	IJsonParser "FilterWorkerService/pkg/jsonParser"
-	"FilterWorkerService/pkg/logger"
+	"log"
 )
 
 type hardwareInformationManager struct {
 	ICacheService           *ICacheService.ICacheService
 	IHardwareInformationDal *IHardwareInformationDal.IHardwareInformationDal
 	IJsonParser             *IJsonParser.IJsonParser
-	ILog                    *logger.ILog
 }
 
 func HardwareInformationManagerConstructor() *hardwareInformationManager {
@@ -21,7 +20,6 @@ func HardwareInformationManagerConstructor() *hardwareInformationManager {
 		ICacheService:           &IoC.CacheService,
 		IHardwareInformationDal: &IoC.HardwareInformationDal,
 		IJsonParser:             &IoC.JsonParser,
-		ILog:                    &IoC.Logger,
 	}
 }
 
@@ -30,7 +28,7 @@ func (h *hardwareInformationManager) AddHardwareInformation(data *[]byte) (v int
 	firstmodel := model.HardwareInformationModel{}
 	convertErr := (*h.IJsonParser).DecodeJson(data, &firstmodel)
 	if convertErr != nil {
-		(*h.ILog).SendErrorLog("HardwareInformationManager", "AddHardwareInformation",
+		log.Fatal("HardwareInformationManager", "AddHardwareInformation",
 			"byte array to HardwareInformationModel", "Json Parser Decode Err: ", convertErr.Error())
 		return &model.HardwareInformationResponseModel{}, false, convertErr.Error()
 	}
@@ -47,11 +45,11 @@ func (h *hardwareInformationManager) AddHardwareInformation(data *[]byte) (v int
 	modelResponse.ProcessorType, _, _ = (*h.ICacheService).ManageCache("ProcessorType", firstmodel.ProcessorType)
 	modelResponse.SystemMemorySize = int64(firstmodel.SystemMemorySize)
 	// Todo : 3 Model burada kayıt edilecek
-	defer (*h.ILog).SendInfoLog("HardwareInformationManager", "AddHardwareInformation",
+	defer log.Print("HardwareInformationManager", "AddHardwareInformation",
 		modelResponse.ClientId, modelResponse.ProjectId)
 	logErr := (*h.IHardwareInformationDal).Add(&modelResponse)
 	if logErr != nil {
-		(*h.ILog).SendErrorLog("HardwareInformationManager", "AddHardwareInformation",
+		log.Fatal("HardwareInformationManager", "AddHardwareInformation",
 			"HardwareInformationDal_Add", logErr.Error())
 		return &modelResponse, false, logErr.Error()
 	}

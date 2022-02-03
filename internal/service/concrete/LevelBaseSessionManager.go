@@ -5,20 +5,18 @@ import (
 	model "FilterWorkerService/internal/model"
 	ILevelBaseSessionDal "FilterWorkerService/internal/repository/abstract"
 	IJsonParser "FilterWorkerService/pkg/jsonParser"
-	"FilterWorkerService/pkg/logger"
+	"log"
 )
 
 type levelBaseSessionManager struct {
 	ILevelBaseSessionDal *ILevelBaseSessionDal.ILevelBaseSessionDal
 	IJsonParser          *IJsonParser.IJsonParser
-	ILog                 *logger.ILog
 }
 
 func LevelBaseSessionManagerConstructor() *levelBaseSessionManager {
 	return &levelBaseSessionManager{
 		ILevelBaseSessionDal: &IoC.LevelBaseSessionDal,
 		IJsonParser:          &IoC.JsonParser,
-		ILog:                 &IoC.Logger,
 	}
 }
 
@@ -26,7 +24,7 @@ func (l *levelBaseSessionManager) ConvertRawModelToResponseModel(data *[]byte) (
 	firstModel := model.LevelBaseSessionDataModel{}
 	convertErr := (*l.IJsonParser).DecodeJson(data, &firstModel)
 	if convertErr != nil {
-		(*l.ILog).SendErrorLog("LevelBaseSessionManager", "ConvertRawModelToResponseModel",
+		log.Fatal("LevelBaseSessionManager", "ConvertRawModelToResponseModel",
 			"byte array to LevelBaseSessionDataModel", "Json Parser Decode Err: ", convertErr.Error())
 		return &model.LevelBaseSessionRespondModel{}, false, convertErr.Error()
 	}
@@ -77,12 +75,12 @@ func (l *levelBaseSessionManager) ConvertRawModelToResponseModel(data *[]byte) (
 	modelResponse.LastLevelSessionWeekDay = 0
 	modelResponse.LastLevelSessionHour = 0
 	modelResponse.LastLevelSessionMinute = 0
-	defer (*l.ILog).SendInfoLog("LevelBaseSessionManager", "ConvertRawModelToResponseModel",
+	defer log.Print("LevelBaseSessionManager", "ConvertRawModelToResponseModel",
 		modelResponse.ClientId, modelResponse.ProjectId)
 
 	oldModel, err := (*l.ILevelBaseSessionDal).GetLevelBaseSessionById(modelResponse.ClientId)
 	if err != nil && err.Error() != "null data error" {
-		(*l.ILog).SendErrorLog("LevelBaseSessionManager", "ConvertRawModelToResponseModel",
+		log.Fatal("LevelBaseSessionManager", "ConvertRawModelToResponseModel",
 			"LevelBaseSessionDal_GetLevelBaseSessionById", err.Error())
 	}
 	switch {
@@ -90,7 +88,7 @@ func (l *levelBaseSessionManager) ConvertRawModelToResponseModel(data *[]byte) (
 
 		logErr := (*l.ILevelBaseSessionDal).Add(&modelResponse)
 		if logErr != nil {
-			(*l.ILog).SendErrorLog("LevelBaseSessionManager", "ConvertRawModelToResponseModel",
+			log.Fatal("LevelBaseSessionManager", "ConvertRawModelToResponseModel",
 				"LevelBaseSessionDal_Add", logErr.Error())
 			return &modelResponse, false, logErr.Error()
 		}
@@ -137,11 +135,11 @@ func (l *levelBaseSessionManager) UpdateLevelBaseSession(modelResponse *model.Le
 	oldModel.LastLevelSessionHour = modelResponse.FirstLevelSessionHour
 	oldModel.LastLevelSessionMinute = modelResponse.FirstLevelSessionMinute
 
-	defer (*l.ILog).SendInfoLog("LevelBaseSessionManager", "UpdateLevelBaseSession",
+	defer log.Print("LevelBaseSessionManager", "UpdateLevelBaseSession",
 		oldModel.ClientId, oldModel.ProjectId)
 	logErr := (*l.ILevelBaseSessionDal).UpdateLevelBaseSessionById(oldModel.ClientId, oldModel)
 	if logErr != nil {
-		(*l.ILog).SendErrorLog("LevelBaseSessionManager", "UpdateLevelBaseSession",
+		log.Fatal("LevelBaseSessionManager", "UpdateLevelBaseSession",
 			"LevelBaseSessionDal_UpdateLevelBaseSessionById", logErr.Error())
 		return oldModel, false, logErr
 	}

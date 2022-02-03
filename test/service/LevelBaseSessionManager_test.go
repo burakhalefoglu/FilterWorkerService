@@ -5,7 +5,6 @@ import (
 	"FilterWorkerService/internal/model"
 	"FilterWorkerService/internal/service/concrete"
 	"FilterWorkerService/pkg/jsonParser/gojson"
-	"FilterWorkerService/test/Mock/Log"
 	"FilterWorkerService/test/Mock/repository"
 	"errors"
 	"fmt"
@@ -59,11 +58,9 @@ var levelBaseUpdateSession = model.LevelBaseSessionRespondModel{}
 func Test_UpdateLevelBaseSession_UpdatedSuccess(t *testing.T) {
 
 	var testLevelBaseDal = new(repository.MockLevelBaseSessionDal)
-	var testLog = new(Log.MockLogger)
 	var json = gojson.GoJsonConstructor()
 	IoC.JsonParser = json
 	IoC.LevelBaseSessionDal = testLevelBaseDal
-	IoC.Logger = testLog
 	var manager = concrete.LevelBaseSessionManagerConstructor()
 	var levelBaseOldSession_test = levelBaseOldSession
 	levelBaseOldSession_test.ProjectId                               =   "Test"
@@ -162,11 +159,9 @@ func Test_UpdateLevelBaseSession_UpdatedSuccess(t *testing.T) {
 
 func Test_ConvertRawModelToResponseModel_AddSucces(t *testing.T){
 	var testLevelBaseDal = new(repository.MockLevelBaseSessionDal)
-	var testLog = new(Log.MockLogger)
 	var json = gojson.GoJsonConstructor()
 	IoC.JsonParser = json
 	IoC.LevelBaseSessionDal = testLevelBaseDal
-	IoC.Logger = testLog
 	var manager = concrete.LevelBaseSessionManagerConstructor()
 
 	var levelBaseModel_test = levelBaseSession

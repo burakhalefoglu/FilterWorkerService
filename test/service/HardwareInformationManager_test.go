@@ -5,7 +5,6 @@ import (
 	"FilterWorkerService/internal/model"
 	"FilterWorkerService/internal/service/concrete"
 	"FilterWorkerService/pkg/jsonParser/gojson"
-	"FilterWorkerService/test/Mock/Log"
 	"FilterWorkerService/test/Mock/repository"
 	"FilterWorkerService/test/Mock/service"
 	"testing"
@@ -42,11 +41,9 @@ var hardwareResponseModel = model.HardwareInformationResponseModel{
 func Test_AddHardwareInformation_AddSuccess(t *testing.T){
 	var testHardwareInfoDal = new(repository.MockHardwareInformationDal)
 	var testCache = new(service.MockCacheService)	
-	var testLog = new(Log.MockLogger)
 	var json = gojson.GoJsonConstructor()
 	IoC.JsonParser = json
 	IoC.HardwareInformationDal = testHardwareInfoDal
-	IoC.Logger = testLog
 	IoC.CacheService = testCache
 	var manager = concrete.HardwareInformationManagerConstructor()
 	var hardwareModel_test = harwareModel

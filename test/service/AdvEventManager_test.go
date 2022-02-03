@@ -5,7 +5,6 @@ import (
 	"FilterWorkerService/internal/model"
 	"FilterWorkerService/internal/service/concrete"
 	"FilterWorkerService/pkg/jsonParser/gojson"
-	"FilterWorkerService/test/Mock/Log"
 	"FilterWorkerService/test/Mock/repository"
 	"FilterWorkerService/test/Mock/service"
 	"errors"
@@ -28,11 +27,9 @@ func Test_ConvertRawModelToResponse_AddedSuccess(t *testing.T) {
 	//Arrance
 	var testAdv = new(repository.MockAdvEventDal)
 	var testCache = new(service.MockCacheService)
-	var testLog = new(Log.MockLogger)
 	var json = gojson.GoJsonConstructor()
 	IoC.JsonParser = json
 	IoC.AdvEventDal = testAdv
-	IoC.Logger = testLog
 	IoC.CacheService = testCache
 	var advModel_test = advModel
 	advModel_test.ProjectId = "Test"
@@ -140,11 +137,9 @@ func Test_UpdateAdvEvent(t *testing.T) {
 	//Arrance
 	var testAdv = new(repository.MockAdvEventDal)
 	var testCache = new(service.MockCacheService)
-	var testLog = new(Log.MockLogger)
 	var json = gojson.GoJsonConstructor()
 	IoC.JsonParser = json
 	IoC.AdvEventDal = testAdv
-	IoC.Logger = testLog
 	IoC.CacheService = testCache
 	var manager = concrete.AdvEventManagerConstructor()
 	var advModel_test = advModel

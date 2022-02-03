@@ -2,9 +2,9 @@ package RedisV8
 
 import (
 	"FilterWorkerService/pkg/helper"
-	"FilterWorkerService/pkg/logger"
 	"context"
 	"errors"
+	"log"
 	"os"
 	"time"
 
@@ -15,22 +15,22 @@ type redisCache struct {
 	Client *redis.Client
 }
 
-func RedisCacheConstructor(log *logger.ILog) *redisCache {
-	return &redisCache{Client: createClient(log)}
+func RedisCacheConstructor() *redisCache {
+	return &redisCache{Client: createClient()}
 }
 
-func createClient(log *logger.ILog) *redis.Client {
+func createClient() *redis.Client {
 	client := redis.NewClient(&redis.Options{
 		Addr:     helper.ResolvePath("REDIS_HOST", "REDIS_PORT"),
 		Password: os.Getenv("REDIS_PASS"), // no password set
 		DB:       0,                       // use default DB
 	})
-	func(log *logger.ILog) {
+	func() {
 		_, err := client.Ping(context.Background()).Result()
 		if err != nil {
-			(*log).SendPanicLog("RedisConnection", "ConnectRedis", err)
+			log.Fatal("RedisConnection", "ConnectRedis", err)
 		}
-	}(log)
+	}()
 
 	return client
 }

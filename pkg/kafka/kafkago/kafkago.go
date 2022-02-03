@@ -1,9 +1,7 @@
 package kafkago
 
 import (
-	"FilterWorkerService/internal/IoC"
 	"FilterWorkerService/pkg/helper"
-	"FilterWorkerService/pkg/logger"
 	"context"
 	"log"
 	"sync"
@@ -15,11 +13,10 @@ import (
 )
 
 type kafkaGo struct {
-	Log *logger.ILog
 }
 
 func KafkaGoConstructor() *kafkaGo {
-	return &kafkaGo{Log: &IoC.Logger}
+	return &kafkaGo{}
 }
 
 func (k *kafkaGo) Produce(key *[]byte, value *[]byte, topic string) (err error) {
@@ -30,7 +27,7 @@ func (k *kafkaGo) Produce(key *[]byte, value *[]byte, topic string) (err error) 
 		Time:  time.Now(),
 	}
 	err = writer.WriteMessages(context.Background(), message)
-	(*k.Log).SendInfoLog("kafkaGo", "Producer", topic, key)
+	log.Print("kafkaGo", "Producer", topic, key)
 	return err
 }
 
@@ -41,21 +38,21 @@ func (k *kafkaGo) Consume(topic string, groupId string, wg *sync.WaitGroup, call
 		wg.Done()
 		err := reader.Close()
 		if err != nil {
-			(*k.Log).SendErrorLog("kafkaGo", "Consume", "failed to reader.Close() messages:"+err.Error())
+			log.Fatal("kafkaGo", "Consume", "failed to reader.Close() messages:"+err.Error())
 		}
 	}(reader)
-	(*k.Log).SendInfoLog("kafkaGo", "Consume", reader.Stats().ClientID)
+	log.Print("kafkaGo", "Consume", reader.Stats().ClientID)
 	for {
 		m, err := reader.FetchMessage(context.Background())
 		if err != nil {
-			(*k.Log).SendFatalLog("kafkaGo", "Consume", "error while receiving message: "+err.Error())
+			log.Fatal("kafkaGo", "Consume", "error while receiving message: "+err.Error())
 			continue
 		}
-		(*k.Log).SendInfoLog("kafkaGo", "Consume", topic, groupId)
+		log.Print("kafkaGo", "Consume", topic, groupId)
 		_, isSuccess, _ := callback(&m.Value)
 		if isSuccess {
 			if err := reader.CommitMessages(context.Background(), m); err != nil {
-				(*k.Log).SendFatalLog("kafkaGo", "Consume", "failed to commit messages:"+err.Error())
+				log.Fatal("kafkaGo", "Consume", "failed to commit messages:"+err.Error())
 			}
 		}
 	}

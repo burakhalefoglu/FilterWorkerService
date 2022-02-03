@@ -5,7 +5,6 @@ import (
 	"FilterWorkerService/internal/model"
 	"FilterWorkerService/internal/service/concrete"
 	"FilterWorkerService/pkg/jsonParser/gojson"
-	"FilterWorkerService/test/Mock/Log"
 	"FilterWorkerService/test/Mock/repository"
 	"FilterWorkerService/test/Mock/service"
 	"errors"
@@ -189,11 +188,9 @@ func Test_UpdateScreenClick_Success(t *testing.T) {
 
 	var testClickDal = new(repository.MockScreenClickDal)
 	var testCache = new(service.MockCacheService)
-	var testLog = new(Log.MockLogger)
 	var json = gojson.GoJsonConstructor()
 	IoC.JsonParser = json
 	IoC.ScreenClickDal = testClickDal
-	IoC.Logger = testLog
 	IoC.CacheService = testCache
 	var manager = concrete.ScreenClickManagerConstructor()
 	var clickModel_test = clickModel
@@ -326,11 +323,9 @@ func Test_UpdateScreenClick_Success(t *testing.T) {
 func Test_ConvertRawModelToResponseModel_Add_Succes(t *testing.T) {
 
 	var testClickDal = new(repository.MockScreenClickDal)
-	var testLog = new(Log.MockLogger)
 	var json = gojson.GoJsonConstructor()
 	IoC.JsonParser = json
 	IoC.ScreenClickDal = testClickDal
-	IoC.Logger = testLog
 	var manager = concrete.ScreenClickManagerConstructor()
 	var clickModel_test = clickModel
 	var screenClickOldModel_test = screenClickOldModel

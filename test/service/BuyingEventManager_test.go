@@ -5,7 +5,6 @@ import (
 	"FilterWorkerService/internal/model"
 	"FilterWorkerService/internal/service/concrete"
 	"FilterWorkerService/pkg/jsonParser/gojson"
-	"FilterWorkerService/test/Mock/Log"
 	"FilterWorkerService/test/Mock/repository"
 	"FilterWorkerService/test/Mock/service"
 	"errors"
@@ -27,11 +26,9 @@ func Test_UpdateBuyingEvent_UpdateSuccess(t *testing.T) {
 
 	var testBuyingDal = new(repository.MockBuyingEventDal)
 	var testCache = new(service.MockCacheService)
-	var testLog = new(Log.MockLogger)
 	var json = gojson.GoJsonConstructor()
 	IoC.JsonParser = json
 	IoC.BuyingEventDal = testBuyingDal
-	IoC.Logger = testLog
 	IoC.CacheService = testCache
 	var manager = concrete.BuyingEventManagerConstructor()
 	var buyingModel_test = buyingModel
@@ -168,11 +165,9 @@ func Test_UpdateBuyingEvent_UpdateSuccess(t *testing.T) {
 func Test_ConvertRawModelToResponseModel_AddSuccess(t *testing.T) {
 	var testBuyingDal = new(repository.MockBuyingEventDal)
 	var testCache = new(service.MockCacheService)
-	var testLog = new(Log.MockLogger)
 	var json = gojson.GoJsonConstructor()
 	IoC.JsonParser = json
 	IoC.BuyingEventDal = testBuyingDal
-	IoC.Logger = testLog
 	IoC.CacheService = testCache
 	var manager = concrete.BuyingEventManagerConstructor()
 	var buyingModel_test = buyingModel

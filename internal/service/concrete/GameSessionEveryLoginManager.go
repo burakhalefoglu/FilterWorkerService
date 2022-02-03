@@ -5,20 +5,18 @@ import (
 	model "FilterWorkerService/internal/model"
 	IGameSessionEveryLoginDal "FilterWorkerService/internal/repository/abstract"
 	IJsonParser "FilterWorkerService/pkg/jsonParser"
-	"FilterWorkerService/pkg/logger"
+	"log"
 )
 
 type gameSessionEveryLoginManager struct {
 	IGameSessionEveryLoginDal *IGameSessionEveryLoginDal.IGameSessionEveryLoginDal
 	IJsonParser               *IJsonParser.IJsonParser
-	ILog                      *logger.ILog
 }
 
 func GameSessionEveryLoginManagerConstructor() *gameSessionEveryLoginManager {
 	return &gameSessionEveryLoginManager{
 		IGameSessionEveryLoginDal: &IoC.GameSessionEveryLoginDal,
 		IJsonParser:               &IoC.JsonParser,
-		ILog:                      &IoC.Logger,
 	}
 }
 
@@ -26,7 +24,7 @@ func (g *gameSessionEveryLoginManager) ConvertRawModelToResponseModel(data *[]by
 	firstModel := model.GameSessionEveryLoginModel{}
 	convertErr := (*g.IJsonParser).DecodeJson(data, &firstModel)
 	if convertErr != nil {
-		(*g.ILog).SendErrorLog("GameSessionEveryLoginManager", "ConvertRawModelToResponseModel",
+		log.Fatal("GameSessionEveryLoginManager", "ConvertRawModelToResponseModel",
 			"byte array to GameSessionEveryLoginModel", "Json Parser Decode Err: ", convertErr.Error())
 		return &model.GameSessionEveryLoginRespondModel{}, false, convertErr.Error()
 	}
@@ -118,12 +116,12 @@ func (g *gameSessionEveryLoginManager) ConvertRawModelToResponseModel(data *[]by
 	DetermineGameSessionHour(&modelResponse, hour)
 	DetermineGameSessionAmPm(&modelResponse, hour)
 
-	defer (*g.ILog).SendInfoLog("GameSessionEveryLoginManager", "ConvertRawModelToResponseModel",
+	defer log.Print("GameSessionEveryLoginManager", "ConvertRawModelToResponseModel",
 		modelResponse.ClientId, modelResponse.ProjectId)
 
 	oldModel, err := (*g.IGameSessionEveryLoginDal).GetGameSessionEveryLoginById(modelResponse.ClientId)
 	if err != nil && err.Error() != "null data error" {
-		(*g.ILog).SendErrorLog("GameSessionEveryLoginManager", "ConvertRawModelToResponseModel",
+		log.Fatal("GameSessionEveryLoginManager", "ConvertRawModelToResponseModel",
 			"GameSessionEveryLoginDal_GetGameSessionEveryLoginById", err.Error())
 	}
 	switch {
@@ -131,7 +129,7 @@ func (g *gameSessionEveryLoginManager) ConvertRawModelToResponseModel(data *[]by
 
 		logErr := (*g.IGameSessionEveryLoginDal).Add(&modelResponse)
 		if logErr != nil {
-			(*g.ILog).SendErrorLog("GameSessionEveryLoginManager", "ConvertRawModelToResponseModel",
+			log.Fatal("GameSessionEveryLoginManager", "ConvertRawModelToResponseModel",
 				"GameSessionEveryLoginDal_Add", logErr.Error())
 			return &modelResponse, false, logErr.Error()
 		}
@@ -212,11 +210,11 @@ func (g *gameSessionEveryLoginManager) UpdateGameSession(modelResponse *model.Ga
 	oldModel.Session12To17HourCount = oldModel.Session12To17HourCount + modelResponse.Session12To17HourCount
 	oldModel.Session18To23HourCount = oldModel.Session18To23HourCount + modelResponse.Session18To23HourCount
 
-	defer (*g.ILog).SendInfoLog("GameSessionEveryLoginManager", "UpdateLevelBaseSession",
+	defer log.Print("GameSessionEveryLoginManager", "UpdateLevelBaseSession",
 		oldModel.ClientId, oldModel.ProjectId)
 	logErr := (*g.IGameSessionEveryLoginDal).UpdateGameSessionEveryLoginById(oldModel.ClientId, oldModel)
 	if logErr != nil {
-		(*g.ILog).SendErrorLog("GameSessionEveryLoginManager", "UpdateGameSession",
+		log.Fatal("GameSessionEveryLoginManager", "UpdateGameSession",
 			"GameSessionEveryLoginDal_UpdateGameSessionEveryLoginById", logErr.Error())
 		return oldModel, false, logErr
 	}

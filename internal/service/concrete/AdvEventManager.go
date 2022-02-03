@@ -5,23 +5,20 @@ import (
 	model "FilterWorkerService/internal/model"
 	IAdvEventDal "FilterWorkerService/internal/repository/abstract"
 	ICacheService "FilterWorkerService/internal/service/abstract"
-	"FilterWorkerService/pkg/logger"
-
 	IJsonParser "FilterWorkerService/pkg/jsonParser"
+	"log"
 )
 
 type advEventManager struct {
 	IAdvEventDal  *IAdvEventDal.IAdvEventDal
 	IJsonParser   *IJsonParser.IJsonParser
 	ICacheService *ICacheService.ICacheService
-	ILog          *logger.ILog
 }
 
 func AdvEventManagerConstructor() *advEventManager {
 	return &advEventManager{IAdvEventDal: &IoC.AdvEventDal,
 		IJsonParser:   &IoC.JsonParser,
 		ICacheService: &IoC.CacheService,
-		ILog:          &IoC.Logger,
 	}
 }
 
@@ -29,7 +26,7 @@ func (a *advEventManager) ConvertRawModelToResponseModel(data *[]byte) (v interf
 	firstModel := model.AdvEventModel{}
 	convertErr := (*a.IJsonParser).DecodeJson(data, &firstModel)
 	if convertErr != nil {
-		(*a.ILog).SendErrorLog("AdvEventManager", "ConvertRawModelToResponseModel",
+		log.Fatal("AdvEventManager", "ConvertRawModelToResponseModel",
 			"byte array to AdvEventModel", "Json Parser Decode Err: ", convertErr.Error())
 		return nil, false, convertErr.Error()
 	}
@@ -105,12 +102,12 @@ func (a *advEventManager) ConvertRawModelToResponseModel(data *[]byte) (v interf
 	DetermineAdvHour(&modelResponse, hour)
 	DetermineAdvAmPm(&modelResponse, hour)
 
-	defer (*a.ILog).SendInfoLog("AdvEventManager", "ConvertRawModelToResponseModel",
+	defer log.Print("AdvEventManager", "ConvertRawModelToResponseModel",
 		modelResponse.ClientId, modelResponse.ProjectId)
 
 	oldModel, err := (*a.IAdvEventDal).GetAdvEventById(modelResponse.ClientId)
 	if err != nil && err.Error() != "null data error"{
-		(*a.ILog).SendErrorLog("AdvEventManager", "ConvertRawModelToResponseModel",
+		log.Fatal("AdvEventManager", "ConvertRawModelToResponseModel",
 			"AdvEventDal_GetAdvEventById", err.Error())
 	}
 	switch {
@@ -118,7 +115,7 @@ func (a *advEventManager) ConvertRawModelToResponseModel(data *[]byte) (v interf
 
 		logErr := (*a.IAdvEventDal).Add(&modelResponse)
 		if logErr != nil {
-			(*a.ILog).SendErrorLog("AdvEventManager", "ConvertRawModelToResponseModel",
+			log.Fatal("AdvEventManager", "ConvertRawModelToResponseModel",
 				"AdvEventDal_Add", logErr.Error())
 			return nil, false, logErr.Error()
 		}
@@ -201,11 +198,11 @@ func (a *advEventManager) UpdateAdvEvent(modelResponse *model.AdvEventRespondMod
 	oldModel.AmAdvClickCount = oldModel.AmAdvClickCount + modelResponse.AmAdvClickCount
 	oldModel.PmAdvClickCount = oldModel.PmAdvClickCount + modelResponse.PmAdvClickCount
 
-	defer (*a.ILog).SendInfoLog("AdvEventManager", "UpdateAdvEvent",
+	defer log.Print("AdvEventManager", "UpdateAdvEvent",
 		oldModel.ClientId, oldModel.ProjectId)
 	logErr := (*a.IAdvEventDal).UpdateAdvEventById(oldModel.ClientId, oldModel)
 	if logErr != nil {
-		(*a.ILog).SendErrorLog("AdvEventManager", "UpdateAdvEvent",
+		log.Fatal("AdvEventManager", "UpdateAdvEvent",
 			"AdvEventDal_UpdateAdvEventById", logErr.Error())
 		return oldModel, false, logErr
 	}

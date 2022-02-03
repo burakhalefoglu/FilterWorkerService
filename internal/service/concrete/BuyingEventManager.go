@@ -6,14 +6,13 @@ import (
 	IBuyingEventDal "FilterWorkerService/internal/repository/abstract"
 	ICacheService "FilterWorkerService/internal/service/abstract"
 	IJsonParser "FilterWorkerService/pkg/jsonParser"
-	"FilterWorkerService/pkg/logger"
+	"log"
 )
 
 type buyingEventManager struct {
 	IBuyingEventDal *IBuyingEventDal.IBuyingEventDal
 	IJsonParser     *IJsonParser.IJsonParser
 	ICacheService   *ICacheService.ICacheService
-	ILog            *logger.ILog
 }
 
 func BuyingEventManagerConstructor() *buyingEventManager {
@@ -21,7 +20,6 @@ func BuyingEventManagerConstructor() *buyingEventManager {
 		IBuyingEventDal: &IoC.BuyingEventDal,
 		IJsonParser:     &IoC.JsonParser,
 		ICacheService:   &IoC.CacheService,
-		ILog:            &IoC.Logger,
 	}
 }
 
@@ -29,7 +27,7 @@ func (b *buyingEventManager) ConvertRawModelToResponseModel(data *[]byte) (v int
 	firstModel := model.BuyingEventModel{}
 	convertErr := (*b.IJsonParser).DecodeJson(data, &firstModel)
 	if convertErr != nil {
-		(*b.ILog).SendErrorLog("BuyingEventManager", "ConvertRawModelToResponseModel",
+		log.Fatal("BuyingEventManager", "ConvertRawModelToResponseModel",
 			"byte array to BuyingEventModel", "Json Parser Decode Err: ", convertErr.Error())
 		return &model.BuyingEventRespondModel{}, false, convertErr.Error()
 	}
@@ -91,11 +89,11 @@ func (b *buyingEventManager) ConvertRawModelToResponseModel(data *[]byte) (v int
 	modelResponse.BuyingDayAverageBuyingCount = 1
 	CalculateBuyingLevelBasedAvgBuyingCount(&modelResponse)
 
-	defer (*b.ILog).SendInfoLog("BuyingEventManager", "ConvertRawModelToResponseModel",
+	defer log.Print("BuyingEventManager", "ConvertRawModelToResponseModel",
 		modelResponse.ClientId, modelResponse.ProjectId)
 	oldModel, err := (*b.IBuyingEventDal).GetBuyingEventById(modelResponse.ClientId)
 	if err != nil && err.Error() != "null data error" {
-		(*b.ILog).SendErrorLog("BuyingEventManager", "ConvertRawModelToResponseModel",
+		log.Fatal("BuyingEventManager", "ConvertRawModelToResponseModel",
 			"BuyingEventDal_GetBuyingEventById", err.Error())
 	}
 	switch {
@@ -103,7 +101,7 @@ func (b *buyingEventManager) ConvertRawModelToResponseModel(data *[]byte) (v int
 
 		logErr := (*b.IBuyingEventDal).Add(&modelResponse)
 		if logErr != nil {
-			(*b.ILog).SendErrorLog("BuyingEventManager", "ConvertRawModelToResponseModel",
+			log.Fatal("BuyingEventManager", "ConvertRawModelToResponseModel",
 				"BuyingEventDal_Add", logErr.Error())
 			return nil, false, logErr.Error()
 		}
@@ -174,11 +172,11 @@ func (b *buyingEventManager) UpdateBuyingEvent(modelResponse *model.BuyingEventR
 	oldModel.BuyingDayAverageBuyingCount = float64(oldModel.TotalBuyingCount) / float64(oldModel.TotalBuyingDay)
 	CalculateBuyingLevelBasedAvgBuyingCount(oldModel)
 
-	defer (*b.ILog).SendInfoLog("BuyingEventManager", "UpdateBuyingEvent",
+	defer log.Print("BuyingEventManager", "UpdateBuyingEvent",
 		oldModel.ClientId, oldModel.ProjectId)
 	logErr := (*b.IBuyingEventDal).UpdateBuyingEventById(oldModel.ClientId, oldModel)
 	if logErr != nil {
-		(*b.ILog).SendErrorLog("BuyingEventManager", "UpdateBuyingEvent",
+		log.Fatal("BuyingEventManager", "UpdateBuyingEvent",
 			"BuyingEventDal_UpdateBuyingEventById", logErr.Error())
 		return oldModel, false, logErr
 	}

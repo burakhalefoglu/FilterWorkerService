@@ -6,14 +6,13 @@ import (
 	ILocationDal "FilterWorkerService/internal/repository/abstract"
 	ICacheService "FilterWorkerService/internal/service/abstract"
 	Ijsonparser "FilterWorkerService/pkg/jsonParser"
-	"FilterWorkerService/pkg/logger"
+	"log"
 )
 
 type locationManager struct {
 	ICacheService *ICacheService.ICacheService
 	IJsonParser   *Ijsonparser.IJsonParser
 	ILocationDal  *ILocationDal.ILocationDal
-	ILog          *logger.ILog
 }
 
 func LocationManagerConstructor() *locationManager {
@@ -21,7 +20,6 @@ func LocationManagerConstructor() *locationManager {
 		ICacheService: &IoC.CacheService,
 		IJsonParser:   &IoC.JsonParser,
 		ILocationDal:  &IoC.LocationDal,
-		ILog:          &IoC.Logger,
 	}
 }
 
@@ -30,7 +28,7 @@ func (l *locationManager) AddLocation(data *[]byte) (v interface{}, s bool, m st
 	firstmodel := model.LocationModel{}
 	convertErr := (*l.IJsonParser).DecodeJson(data, &firstmodel)
 	if convertErr != nil {
-		(*l.ILog).SendErrorLog("LocationManager", "AddLocation",
+		log.Fatal("LocationManager", "AddLocation",
 			"byte array to LocationModel", "Json Parser Decode Err: ", convertErr.Error())
 		return &model.LocationResponseModel{}, false, convertErr.Error()
 	}
@@ -43,11 +41,11 @@ func (l *locationManager) AddLocation(data *[]byte) (v interface{}, s bool, m st
 	modelResponse.Org, _, _ = (*l.ICacheService).ManageCache("Org", firstmodel.Org)
 	modelResponse.City, _, _ = (*l.ICacheService).ManageCache("City", firstmodel.City)
 	modelResponse.Continent, _, _ = (*l.ICacheService).ManageCache("Continent", firstmodel.Continent)
-	defer (*l.ILog).SendInfoLog("LocationManager", "AddLocation",
+	defer log.Print("LocationManager", "AddLocation",
 		modelResponse.ClientId, modelResponse.ProjectId)
 	logErr := (*l.ILocationDal).Add(&modelResponse)
 	if logErr != nil {
-		(*l.ILog).SendErrorLog("LocationManager", "AddLocation",
+		log.Fatal("LocationManager", "AddLocation",
 			"LocationDal_Add", logErr.Error())
 		return &modelResponse, false, logErr.Error()
 	}

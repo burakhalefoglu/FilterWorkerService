@@ -12,9 +12,6 @@ import (
 	"FilterWorkerService/pkg/jsonParser/gojson"
 	IKafka "FilterWorkerService/pkg/kafka"
 	"FilterWorkerService/pkg/kafka/kafkago"
-	"FilterWorkerService/pkg/logger"
-	"FilterWorkerService/pkg/logger/logrus_logstash_hook"
-
 	"github.com/golobby/container/v3"
 )
 
@@ -25,7 +22,6 @@ func InjectionConstructor() *golobbyInjection {
 }
 
 func (i *golobbyInjection) Inject() {
-	injectLog()
 	injectJsonParser()
 	injectKafka()
 	injectCache()
@@ -277,18 +273,6 @@ func injectKafka() {
 	}
 }
 
-func injectLog() {
-	if err := container.Singleton(func() logger.ILog {
-		return logrus_logstash_hook.LogrusToLogstashLOGConstructor()
-	}); err != nil {
-		panic(err)
-	}
-
-	if err := container.Resolve(&IoC.Logger); err != nil {
-		panic(err)
-	}
-}
-
 func injectJsonParser() {
 	if err := container.Singleton(func() Ijsonparser.IJsonParser {
 		return gojson.GoJsonConstructor()
@@ -304,7 +288,7 @@ func injectJsonParser() {
 func injectCache() {
 
 	if err := container.Singleton(func() cache.ICache {
-		return rediscachev8.RedisCacheConstructor(&IoC.Logger)
+		return rediscachev8.RedisCacheConstructor()
 	}); err != nil {
 		panic(err)
 	}
