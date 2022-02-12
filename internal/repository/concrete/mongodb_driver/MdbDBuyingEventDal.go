@@ -73,9 +73,6 @@ func (m *mdbDBuyingEventDal) Add(data *model.BuyingEventRespondModel) error {
 		{"SixthDayBuyingCount", data.SixthDayBuyingCount},
 		{"SeventhDayBuyingCount", data.SeventhDayBuyingCount},
 
-		{"PenultimateDayBuyingCount", data.PenultimateDayBuyingCount},
-		{"LastDayBuyingCount", data.LastDayBuyingCount},
-		{"LastMinusFirstDayBuyingCount", data.LastMinusFirstDayBuyingCount},
 		{"SundayBuyingCount", data.SundayBuyingCount},
 		{"MondayBuyingCount", data.MondayBuyingCount},
 		{"TuesdayBuyingCount", data.TuesdayBuyingCount},
@@ -175,9 +172,6 @@ func (m *mdbDBuyingEventDal) UpdateBuyingEventById(ClientId string, data *model.
 		{"SixthDayBuyingCount", data.SixthDayBuyingCount},
 		{"SeventhDayBuyingCount", data.SeventhDayBuyingCount},
 
-		{"PenultimateDayBuyingCount", data.PenultimateDayBuyingCount},
-		{"LastDayBuyingCount", data.LastDayBuyingCount},
-		{"LastMinusFirstDayBuyingCount", data.LastMinusFirstDayBuyingCount},
 		{"SundayBuyingCount", data.SundayBuyingCount},
 		{"MondayBuyingCount", data.MondayBuyingCount},
 		{"TuesdayBuyingCount", data.TuesdayBuyingCount},

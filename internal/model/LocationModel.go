@@ -4,11 +4,11 @@ type LocationResponseModel struct {
 	ProjectId  string
 	ClientId   string
 	CustomerId string
-	Continent  int64
-	Country    int64
-	City       int64
-	Region     int64
-	Org        int64
+	Continent  int16
+	Country    int16
+	City       int16
+	Region     int16
+	Org        int16
 }
 
 type LocationModel struct {

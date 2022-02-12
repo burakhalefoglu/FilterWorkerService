@@ -28,19 +28,19 @@ func (l *levelBaseSessionManager) ConvertRawModelToResponseModel(data *[]byte) (
 			"byte array to LevelBaseSessionDataModel", "Json Parser Decode Err: ", convertErr.Error())
 		return &model.LevelBaseSessionRespondModel{}, false, convertErr.Error()
 	}
-	hour := int64(firstModel.SessionFinishTime.Hour())
-	yearOfDay := int64(firstModel.SessionFinishTime.YearDay())
-	year := int64(firstModel.SessionFinishTime.Year())
-	weekDay := int64(firstModel.SessionFinishTime.Weekday())
-	minute := int64(firstModel.SessionFinishTime.Minute())
+	hour := int16(firstModel.SessionFinishTime.Hour())
+	yearOfDay := int16(firstModel.SessionFinishTime.YearDay())
+	year := int16(firstModel.SessionFinishTime.Year())
+	weekDay := int16(firstModel.SessionFinishTime.Weekday())
+	minute := int16(firstModel.SessionFinishTime.Minute())
 	modelResponse := model.LevelBaseSessionRespondModel{}
 	modelResponse.ProjectId = firstModel.ProjectId
 	modelResponse.ClientId = firstModel.ClientId
 	modelResponse.CustomerId = firstModel.CustomerId
 	modelResponse.TotalLevelBaseSessionMinute = 1
 	modelResponse.TotalLevelBaseSessionCount = 1
-	modelResponse.FirstLevelSessionLevelIndex = int64(firstModel.LevelIndex)
-	modelResponse.FirstLevelSessionDuration = int64(firstModel.SessionTimeMinute)
+	modelResponse.FirstLevelSessionLevelIndex = int16(firstModel.LevelIndex)
+	modelResponse.FirstLevelSessionDuration = int16(firstModel.SessionTimeMinute)
 	modelResponse.FirstLevelSessionYearOfDay = yearOfDay
 	modelResponse.FirstLevelSessionYear = year
 	modelResponse.FirstLevelSessionWeekDay = weekDay
@@ -84,7 +84,7 @@ func (l *levelBaseSessionManager) ConvertRawModelToResponseModel(data *[]byte) (
 			"LevelBaseSessionDal_GetLevelBaseSessionById", err.Error())
 	}
 	switch {
-	case  err != nil && err.Error() == "null data error":
+	case err != nil && err.Error() == "null data error":
 
 		logErr := (*l.ILevelBaseSessionDal).Add(&modelResponse)
 		if logErr != nil {
@@ -113,7 +113,7 @@ func (l *levelBaseSessionManager) UpdateLevelBaseSession(modelResponse *model.Le
 	oldModel.ProjectId = modelResponse.ProjectId
 	oldModel.ClientId = modelResponse.ClientId
 	oldModel.CustomerId = modelResponse.CustomerId
-	oldModel.TotalLevelBaseSessionMinute = (((modelResponse.FirstLevelSessionYearOfDay+365*modelResponse.FirstLevelSessionYear)*24+modelResponse.FirstLevelSessionHour)*60 + modelResponse.FirstLevelSessionMinute) - (((oldModel.FirstLevelSessionYearOfDay+365*oldModel.FirstLevelSessionYear)*24+oldModel.FirstLevelSessionHour)*60 + oldModel.FirstLevelSessionMinute)
+	oldModel.TotalLevelBaseSessionMinute = (((int32(modelResponse.FirstLevelSessionYearOfDay)+365*int32(modelResponse.FirstLevelSessionYear))*24+int32(modelResponse.FirstLevelSessionHour))*60 + int32(modelResponse.FirstLevelSessionMinute)) - (((int32(oldModel.FirstLevelSessionYearOfDay)+365*int32(oldModel.FirstLevelSessionYear))*24+int32(oldModel.FirstLevelSessionHour))*60 + int32(oldModel.FirstLevelSessionMinute))
 	oldModel.TotalLevelBaseSessionCount = modelResponse.TotalLevelBaseSessionCount + oldModel.TotalLevelBaseSessionCount
 	CalculateLevelIndexBaseSession(modelResponse, oldModel)
 	CalculateLevelBaseSessionFirstQuarterHour(modelResponse, oldModel, oldModel.TotalLevelBaseSessionMinute)
@@ -124,7 +124,7 @@ func (l *levelBaseSessionManager) UpdateLevelBaseSession(modelResponse *model.Le
 	CalculateLevelBaseSessionFirstSixHour(modelResponse, oldModel, oldModel.TotalLevelBaseSessionMinute)
 	CalculateLevelBaseSessionFirstTwelveHour(modelResponse, oldModel, oldModel.TotalLevelBaseSessionMinute)
 	CalculateLevelBaseSessionFirstDay(modelResponse, oldModel, oldModel.TotalLevelBaseSessionMinute)
-	
+
 	oldModel.PenultimateLevelSessionLevelIndex = oldModel.LastLevelSessionLevelIndex
 	oldModel.PenultimateLevelSessionLevelDuration = oldModel.LastLevelSessionLevelDuration
 	oldModel.LastLevelSessionLevelIndex = modelResponse.FirstLevelSessionLevelIndex
@@ -146,56 +146,56 @@ func (l *levelBaseSessionManager) UpdateLevelBaseSession(modelResponse *model.Le
 	return oldModel, true, nil
 }
 
-func CalculateLevelBaseSessionFirstQuarterHour(modelResponse *model.LevelBaseSessionRespondModel, oldModel *model.LevelBaseSessionRespondModel, total_session_minute int64) {
+func CalculateLevelBaseSessionFirstQuarterHour(modelResponse *model.LevelBaseSessionRespondModel, oldModel *model.LevelBaseSessionRespondModel, total_session_minute int32) {
 	switch {
 	case total_session_minute <= 15:
 		oldModel.FirstQuarterHourTotalLevelBaseSessionCount = oldModel.FirstQuarterHourTotalLevelBaseSessionCount + modelResponse.FirstQuarterHourTotalLevelBaseSessionCount
 	}
 }
 
-func CalculateLevelBaseSessionFirstHalfHour(modelResponse *model.LevelBaseSessionRespondModel, oldModel *model.LevelBaseSessionRespondModel, total_session_minute int64) {
+func CalculateLevelBaseSessionFirstHalfHour(modelResponse *model.LevelBaseSessionRespondModel, oldModel *model.LevelBaseSessionRespondModel, total_session_minute int32) {
 	switch {
 	case total_session_minute <= 30:
 		oldModel.FirstHalfHourTotalLEvelBaseSessionCount = oldModel.FirstHalfHourTotalLEvelBaseSessionCount + modelResponse.FirstHalfHourTotalLEvelBaseSessionCount
 	}
 }
 
-func CalculateLevelBaseSessionFirstHour(modelResponse *model.LevelBaseSessionRespondModel, oldModel *model.LevelBaseSessionRespondModel, total_session_minute int64) {
+func CalculateLevelBaseSessionFirstHour(modelResponse *model.LevelBaseSessionRespondModel, oldModel *model.LevelBaseSessionRespondModel, total_session_minute int32) {
 	switch {
 	case total_session_minute <= 60:
 		oldModel.FirstHourTotalLevelBaseSessionCount = oldModel.FirstHourTotalLevelBaseSessionCount + modelResponse.FirstHourTotalLevelBaseSessionCount
 	}
 }
 
-func CalculateLevelBaseSessionFirstTwoHour(modelResponse *model.LevelBaseSessionRespondModel, oldModel *model.LevelBaseSessionRespondModel, total_session_minute int64) {
+func CalculateLevelBaseSessionFirstTwoHour(modelResponse *model.LevelBaseSessionRespondModel, oldModel *model.LevelBaseSessionRespondModel, total_session_minute int32) {
 	switch {
 	case total_session_minute <= 120:
 		oldModel.FirstTwoHourTotalLevelBaseSessionCount = oldModel.FirstTwoHourTotalLevelBaseSessionCount + modelResponse.FirstTwoHourTotalLevelBaseSessionCount
 	}
 }
 
-func CalculateLevelBaseSessionFirstThreeHour(modelResponse *model.LevelBaseSessionRespondModel, oldModel *model.LevelBaseSessionRespondModel, total_session_minute int64) {
+func CalculateLevelBaseSessionFirstThreeHour(modelResponse *model.LevelBaseSessionRespondModel, oldModel *model.LevelBaseSessionRespondModel, total_session_minute int32) {
 	switch {
 	case total_session_minute <= 180:
 		oldModel.FirstThreeHourTotalLevelBaseSessionCount = oldModel.FirstThreeHourTotalLevelBaseSessionCount + modelResponse.FirstThreeHourTotalLevelBaseSessionCount
 	}
 }
 
-func CalculateLevelBaseSessionFirstSixHour(modelResponse *model.LevelBaseSessionRespondModel, oldModel *model.LevelBaseSessionRespondModel, total_session_minute int64) {
+func CalculateLevelBaseSessionFirstSixHour(modelResponse *model.LevelBaseSessionRespondModel, oldModel *model.LevelBaseSessionRespondModel, total_session_minute int32) {
 	switch {
 	case total_session_minute <= 360:
 		oldModel.FirstSixHourTotalLevelBaseSessionCount = oldModel.FirstSixHourTotalLevelBaseSessionCount + modelResponse.FirstSixHourTotalLevelBaseSessionCount
 	}
 }
 
-func CalculateLevelBaseSessionFirstTwelveHour(modelResponse *model.LevelBaseSessionRespondModel, oldModel *model.LevelBaseSessionRespondModel, total_session_minute int64) {
+func CalculateLevelBaseSessionFirstTwelveHour(modelResponse *model.LevelBaseSessionRespondModel, oldModel *model.LevelBaseSessionRespondModel, total_session_minute int32) {
 	switch {
 	case total_session_minute <= 720:
 		oldModel.FirstTwelveHourTotalLevelBaseSessionCount = oldModel.FirstTwelveHourTotalLevelBaseSessionCount + modelResponse.FirstTwelveHourTotalLevelBaseSessionCount
 	}
 }
 
-func CalculateLevelBaseSessionFirstDay(modelResponse *model.LevelBaseSessionRespondModel, oldModel *model.LevelBaseSessionRespondModel, total_session_minute int64) {
+func CalculateLevelBaseSessionFirstDay(modelResponse *model.LevelBaseSessionRespondModel, oldModel *model.LevelBaseSessionRespondModel, total_session_minute int32) {
 	switch {
 	case total_session_minute <= 1440:
 		oldModel.FirstDayTotalLevelBaseSessionCount = oldModel.FirstDayTotalLevelBaseSessionCount + modelResponse.FirstDayTotalLevelBaseSessionCount

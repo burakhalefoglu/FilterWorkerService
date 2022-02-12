@@ -37,13 +37,13 @@ func (h *hardwareInformationManager) AddHardwareInformation(data *[]byte) (v int
 	modelResponse.ClientId = firstmodel.ClientId
 	modelResponse.ProjectId = firstmodel.ProjectId
 	modelResponse.CustomerId = firstmodel.CustomerId
-	modelResponse.DeviceType = int64(firstmodel.DeviceType)
-	modelResponse.GraphicsDeviceType = int64(firstmodel.GraphicsDeviceType)
-	modelResponse.GraphicsMemorySize = int64(firstmodel.GraphicsMemorySize)
+	modelResponse.DeviceType = int16(firstmodel.DeviceType)
+	modelResponse.GraphicsDeviceType = int16(firstmodel.GraphicsDeviceType)
+	modelResponse.GraphicsMemorySize = int16(firstmodel.GraphicsMemorySize)
 	modelResponse.OperatingSystem, _, _ = (*h.ICacheService).ManageCache("OperatingSystem", firstmodel.OperatingSystem)
-	modelResponse.ProcessorCount = int64(firstmodel.ProcessorCount)
+	modelResponse.ProcessorCount = int16(firstmodel.ProcessorCount)
 	modelResponse.ProcessorType, _, _ = (*h.ICacheService).ManageCache("ProcessorType", firstmodel.ProcessorType)
-	modelResponse.SystemMemorySize = int64(firstmodel.SystemMemorySize)
+	modelResponse.SystemMemorySize = int16(firstmodel.SystemMemorySize)
 	// Todo : 3 Model burada kayıt edilecek
 	defer log.Print("HardwareInformationManager", "AddHardwareInformation",
 		modelResponse.ClientId, modelResponse.ProjectId)

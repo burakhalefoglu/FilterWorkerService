@@ -4,9 +4,10 @@ import (
 	"FilterWorkerService/internal/model"
 	"FilterWorkerService/pkg/database/mongodb"
 	"context"
+	"time"
+
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-	"time"
 )
 
 type mdbDTypeStandardizationDal struct {
@@ -17,7 +18,7 @@ func MdbDTypeStandardizationDalConstructor() *mdbDTypeStandardizationDal {
 	return &mdbDTypeStandardizationDal{Client: mongodb.GetMongodbClient()}
 }
 
-func (m *mdbDTypeStandardizationDal) Add(tableName string, data *model.TypeStandardizationModel) error{
+func (m *mdbDTypeStandardizationDal) Add(tableName string, data *model.TypeStandardizationModel) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	collection := m.Client.Database("MLDatabase").Collection(tableName)
@@ -31,12 +32,12 @@ func (m *mdbDTypeStandardizationDal) Add(tableName string, data *model.TypeStand
 	return nil
 }
 
-func (m *mdbDTypeStandardizationDal) GetByKey(tableName string, key string) (*model.TypeStandardizationModel, error){
+func (m *mdbDTypeStandardizationDal) GetByKey(tableName string, key string) (*model.TypeStandardizationModel, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	collection := m.Client.Database("MLDatabase").Collection(tableName)
 	var result = collection.FindOne(ctx, bson.D{{
-		"Key",key,
+		"Key", key,
 	}})
 
 	var model = model.TypeStandardizationModel{}
@@ -44,13 +45,13 @@ func (m *mdbDTypeStandardizationDal) GetByKey(tableName string, key string) (*mo
 		return &model, result.Err()
 	}
 	var err = result.Decode(&model)
-	if err != nil{
+	if err != nil {
 		return &model, err
 	}
 	return &model, nil
 }
 
-func (m *mdbDTypeStandardizationDal) GetAll(tableName string)(*[]model.TypeStandardizationModel, error){
+func (m *mdbDTypeStandardizationDal) GetAll(tableName string) (*[]model.TypeStandardizationModel, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -61,11 +62,11 @@ func (m *mdbDTypeStandardizationDal) GetAll(tableName string)(*[]model.TypeStand
 	if err != nil {
 		return nil, err
 	}
-	cur.All(ctx,&models)
+	cur.All(ctx, &models)
 	return &models, nil
 }
 
-func (m *mdbDTypeStandardizationDal) GetMaxByValue(tableName string)(int64, error){
+func (m *mdbDTypeStandardizationDal) GetMaxByValue(tableName string) (int16, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	collection := m.Client.Database("MLDatabase").Collection(tableName)
@@ -77,7 +78,7 @@ func (m *mdbDTypeStandardizationDal) GetMaxByValue(tableName string)(int64, erro
 		}},
 	}
 	var result, err = collection.Aggregate(ctx, filter)
-	if err != nil{
+	if err != nil {
 		return 0, err
 	}
 
@@ -86,7 +87,7 @@ func (m *mdbDTypeStandardizationDal) GetMaxByValue(tableName string)(int64, erro
 		return 0, result.Err()
 	}
 	decodeErr := result.Decode(&model)
-	if decodeErr != nil{
+	if decodeErr != nil {
 		return 0, decodeErr
 	}
 	return model.Value, nil

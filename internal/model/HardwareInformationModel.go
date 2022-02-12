@@ -4,13 +4,13 @@ type HardwareInformationResponseModel struct {
 	ProjectId          string
 	ClientId           string
 	CustomerId         string
-	DeviceType         int64
-	GraphicsDeviceType int64
-	GraphicsMemorySize int64
-	OperatingSystem    int64
-	ProcessorCount     int64
-	ProcessorType      int64
-	SystemMemorySize   int64
+	DeviceType         int16
+	GraphicsDeviceType int16
+	GraphicsMemorySize int16
+	OperatingSystem    int16
+	ProcessorCount     int16
+	ProcessorType      int16
+	SystemMemorySize   int16
 }
 
 type HardwareInformationModel struct {

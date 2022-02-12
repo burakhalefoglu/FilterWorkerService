@@ -28,11 +28,11 @@ func (g *gameSessionEveryLoginManager) ConvertRawModelToResponseModel(data *[]by
 			"byte array to GameSessionEveryLoginModel", "Json Parser Decode Err: ", convertErr.Error())
 		return &model.GameSessionEveryLoginRespondModel{}, false, convertErr.Error()
 	}
-	hour := int64(firstModel.SessionFinishTime.Hour())
-	yearOfDay := int64(firstModel.SessionFinishTime.YearDay())
-	year := int64(firstModel.SessionFinishTime.Year())
-	weekDay := int64(firstModel.SessionFinishTime.Weekday())
-	minute := int64(firstModel.SessionFinishTime.Minute())
+	hour := int16(firstModel.SessionFinishTime.Hour())
+	yearOfDay := int16(firstModel.SessionFinishTime.YearDay())
+	year := int16(firstModel.SessionFinishTime.Year())
+	weekDay := int16(firstModel.SessionFinishTime.Weekday())
+	minute := int16(firstModel.SessionFinishTime.Minute())
 
 	modelResponse := model.GameSessionEveryLoginRespondModel{}
 	modelResponse.ProjectId = firstModel.ProjectId
@@ -42,7 +42,7 @@ func (g *gameSessionEveryLoginManager) ConvertRawModelToResponseModel(data *[]by
 	modelResponse.FirstSessionYear = year
 	modelResponse.FirstSessionWeekDay = weekDay
 	modelResponse.FirstSessionHour = hour
-	modelResponse.FirstSessionDuration = int64(firstModel.SessionTimeMinute)
+	modelResponse.FirstSessionDuration = int16(firstModel.SessionTimeMinute)
 	modelResponse.FirstSessionMinute = minute
 	modelResponse.SecondSessionHour = 0
 	modelResponse.SecondSessionDuration = 0
@@ -70,26 +70,26 @@ func (g *gameSessionEveryLoginManager) ConvertRawModelToResponseModel(data *[]by
 	modelResponse.LastDurationMinusPenultimateDuration = 0
 
 	modelResponse.FirstHalfHourTotalSessionCount = 1
-	modelResponse.FirstHalfHourTotalSessionDuration = int64(firstModel.SessionTimeMinute)
+	modelResponse.FirstHalfHourTotalSessionDuration = int16(firstModel.SessionTimeMinute)
 	modelResponse.FirstHourTotalSessionCount = 1
-	modelResponse.FirstHourTotalSessionDuration = int64(firstModel.SessionTimeMinute)
+	modelResponse.FirstHourTotalSessionDuration = int16(firstModel.SessionTimeMinute)
 	modelResponse.FirstTwoHourTotalSessionCount = 1
-	modelResponse.FirstTwoHourTotalSessionDuration = int64(firstModel.SessionTimeMinute)
+	modelResponse.FirstTwoHourTotalSessionDuration = int16(firstModel.SessionTimeMinute)
 	modelResponse.FirstThreeHourTotalSessionCount = 1
-	modelResponse.FirstThreeHourTotalSessionDuration = int64(firstModel.SessionTimeMinute)
+	modelResponse.FirstThreeHourTotalSessionDuration = int16(firstModel.SessionTimeMinute)
 	modelResponse.FirstSixHourTotalSessionCount = 1
-	modelResponse.FirstSixHourTotalSessionDuration = int64(firstModel.SessionTimeMinute)
+	modelResponse.FirstSixHourTotalSessionDuration = int16(firstModel.SessionTimeMinute)
 	modelResponse.FirstTwelveHourTotalSessionCount = 1
-	modelResponse.FirstTwelveHourTotalSessionDuration = int64(firstModel.SessionTimeMinute)
+	modelResponse.FirstTwelveHourTotalSessionDuration = int16(firstModel.SessionTimeMinute)
 
 	modelResponse.TotalSessionDay = 1
-	modelResponse.TotalSessionDuration = int64(firstModel.SessionTimeMinute)
+	modelResponse.TotalSessionDuration = int32(firstModel.SessionTimeMinute)
 	modelResponse.TotalSessionCount = 1
 	modelResponse.TotalSessionHour = 1
-	modelResponse.TotalSessionMinute = int64(firstModel.SessionTimeMinute)
+	modelResponse.TotalSessionMinute = int32(firstModel.SessionTimeMinute)
 
 	modelResponse.FirstDayTotalSessionCount = 1
-	modelResponse.FirstDayTotalSessionDuration = int64(firstModel.SessionTimeMinute)
+	modelResponse.FirstDayTotalSessionDuration = int16(firstModel.SessionTimeMinute)
 	modelResponse.SecondDayTotalSessionCount = 0
 	modelResponse.SecondDayTotalSessionDuration = 0
 	modelResponse.ThirdDayTotalSessionCount = 0
@@ -103,15 +103,15 @@ func (g *gameSessionEveryLoginManager) ConvertRawModelToResponseModel(data *[]by
 	modelResponse.SeventhDayTotalSessionCount = 0
 	modelResponse.SeventhDayTotalSessionDuration = 0
 
-	modelResponse.MinSessionDuration = int64(firstModel.SessionTimeMinute)
-	modelResponse.MaxSessionDuration = int64(firstModel.SessionTimeMinute)
+	modelResponse.MinSessionDuration = int16(firstModel.SessionTimeMinute)
+	modelResponse.MaxSessionDuration = int16(firstModel.SessionTimeMinute)
 	modelResponse.DailyAvegareSessionCount = 1
-	modelResponse.DailyAverageSessionDuration = float64(firstModel.SessionTimeMinute)
-	modelResponse.SessionBasedAvegareSessionDuration = float64(firstModel.SessionTimeMinute)
+	modelResponse.DailyAverageSessionDuration = float32(firstModel.SessionTimeMinute)
+	modelResponse.SessionBasedAvegareSessionDuration = float32(firstModel.SessionTimeMinute)
 	modelResponse.DailyAvegareSessionCountMinusFirstDaySessionCount = 0
 	modelResponse.DailyAvegareSessionDurationMinusFirstDaySessionDuration = 0
 	modelResponse.SessionBasedAvegareSessionDurationMinusFirstSessionDuration = 0
-	modelResponse.SessionBasedAvegareSessionDurationMinusLastSessionDuration = float64(firstModel.SessionTimeMinute)
+	modelResponse.SessionBasedAvegareSessionDurationMinusLastSessionDuration = float32(firstModel.SessionTimeMinute)
 	DetermineGameSessionDay(&modelResponse, weekDay)
 	DetermineGameSessionHour(&modelResponse, hour)
 	DetermineGameSessionAmPm(&modelResponse, hour)
@@ -153,12 +153,12 @@ func (g *gameSessionEveryLoginManager) UpdateGameSession(modelResponse *model.Ga
 	oldModel.ProjectId = modelResponse.ProjectId
 	oldModel.ClientId = modelResponse.ClientId
 	oldModel.CustomerId = modelResponse.CustomerId
-	oldModel.TotalSessionDay = (modelResponse.FirstSessionYearOfDay - oldModel.FirstSessionYearOfDay) + 365*(modelResponse.FirstSessionYear-oldModel.FirstSessionYear)
+	oldModel.TotalSessionDay = (int32(modelResponse.FirstSessionYearOfDay) - int32(oldModel.FirstSessionYearOfDay)) + 365*(int32(modelResponse.FirstSessionYear)-int32(oldModel.FirstSessionYear))
 	oldModel.TotalSessionDuration = oldModel.TotalSessionDuration + modelResponse.TotalSessionDuration
 	oldModel.TotalSessionCount = oldModel.TotalSessionCount + modelResponse.TotalSessionCount
 
-	oldModel.TotalSessionHour = ((modelResponse.FirstSessionYearOfDay+365*modelResponse.FirstSessionYear)*24 + modelResponse.FirstSessionHour) - ((oldModel.FirstSessionYearOfDay+365*oldModel.FirstSessionYear)*24 + oldModel.FirstSessionHour)
-	oldModel.TotalSessionMinute = (((modelResponse.FirstSessionYearOfDay+365*modelResponse.FirstSessionYear)*24+modelResponse.FirstSessionHour)*60 + modelResponse.FirstSessionMinute) - (((oldModel.FirstSessionYearOfDay+365*oldModel.FirstSessionYear)*24+oldModel.FirstSessionHour)*60 + oldModel.FirstSessionMinute)
+	oldModel.TotalSessionHour = ((int32(modelResponse.FirstSessionYearOfDay)+365*int32(modelResponse.FirstSessionYear))*24 + int32(modelResponse.FirstSessionHour)) - ((int32(oldModel.FirstSessionYearOfDay)+365*int32(oldModel.FirstSessionYear))*24 + int32(oldModel.FirstSessionHour))
+	oldModel.TotalSessionMinute = (((int32(modelResponse.FirstSessionYearOfDay)+365*int32(modelResponse.FirstSessionYear))*24+int32(modelResponse.FirstSessionHour))*60 + int32(modelResponse.FirstSessionMinute)) - (((int32(oldModel.FirstSessionYearOfDay)+365*int32(oldModel.FirstSessionYear))*24+int32(oldModel.FirstSessionHour))*60 + int32(oldModel.FirstSessionMinute))
 	CalculateSecondGameSession(modelResponse, oldModel)
 	CalculateThirdGameSession(modelResponse, oldModel)
 	CalculateFourthGameSession(modelResponse, oldModel)
@@ -191,11 +191,11 @@ func (g *gameSessionEveryLoginManager) UpdateGameSession(modelResponse *model.Ga
 	CalculateMinDuration(modelResponse, oldModel)
 	CalculateMaxDuration(modelResponse, oldModel)
 	oldModel.DailyAvegareSessionCount, oldModel.DailyAverageSessionDuration = CalculateDailyAvegareSessionCountAndDuration(oldModel)
-	oldModel.SessionBasedAvegareSessionDuration = float64(oldModel.TotalSessionDuration) / float64(oldModel.TotalSessionCount)
-	oldModel.DailyAvegareSessionCountMinusFirstDaySessionCount = oldModel.DailyAvegareSessionCount - float64(oldModel.FirstDayTotalSessionCount)
-	oldModel.DailyAvegareSessionDurationMinusFirstDaySessionDuration = oldModel.DailyAverageSessionDuration - float64(oldModel.FirstDayTotalSessionDuration)
-	oldModel.SessionBasedAvegareSessionDurationMinusFirstSessionDuration = oldModel.SessionBasedAvegareSessionDuration - float64(oldModel.FirstSessionDuration)
-	oldModel.SessionBasedAvegareSessionDurationMinusLastSessionDuration = oldModel.SessionBasedAvegareSessionDuration - float64(oldModel.LastSessionDuration)
+	oldModel.SessionBasedAvegareSessionDuration = float32(oldModel.TotalSessionDuration) / float32(oldModel.TotalSessionCount)
+	oldModel.DailyAvegareSessionCountMinusFirstDaySessionCount = oldModel.DailyAvegareSessionCount - float32(oldModel.FirstDayTotalSessionCount)
+	oldModel.DailyAvegareSessionDurationMinusFirstDaySessionDuration = oldModel.DailyAverageSessionDuration - float32(oldModel.FirstDayTotalSessionDuration)
+	oldModel.SessionBasedAvegareSessionDurationMinusFirstSessionDuration = oldModel.SessionBasedAvegareSessionDuration - float32(oldModel.FirstSessionDuration)
+	oldModel.SessionBasedAvegareSessionDurationMinusLastSessionDuration = oldModel.SessionBasedAvegareSessionDuration - float32(oldModel.LastSessionDuration)
 	oldModel.SundaySessionCount = oldModel.SundaySessionCount + modelResponse.SundaySessionCount
 	oldModel.MondaySessionCount = oldModel.MondaySessionCount + modelResponse.MondaySessionCount
 	oldModel.TuesdaySessionCount = oldModel.TuesdaySessionCount + modelResponse.TuesdaySessionCount
@@ -221,14 +221,14 @@ func (g *gameSessionEveryLoginManager) UpdateGameSession(modelResponse *model.Ga
 	return oldModel, true, nil
 }
 
-func CalculateDailyAvegareSessionCountAndDuration(oldModel *model.GameSessionEveryLoginRespondModel) (count float64, duration float64) {
+func CalculateDailyAvegareSessionCountAndDuration(oldModel *model.GameSessionEveryLoginRespondModel) (count float32, duration float32) {
 	if oldModel.TotalSessionDay == 0 {
-		return float64(oldModel.TotalSessionCount), float64(oldModel.TotalSessionDuration)
+		return float32(oldModel.TotalSessionCount), float32(oldModel.TotalSessionDuration)
 	}
-	return float64(oldModel.TotalSessionCount) / float64(oldModel.TotalSessionDay), float64(oldModel.TotalSessionDuration) / float64(oldModel.TotalSessionDay)
+	return float32(oldModel.TotalSessionCount) / float32(oldModel.TotalSessionDay), float32(oldModel.TotalSessionDuration) / float32(oldModel.TotalSessionDay)
 }
 
-func CalculateFirstHalfHourTotalSessionCountAndSessionDuration(modelResponse *model.GameSessionEveryLoginRespondModel, oldModel *model.GameSessionEveryLoginRespondModel, total_session_minute int64) {
+func CalculateFirstHalfHourTotalSessionCountAndSessionDuration(modelResponse *model.GameSessionEveryLoginRespondModel, oldModel *model.GameSessionEveryLoginRespondModel, total_session_minute int32) {
 	switch {
 	case total_session_minute <= 30:
 		oldModel.FirstHalfHourTotalSessionCount = oldModel.FirstHalfHourTotalSessionCount + modelResponse.FirstDayTotalSessionCount
@@ -236,7 +236,7 @@ func CalculateFirstHalfHourTotalSessionCountAndSessionDuration(modelResponse *mo
 	}
 }
 
-func CalculateFirstHourTotalSessionCountAndDuration(modelResponse *model.GameSessionEveryLoginRespondModel, oldModel *model.GameSessionEveryLoginRespondModel, total_session_minute int64) {
+func CalculateFirstHourTotalSessionCountAndDuration(modelResponse *model.GameSessionEveryLoginRespondModel, oldModel *model.GameSessionEveryLoginRespondModel, total_session_minute int32) {
 	switch {
 	case total_session_minute <= 60:
 		oldModel.FirstHourTotalSessionCount = oldModel.FirstHourTotalSessionCount + modelResponse.FirstDayTotalSessionCount
@@ -244,7 +244,7 @@ func CalculateFirstHourTotalSessionCountAndDuration(modelResponse *model.GameSes
 	}
 }
 
-func CalculateFirstTwoHourTotalSessionCountAndDuration(modelResponse *model.GameSessionEveryLoginRespondModel, oldModel *model.GameSessionEveryLoginRespondModel, total_session_minute int64) {
+func CalculateFirstTwoHourTotalSessionCountAndDuration(modelResponse *model.GameSessionEveryLoginRespondModel, oldModel *model.GameSessionEveryLoginRespondModel, total_session_minute int32) {
 	switch {
 	case total_session_minute <= 120:
 		oldModel.FirstTwoHourTotalSessionCount = oldModel.FirstTwoHourTotalSessionCount + modelResponse.FirstDayTotalSessionCount
@@ -252,7 +252,7 @@ func CalculateFirstTwoHourTotalSessionCountAndDuration(modelResponse *model.Game
 	}
 }
 
-func CalculateFirstThreeHourTotalSessionCountAndDuration(modelResponse *model.GameSessionEveryLoginRespondModel, oldModel *model.GameSessionEveryLoginRespondModel, total_session_minute int64) {
+func CalculateFirstThreeHourTotalSessionCountAndDuration(modelResponse *model.GameSessionEveryLoginRespondModel, oldModel *model.GameSessionEveryLoginRespondModel, total_session_minute int32) {
 	switch {
 	case total_session_minute <= 180:
 		oldModel.FirstThreeHourTotalSessionCount = oldModel.FirstThreeHourTotalSessionCount + modelResponse.FirstDayTotalSessionCount
@@ -260,7 +260,7 @@ func CalculateFirstThreeHourTotalSessionCountAndDuration(modelResponse *model.Ga
 	}
 }
 
-func CalculateFirstSixHourTotalSessionCountAndDuration(modelResponse *model.GameSessionEveryLoginRespondModel, oldModel *model.GameSessionEveryLoginRespondModel, total_session_minute int64) {
+func CalculateFirstSixHourTotalSessionCountAndDuration(modelResponse *model.GameSessionEveryLoginRespondModel, oldModel *model.GameSessionEveryLoginRespondModel, total_session_minute int32) {
 	switch {
 	case total_session_minute <= 360:
 		oldModel.FirstSixHourTotalSessionCount = oldModel.FirstSixHourTotalSessionCount + modelResponse.FirstDayTotalSessionCount
@@ -268,7 +268,7 @@ func CalculateFirstSixHourTotalSessionCountAndDuration(modelResponse *model.Game
 	}
 }
 
-func CalculateFirstTwelveHourTotalSessionCountAndDuration(modelResponse *model.GameSessionEveryLoginRespondModel, oldModel *model.GameSessionEveryLoginRespondModel, total_session_minute int64) {
+func CalculateFirstTwelveHourTotalSessionCountAndDuration(modelResponse *model.GameSessionEveryLoginRespondModel, oldModel *model.GameSessionEveryLoginRespondModel, total_session_minute int32) {
 	switch {
 	case total_session_minute <= 720:
 		oldModel.FirstTwelveHourTotalSessionCount = oldModel.FirstTwelveHourTotalSessionCount + modelResponse.FirstDayTotalSessionCount
@@ -276,7 +276,7 @@ func CalculateFirstTwelveHourTotalSessionCountAndDuration(modelResponse *model.G
 	}
 }
 
-func CalculateFirstDayTotalSessionCountAndDuration(modelResponse *model.GameSessionEveryLoginRespondModel, oldModel *model.GameSessionEveryLoginRespondModel, total_session_minute int64) {
+func CalculateFirstDayTotalSessionCountAndDuration(modelResponse *model.GameSessionEveryLoginRespondModel, oldModel *model.GameSessionEveryLoginRespondModel, total_session_minute int32) {
 	switch {
 	case total_session_minute <= 1440:
 		oldModel.FirstDayTotalSessionCount = oldModel.FirstDayTotalSessionCount + modelResponse.FirstDayTotalSessionCount
@@ -284,7 +284,7 @@ func CalculateFirstDayTotalSessionCountAndDuration(modelResponse *model.GameSess
 	}
 }
 
-func CalculateSecondDayTotalSessionCountAndDuration(modelResponse *model.GameSessionEveryLoginRespondModel, oldModel *model.GameSessionEveryLoginRespondModel, total_session_hour int64) {
+func CalculateSecondDayTotalSessionCountAndDuration(modelResponse *model.GameSessionEveryLoginRespondModel, oldModel *model.GameSessionEveryLoginRespondModel, total_session_hour int32) {
 	switch {
 	case total_session_hour <= 48 && total_session_hour > 24:
 		oldModel.SecondDayTotalSessionCount = oldModel.SecondDayTotalSessionCount + modelResponse.FirstDayTotalSessionCount
@@ -292,7 +292,7 @@ func CalculateSecondDayTotalSessionCountAndDuration(modelResponse *model.GameSes
 	}
 }
 
-func CalculateThirdDayTotalSessionCountAndDuration(modelResponse *model.GameSessionEveryLoginRespondModel, oldModel *model.GameSessionEveryLoginRespondModel, total_session_hour int64) {
+func CalculateThirdDayTotalSessionCountAndDuration(modelResponse *model.GameSessionEveryLoginRespondModel, oldModel *model.GameSessionEveryLoginRespondModel, total_session_hour int32) {
 	switch {
 	case total_session_hour <= 72 && total_session_hour > 48:
 		oldModel.ThirdDayTotalSessionCount = oldModel.ThirdDayTotalSessionCount + modelResponse.FirstDayTotalSessionCount
@@ -300,7 +300,7 @@ func CalculateThirdDayTotalSessionCountAndDuration(modelResponse *model.GameSess
 	}
 }
 
-func CalculateFourthDayTotalSessionCountAndDuration(modelResponse *model.GameSessionEveryLoginRespondModel, oldModel *model.GameSessionEveryLoginRespondModel, total_session_hour int64) {
+func CalculateFourthDayTotalSessionCountAndDuration(modelResponse *model.GameSessionEveryLoginRespondModel, oldModel *model.GameSessionEveryLoginRespondModel, total_session_hour int32) {
 	switch {
 	case total_session_hour <= 96 && total_session_hour > 72:
 		oldModel.FourthDayTotalSessionCount = oldModel.FourthDayTotalSessionCount + modelResponse.FirstDayTotalSessionCount
@@ -308,7 +308,7 @@ func CalculateFourthDayTotalSessionCountAndDuration(modelResponse *model.GameSes
 	}
 }
 
-func CalculateFifthDayTotalSessionCountAndDuration(modelResponse *model.GameSessionEveryLoginRespondModel, oldModel *model.GameSessionEveryLoginRespondModel, total_session_hour int64) {
+func CalculateFifthDayTotalSessionCountAndDuration(modelResponse *model.GameSessionEveryLoginRespondModel, oldModel *model.GameSessionEveryLoginRespondModel, total_session_hour int32) {
 	switch {
 	case total_session_hour <= 120 && total_session_hour > 96:
 		oldModel.FifthDayTotalSessionCount = oldModel.FifthDayTotalSessionCount + modelResponse.FirstDayTotalSessionCount
@@ -316,7 +316,7 @@ func CalculateFifthDayTotalSessionCountAndDuration(modelResponse *model.GameSess
 	}
 }
 
-func CalculateSixthDayTotalSessionCountAndDuration(modelResponse *model.GameSessionEveryLoginRespondModel, oldModel *model.GameSessionEveryLoginRespondModel, total_session_hour int64) {
+func CalculateSixthDayTotalSessionCountAndDuration(modelResponse *model.GameSessionEveryLoginRespondModel, oldModel *model.GameSessionEveryLoginRespondModel, total_session_hour int32) {
 	switch {
 	case total_session_hour <= 144 && total_session_hour > 120:
 		oldModel.SixthDayTotalSessionCount = oldModel.SixthDayTotalSessionCount + modelResponse.FirstDayTotalSessionCount
@@ -324,7 +324,7 @@ func CalculateSixthDayTotalSessionCountAndDuration(modelResponse *model.GameSess
 	}
 }
 
-func CalculateSeventhDayTotalSessionCountAndDuration(modelResponse *model.GameSessionEveryLoginRespondModel, oldModel *model.GameSessionEveryLoginRespondModel, total_session_hour int64) {
+func CalculateSeventhDayTotalSessionCountAndDuration(modelResponse *model.GameSessionEveryLoginRespondModel, oldModel *model.GameSessionEveryLoginRespondModel, total_session_hour int32) {
 	switch {
 	case total_session_hour <= 168 && total_session_hour > 144:
 		oldModel.SeventhDayTotalSessionCount = oldModel.SeventhDayTotalSessionCount + modelResponse.FirstDayTotalSessionCount
@@ -373,11 +373,6 @@ func CalculateMinDuration(modelResponse *model.GameSessionEveryLoginRespondModel
 	case oldModel.MinSessionDuration > modelResponse.MinSessionDuration:
 		oldModel.MinSessionDuration = modelResponse.MinSessionDuration
 	}
-	// if oldModel.MinSessionDuration > modelResponse.MinSessionDuration {
-	// 	oldModel.MinSessionDuration = modelResponse.MinSessionDuration
-	// 	return oldModel.MinSessionDuration
-	// }
-	// return oldModel.MinSessionDuration
 }
 
 func CalculateMaxDuration(modelResponse *model.GameSessionEveryLoginRespondModel, oldModel *model.GameSessionEveryLoginRespondModel) {
@@ -385,14 +380,9 @@ func CalculateMaxDuration(modelResponse *model.GameSessionEveryLoginRespondModel
 	case modelResponse.MaxSessionDuration > oldModel.MaxSessionDuration:
 		oldModel.MaxSessionDuration = modelResponse.MaxSessionDuration
 	}
-	// if modelResponse.MaxSessionDuration > oldModel.MaxSessionDuration {
-	// 	oldModel.MaxSessionDuration = modelResponse.MaxSessionDuration
-	// 	return oldModel.MaxSessionDuration
-	// }
-	// return oldModel.MaxSessionDuration
 }
 
-func DetermineGameSessionDay(modelResponse *model.GameSessionEveryLoginRespondModel, day int64) {
+func DetermineGameSessionDay(modelResponse *model.GameSessionEveryLoginRespondModel, day int16) {
 	switch day {
 	case 0:
 		modelResponse.SundaySessionCount = 1
@@ -411,7 +401,7 @@ func DetermineGameSessionDay(modelResponse *model.GameSessionEveryLoginRespondMo
 	}
 }
 
-func DetermineGameSessionHour(modelResponse *model.GameSessionEveryLoginRespondModel, hour int64) {
+func DetermineGameSessionHour(modelResponse *model.GameSessionEveryLoginRespondModel, hour int16) {
 	switch {
 	case hour <= 5:
 		modelResponse.Session0To5HourCount = 1
@@ -424,7 +414,7 @@ func DetermineGameSessionHour(modelResponse *model.GameSessionEveryLoginRespondM
 	}
 }
 
-func DetermineGameSessionAmPm(modelResponse *model.GameSessionEveryLoginRespondModel, hour int64) {
+func DetermineGameSessionAmPm(modelResponse *model.GameSessionEveryLoginRespondModel, hour int16) {
 	switch {
 	case hour <= 12:
 		modelResponse.AmSessionCount = 1
