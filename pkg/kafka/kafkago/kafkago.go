@@ -3,10 +3,13 @@ package kafkago
 import (
 	"FilterWorkerService/pkg/helper"
 	"context"
+	"fmt"
 	"log"
 	"sync"
 	"time"
 
+	logger "github.com/appneuroncompany/light-logger"
+	"github.com/appneuroncompany/light-logger/clogger"
 	"github.com/google/uuid"
 	"github.com/segmentio/kafka-go"
 	"github.com/segmentio/kafka-go/snappy"
@@ -28,6 +31,9 @@ func (k *kafkaGo) Produce(key *[]byte, value *[]byte, topic string) (err error) 
 	}
 	err = writer.WriteMessages(context.Background(), message)
 	log.Print("kafkaGo", "Producer", topic, key)
+	clogger.Error(&logger.Messages{
+		fmt.Sprintf("kafkaGo produce error %s %s : ", topic, key) : err,
+	})
 	return err
 }
 
@@ -38,21 +44,30 @@ func (k *kafkaGo) Consume(topic string, groupId string, wg *sync.WaitGroup, call
 		wg.Done()
 		err := reader.Close()
 		if err != nil {
-			log.Fatal("kafkaGo", "Consume", "failed to reader.Close() messages:"+err.Error())
+			//log.Fatal("kafkaGo", "Consume", "failed to reader.Close() messages:"+err.Error())
+			clogger.Error(&logger.Messages{
+				"kafkaGo Consume failed to reader.Close() messages: ": err,
+			})
 		}
 	}(reader)
 	log.Print("kafkaGo", "Consume", reader.Stats().ClientID)
 	for {
 		m, err := reader.FetchMessage(context.Background())
 		if err != nil {
-			log.Fatal("kafkaGo", "Consume", "error while receiving message: "+err.Error())
+			//log.Fatal("kafkaGo", "Consume", "error while receiving message: "+err.Error())
+			clogger.Error(&logger.Messages{
+				"kafkaGo Consume error while receiving message: ": err,
+			})
 			continue
 		}
 		log.Print("kafkaGo", "Consume", topic, groupId)
 		_, isSuccess, _ := callback(&m.Value)
 		if isSuccess {
 			if err := reader.CommitMessages(context.Background(), m); err != nil {
-				log.Fatal("kafkaGo", "Consume", "failed to commit messages:"+err.Error())
+				//log.Fatal("kafkaGo", "Consume", "failed to commit messages:"+err.Error())
+				clogger.Error(&logger.Messages{
+					"kafkaGo Consume failed to commit messages: ": err,
+				})
 			}
 		}
 	}
