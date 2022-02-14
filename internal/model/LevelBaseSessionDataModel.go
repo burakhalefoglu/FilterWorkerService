@@ -28,7 +28,7 @@ type LevelBaseSessionRespondModel struct {
 	SevenLevelSessionLevelIndex                int16
 	SevenLevelSessionDuration                  int16
 	FirstQuarterHourTotalLevelBaseSessionCount int16
-	FirstHalfHourTotalLEvelBaseSessionCount    int16
+	FirstHalfHourTotalLevelBaseSessionCount    int16
 	FirstHourTotalLevelBaseSessionCount        int16
 	FirstTwoHourTotalLevelBaseSessionCount     int16
 	FirstThreeHourTotalLevelBaseSessionCount   int16

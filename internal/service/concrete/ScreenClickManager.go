@@ -105,7 +105,7 @@ func (sc *screenClickManager) ConvertRawModelToResponseModel(data *[]byte) (v in
 	modelResponse.FirstTwelveHourTouchCount = int32(firstModel.TouchCount)
 
 	modelResponse.FirstMinusLastTouchCount = int16(firstModel.TouchCount)
-	modelResponse.FirstFingerId = int8(firstModel.FingerId)
+	modelResponse.FirstFingerId = byte(firstModel.FingerId)
 	modelResponse.PenultimateFingerId = 0
 	modelResponse.LastFingerId = 0
 

@@ -35,6 +35,8 @@ func (a *advEventManager) ConvertRawModelToResponseModel(data *[]byte) (v interf
 	yearOfDay := int16(firstModel.TrigerdTime.YearDay())
 	year := int16(firstModel.TrigerdTime.Year())
 	minute := int16(firstModel.InMinutes)
+	value, _, _ := (*a.ICacheService).ManageCache("AdvType", firstModel.AdvType)
+	adv_type := byte(value)
 	modelResponse := model.AdvEventRespondModel{}
 	modelResponse.ClientId = firstModel.ClientId
 	modelResponse.ProjectId = firstModel.ProjectId
@@ -51,7 +53,7 @@ func (a *advEventManager) ConvertRawModelToResponseModel(data *[]byte) (v interf
 	modelResponse.FirstWeekDay = day
 	modelResponse.FirstAdvClickHour = hour
 	modelResponse.FirstADvClickMinute = minute
-	modelResponse.FirstAdvType, _, _ = (*a.ICacheService).ManageCache("AdvType", firstModel.AdvType)
+	modelResponse.FirstAdvType = adv_type
 	modelResponse.SecondAdvYearOfDay = 0
 	modelResponse.SecondAdvHour = 0
 	modelResponse.SecondAdvMinute = 0

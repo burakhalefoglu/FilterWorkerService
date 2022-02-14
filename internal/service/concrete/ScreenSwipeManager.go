@@ -33,7 +33,7 @@ func (sc *screenSwipeManager) ConvertRawModelToResponseModel(data *[]byte) (v in
 	year := int16(firstModel.CreationAt.Year())
 	weekDay := int16(firstModel.CreationAt.Weekday())
 	minute := int16(firstModel.CreationAt.Minute())
-	swipeDirection := int8(firstModel.SwipeDirection)
+	swipeDirection := byte(firstModel.SwipeDirection)
 	modelResponse := model.ScreenSwipeRespondModel{}
 	modelResponse.ProjectId = firstModel.ProjectId
 	modelResponse.ClientId = firstModel.ClientId
@@ -46,7 +46,7 @@ func (sc *screenSwipeManager) ConvertRawModelToResponseModel(data *[]byte) (v in
 	modelResponse.FirstSwipeHour = hour
 	modelResponse.FirstSwipeWeekDay = weekDay
 	modelResponse.FirstSwipeMinute = minute
-	modelResponse.FistSwipeDirection = int8(firstModel.SwipeDirection)
+	modelResponse.FistSwipeDirection = byte(firstModel.SwipeDirection)
 	modelResponse.FirstSwipeStartXCor = firstModel.SwipeStartXCor
 	modelResponse.FirstSwipeStartYCor = firstModel.SwipeStartYCor
 	modelResponse.FirstSwipeFinishXCor = firstModel.SwipeFinishXCor
@@ -360,7 +360,7 @@ func CalculateSwipeSeventhDay(modelResponse *model.ScreenSwipeRespondModel, oldM
 	}
 }
 
-func DetermineSwipeDirection(modelResponse *model.ScreenSwipeRespondModel, swipeDirection int8) {
+func DetermineSwipeDirection(modelResponse *model.ScreenSwipeRespondModel, swipeDirection byte) {
 	switch swipeDirection {
 	case 1:
 		modelResponse.FirstDayTotalSwipeRightCount = 1

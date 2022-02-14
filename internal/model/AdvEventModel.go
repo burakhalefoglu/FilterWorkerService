@@ -18,32 +18,32 @@ type AdvEventRespondModel struct {
 	FirstWeekDay                                       int16
 	FirstAdvClickHour                                  int16
 	FirstADvClickMinute                                int16
-	FirstAdvType                                       int16
+	FirstAdvType                                       byte
 	SecondAdvYearOfDay                                 int16
 	SecondAdvHour                                      int16
 	SecondAdvMinute                                    int16
-	SecondAdvType                                      int16
+	SecondAdvType                                      byte
 	ThirdAdvYearOfDay                                  int16
 	ThirdAdvHour                                       int16
 	ThirdAdvMinute                                     int16
-	ThirdAdvType                                       int16
+	ThirdAdvType                                       byte
 	FourthAdvYearOfDay                                 int16
 	FourthAdvHour                                      int16
 	FourthAdvMinute                                    int16
-	FourthAdvType                                      int16
+	FourthAdvType                                      byte
 	FifthAdvYearOfDay                                  int16
 	FifthAdvHour                                       int16
 	FifthAdvMinute                                     int16
-	FifthAdvType                                       int16
+	FifthAdvType                                       byte
 	PenultimateAdvYearOfDay                            int16
 	PenultimateAdvHour                                 int16
 	PenultimateAdvMinute                               int16
-	PenultimateAdvType                                 int16
+	PenultimateAdvType                                 byte
 	LastAdvYearOfDay                                   int16
 	LastAdvYear                                        int16
 	LastAdvClickHour                                   int16
 	LastAdvClickMinute                                 int16
-	LastAdvType                                        int16
+	LastAdvType                                        byte
 	FirstHalfHourAdvClickCount                         int16
 	FirstHourAdvClickCount                             int16
 	FirstTwoHourAdvClickCount                          int16

@@ -54,7 +54,7 @@ func (m *mdbDLevelBaseSessionDal) Add(data *model.LevelBaseSessionRespondModel) 
 		{"SevenLevelSessionDuration", data.SevenLevelSessionDuration},
 
 		{"FirstQuarterHourTotalLevelBaseSessionCount", data.FirstQuarterHourTotalLevelBaseSessionCount},
-		{"FirstHalfHourTotalLEvelBaseSessionCount", data.FirstHalfHourTotalLEvelBaseSessionCount},
+		{"FirstHalfHourTotalLEvelBaseSessionCount", data.FirstHalfHourTotalLevelBaseSessionCount},
 		{"FirstHourTotalLevelBaseSessionCount", data.FirstHourTotalLevelBaseSessionCount},
 		{"FirstTwoHourTotalLevelBaseSessionCount", data.FirstTwoHourTotalLevelBaseSessionCount},
 		{"FirstThreeHourTotalLevelBaseSessionCount", data.FirstThreeHourTotalLevelBaseSessionCount},
@@ -135,7 +135,7 @@ func (m *mdbDLevelBaseSessionDal) UpdateLevelBaseSessionById(ClientId string, da
 		{"SevenLevelSessionDuration", data.SevenLevelSessionDuration},
 
 		{"FirstQuarterHourTotalLevelBaseSessionCount", data.FirstQuarterHourTotalLevelBaseSessionCount},
-		{"FirstHalfHourTotalLEvelBaseSessionCount", data.FirstHalfHourTotalLEvelBaseSessionCount},
+		{"FirstHalfHourTotalLEvelBaseSessionCount", data.FirstHalfHourTotalLevelBaseSessionCount},
 		{"FirstHourTotalLevelBaseSessionCount", data.FirstHourTotalLevelBaseSessionCount},
 		{"FirstTwoHourTotalLevelBaseSessionCount", data.FirstTwoHourTotalLevelBaseSessionCount},
 		{"FirstThreeHourTotalLevelBaseSessionCount", data.FirstThreeHourTotalLevelBaseSessionCount},

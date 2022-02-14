@@ -59,7 +59,7 @@ func (l *levelBaseSessionManager) ConvertRawModelToResponseModel(data *[]byte) (
 	modelResponse.SevenLevelSessionLevelIndex = 0
 	modelResponse.SevenLevelSessionDuration = 0
 	modelResponse.FirstQuarterHourTotalLevelBaseSessionCount = 1
-	modelResponse.FirstHalfHourTotalLEvelBaseSessionCount = 1
+	modelResponse.FirstHalfHourTotalLevelBaseSessionCount = 1
 	modelResponse.FirstHourTotalLevelBaseSessionCount = 1
 	modelResponse.FirstTwoHourTotalLevelBaseSessionCount = 1
 	modelResponse.FirstThreeHourTotalLevelBaseSessionCount = 1
@@ -156,7 +156,7 @@ func CalculateLevelBaseSessionFirstQuarterHour(modelResponse *model.LevelBaseSes
 func CalculateLevelBaseSessionFirstHalfHour(modelResponse *model.LevelBaseSessionRespondModel, oldModel *model.LevelBaseSessionRespondModel, total_session_minute int32) {
 	switch {
 	case total_session_minute <= 30:
-		oldModel.FirstHalfHourTotalLEvelBaseSessionCount = oldModel.FirstHalfHourTotalLEvelBaseSessionCount + modelResponse.FirstHalfHourTotalLEvelBaseSessionCount
+		oldModel.FirstHalfHourTotalLevelBaseSessionCount = oldModel.FirstHalfHourTotalLevelBaseSessionCount + modelResponse.FirstHalfHourTotalLevelBaseSessionCount
 	}
 }
 

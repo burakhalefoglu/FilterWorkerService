@@ -35,6 +35,8 @@ func (b *buyingEventManager) ConvertRawModelToResponseModel(data *[]byte) (v int
 	day := int16(firstModel.TrigerdTime.Weekday())
 	yearOfDay := int16(firstModel.TrigerdTime.YearDay())
 	year := int16(firstModel.TrigerdTime.Year())
+	var value, _, _ = (*b.ICacheService).ManageCache("ProductType", firstModel.ProductType)
+	var ProductType = byte(value)
 	modelResponse := model.BuyingEventRespondModel{}
 	modelResponse.ProjectId = firstModel.ProjectId
 	modelResponse.ClientId = firstModel.ClientId
@@ -47,7 +49,7 @@ func (b *buyingEventManager) ConvertRawModelToResponseModel(data *[]byte) (v int
 	modelResponse.FirstBuyingYear = year
 	modelResponse.FirstBuyingHour = hour
 	modelResponse.FirstBuyingMinute = int16(firstModel.InWhatMinutes)
-	modelResponse.FirstBuyingProductType, _, _ = (*b.ICacheService).ManageCache("ProductType", firstModel.ProductType)
+	modelResponse.FirstBuyingProductType = ProductType
 	modelResponse.SecondBuyingYearOfDay = 0
 	modelResponse.SecondBuyingHour = 0
 	modelResponse.SecondBuyingMinute = 0
@@ -80,9 +82,6 @@ func (b *buyingEventManager) ConvertRawModelToResponseModel(data *[]byte) (v int
 	modelResponse.FifthDayBuyingCount = 0
 	modelResponse.SixthDayBuyingCount = 0
 	modelResponse.SeventhDayBuyingCount = 0
-	// modelResponse.PenultimateDayBuyingCount = 0
-	// modelResponse.LastDayBuyingCount = 0
-	// modelResponse.LastMinusFirstDayBuyingCount = -1
 	DetermineBuyingDay(&modelResponse, day)
 	DetermineBuyingHour(&modelResponse, hour)
 	DetermineBuyingAmPm(&modelResponse, hour)

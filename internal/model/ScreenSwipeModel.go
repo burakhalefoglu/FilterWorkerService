@@ -14,32 +14,32 @@ type ScreenSwipeRespondModel struct {
 	FirstSwipeHour                 int16
 	FirstSwipeWeekDay              int16
 	FirstSwipeMinute               int16
-	FistSwipeDirection             int8
+	FistSwipeDirection             byte
 	FirstSwipeStartXCor            float32
 	FirstSwipeStartYCor            float32
 	FirstSwipeFinishXCor           float32
 	FirstSwipeFinishYCor           float32
-	SecondSwipeDirection           int8
+	SecondSwipeDirection           byte
 	SecondSwipeStartXCor           float32
 	SecondSwipeStartYCor           float32
 	SecondSwipeFinishXCor          float32
 	SecondSwipeFinishYCor          float32
-	ThirdSwipeDirection            int8
+	ThirdSwipeDirection            byte
 	ThirdSwipeStartXCor            float32
 	ThirdSwipeStartYCor            float32
 	ThirdSwipeFinishXCor           float32
 	ThirdSwipeFinishYCor           float32
-	FourthSwipeDirection           int8
+	FourthSwipeDirection           byte
 	FourthSwipeStartXCor           float32
 	FourthSwipeStartYCor           float32
 	FourthSwipeFinishXCor          float32
 	FourthSwipeFinishYCor          float32
-	FifthSwipeDirection            int8
+	FifthSwipeDirection            byte
 	FifthSwipeStartXCor            float32
 	FifthSwipeStartYCor            float32
 	FifthSwipeFinishXCor           float32
 	FifthSwipeFinishYCor           float32
-	PenultimateSwipeDirection      int8
+	PenultimateSwipeDirection      byte
 	PenultimateSwipeStartXCor      float32
 	PenultimateSwipeStartYCor      float32
 	PenultimateSwipeFinishXCor     float32
@@ -49,7 +49,7 @@ type ScreenSwipeRespondModel struct {
 	PenultimateSwipeHour           int16
 	PenultimateSwipeWeekDay        int16
 	PenultimateSwipeMinute         int16
-	LastSwipeDirection             int8
+	LastSwipeDirection             byte
 	LastSwipeStartXCor             float32
 	LastSwipeStartYCor             float32
 	LastSwipeFinishXCor            float32

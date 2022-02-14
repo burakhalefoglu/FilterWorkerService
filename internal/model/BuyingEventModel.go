@@ -14,32 +14,32 @@ type BuyingEventRespondModel struct {
 	FirstBuyingYear              int16
 	FirstBuyingHour              int16
 	FirstBuyingMinute            int16
-	FirstBuyingProductType       int16
+	FirstBuyingProductType       byte
 	SecondBuyingYearOfDay        int16
 	SecondBuyingHour             int16
 	SecondBuyingMinute           int16
-	SecondBuyingProductType      int16
+	SecondBuyingProductType      byte
 	ThirdBuyingYearOfDay         int16
 	ThirdBuyingHour              int16
 	ThirdBuyingMinute            int16
-	ThirdBuyingProductType       int16
+	ThirdBuyingProductType       byte
 	FourthBuyingYearOfDay        int16
 	FourthBuyingHour             int16
 	FourthBuyingMinute           int16
-	FourthBuyingProductType      int16
+	FourthBuyingProductType      byte
 	FifthBuyingYearOfDay         int16
 	FifthBuyingHour              int16
 	FifthBuyingMinute            int16
-	FifthBuyingProductType       int16
+	FifthBuyingProductType       byte
 	PenultimateBuyingYearOfDay   int16
 	PenultimateBuyingHour        int16
 	PenultimateBuyingMinute      int16
-	PenultimateBuyingProductType int16
+	PenultimateBuyingProductType byte
 	LastBuyingYearOfDay          int16
 	LastBuyingYear               int16
 	LastBuyingHour               int16
 	LastBuyingMinute             int16
-	LastBuyingProductType        int16
+	LastBuyingProductType        byte
 	FirstDayBuyingCount          int16
 	SecondDayBuyingCount         int16
 	ThirdDayBuyingCount          int16

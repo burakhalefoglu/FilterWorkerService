@@ -17,13 +17,13 @@ type GameSessionEveryLoginRespondModel struct {
 	SecondSessionMinute                                         int16
 	ThirdSessionHour                                            int16
 	ThirdSessionDuration                                        int16
-	ThirdSessinMinute                                           int16
+	ThirdSessionMinute                                          int16
 	FourthSessionHour                                           int16
 	FourthSessionDuration                                       int16
-	FourthSessinMinute                                          int16
+	FourthSessionMinute                                         int16
 	FifthSessionHour                                            int16
 	FifthSessionDuration                                        int16
-	FifthSessinMinute                                           int16
+	FifthSessionMinute                                          int16
 	PenultimateSessionHour                                      int16
 	PenultimateSessionDuration                                  int16
 	PenultimateSessionMinute                                    int16

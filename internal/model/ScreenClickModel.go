@@ -67,9 +67,9 @@ type ScreenClickRespondModel struct {
 	FirstSixHourTouchCount                           int32
 	FirstTwelveHourTouchCount                        int32
 	FirstMinusLastTouchCount                         int16
-	FirstFingerId                                    int8
-	PenultimateFingerId                              int8
-	LastFingerId                                     int8
+	FirstFingerId                                    byte
+	PenultimateFingerId                              byte
+	LastFingerId                                     byte
 	FirstDayClickCount                               int32
 	SecondDayClickCount                              int32
 	ThirdDayClickCount                               int32

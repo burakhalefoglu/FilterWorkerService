@@ -49,13 +49,13 @@ func (g *gameSessionEveryLoginManager) ConvertRawModelToResponseModel(data *[]by
 	modelResponse.SecondSessionMinute = 0
 	modelResponse.ThirdSessionHour = 0
 	modelResponse.ThirdSessionDuration = 0
-	modelResponse.ThirdSessinMinute = 0
+	modelResponse.ThirdSessionMinute = 0
 	modelResponse.FourthSessionHour = 0
 	modelResponse.FourthSessionDuration = 0
-	modelResponse.FourthSessinMinute = 0
+	modelResponse.FourthSessionMinute = 0
 	modelResponse.FifthSessionHour = 0
 	modelResponse.FifthSessionDuration = 0
-	modelResponse.FifthSessinMinute = 0
+	modelResponse.FifthSessionMinute = 0
 	modelResponse.PenultimateSessionHour = 0
 	modelResponse.PenultimateSessionDuration = 0
 	modelResponse.PenultimateSessionMinute = 0
@@ -346,7 +346,7 @@ func CalculateThirdGameSession(modelResponse *model.GameSessionEveryLoginRespond
 	case 3:
 		oldModel.ThirdSessionHour = modelResponse.FirstSessionHour
 		oldModel.ThirdSessionDuration = modelResponse.FirstSessionDuration
-		oldModel.ThirdSessinMinute = modelResponse.FirstSessionMinute
+		oldModel.ThirdSessionMinute = modelResponse.FirstSessionMinute
 	}
 }
 
@@ -355,7 +355,7 @@ func CalculateFourthGameSession(modelResponse *model.GameSessionEveryLoginRespon
 	case 4:
 		oldModel.FourthSessionHour = modelResponse.FirstSessionHour
 		oldModel.FourthSessionDuration = modelResponse.FirstSessionDuration
-		oldModel.FourthSessinMinute = modelResponse.FirstSessionMinute
+		oldModel.FourthSessionMinute = modelResponse.FirstSessionMinute
 	}
 }
 
@@ -364,7 +364,7 @@ func CalculateFifthGameSession(modelResponse *model.GameSessionEveryLoginRespond
 	case 5:
 		oldModel.FifthSessionHour = modelResponse.FirstSessionHour
 		oldModel.FifthSessionDuration = modelResponse.FirstSessionDuration
-		oldModel.FifthSessinMinute = modelResponse.FirstSessionMinute
+		oldModel.FifthSessionMinute = modelResponse.FirstSessionMinute
 	}
 }
 
