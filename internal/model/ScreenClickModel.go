@@ -24,6 +24,12 @@ type ScreenClickRespondModel struct {
 	FifthClickSessionHour                            int16
 	FifthClickSessionMinute                          int16
 	FifthTouchCount                                  int16
+	SixthClickSessionHour                            int16
+	SixthClickSessionMinute                          int16
+	SixthTouchCount                                  int16
+	SeventhClickSessionHour                          int16
+	SeventhClickSessionMinute                        int16
+	SeventhTouchCount                                int16
 	PenultimateClickSessionHour                      int16
 	PenultimateClickSessionMinute                    int16
 	PenultimateTouchCount                            int16
@@ -52,6 +58,14 @@ type ScreenClickRespondModel struct {
 	FifthStartYCor                                   float32
 	FifthFinishXCor                                  float32
 	FifthFinishYCor                                  float32
+	SixthStartXCor                                   float32
+	SixthStartYCor                                   float32
+	SixthFinishXCor                                  float32
+	SixthFinishYCor                                  float32
+	SeventhStartXCor                                 float32
+	SeventhStartYCor                                 float32
+	SeventhFinishXCor                                float32
+	SeventhFinishYCor                                float32
 	PenultimateStartXCor                             float32
 	PenultimateStartYCor                             float32
 	PenultimateFinishXCor                            float32
@@ -60,6 +74,9 @@ type ScreenClickRespondModel struct {
 	LastStartYCor                                    float32
 	LastFinishXCor                                   float32
 	LastFinishYCor                                   float32
+	FirstFiveMinutesTouchCount                       int32
+	FirstTenMinutesTouchCount                        int32
+	FirstQuarterHourTouchCount                       int32
 	FirstHalfHourTouchCount                          int32
 	FirstHourTouchCount                              int32
 	FirstTwoHourTouchCount                           int32

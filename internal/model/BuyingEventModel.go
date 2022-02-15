@@ -31,6 +31,14 @@ type BuyingEventRespondModel struct {
 	FifthBuyingHour              int16
 	FifthBuyingMinute            int16
 	FifthBuyingProductType       byte
+	SixthBuyingYearOfDay         int16
+	SixthBuyingHour              int16
+	SixthBuyingMinute            int16
+	SixthBuyingProductType       byte
+	SeventhBuyingYearOfDay       int16
+	SeventhBuyingHour            int16
+	SeventhBuyingMinute          int16
+	SeventhBuyingProductType     byte
 	PenultimateBuyingYearOfDay   int16
 	PenultimateBuyingHour        int16
 	PenultimateBuyingMinute      int16

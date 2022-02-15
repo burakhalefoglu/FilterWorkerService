@@ -33,6 +33,7 @@ func (sc *screenClickManager) ConvertRawModelToResponseModel(data *[]byte) (v in
 	yearOfDay := int16(firstModel.CreationAt.YearDay())
 	year := int16(firstModel.CreationAt.Year())
 	minute := int16(firstModel.CreationAt.Minute())
+	touchCount := int32(firstModel.TouchCount)
 	modelResponse := model.ScreenClickRespondModel{}
 	modelResponse.ProjectId = firstModel.ProjectId
 	modelResponse.ClientId = firstModel.ClientId
@@ -56,6 +57,12 @@ func (sc *screenClickManager) ConvertRawModelToResponseModel(data *[]byte) (v in
 	modelResponse.FifthClickSessionHour = 0
 	modelResponse.FifthClickSessionMinute = 0
 	modelResponse.FifthTouchCount = 0
+	modelResponse.SixthClickSessionHour = 0
+	modelResponse.SixthClickSessionMinute = 0
+	modelResponse.SixthTouchCount = 0
+	modelResponse.SeventhClickSessionHour = 0
+	modelResponse.SeventhClickSessionMinute = 0
+	modelResponse.SeventhTouchCount = 0
 
 	modelResponse.PenultimateClickSessionHour = 0
 	modelResponse.PenultimateClickSessionMinute = 0
@@ -88,6 +95,15 @@ func (sc *screenClickManager) ConvertRawModelToResponseModel(data *[]byte) (v in
 	modelResponse.FifthFinishXCor = 0
 	modelResponse.FifthFinishYCor = 0
 
+	modelResponse.SixthStartXCor = 0
+	modelResponse.SixthStartYCor = 0
+	modelResponse.SixthFinishXCor = 0
+	modelResponse.SixthFinishYCor = 0
+	modelResponse.SeventhStartXCor = 0
+	modelResponse.SeventhStartYCor = 0
+	modelResponse.SeventhFinishXCor = 0
+	modelResponse.SeventhFinishYCor = 0
+
 	modelResponse.PenultimateStartXCor = 0
 	modelResponse.PenultimateStartYCor = 0
 	modelResponse.PenultimateFinishXCor = 0
@@ -97,19 +113,22 @@ func (sc *screenClickManager) ConvertRawModelToResponseModel(data *[]byte) (v in
 	modelResponse.LastFinishXCor = 0
 	modelResponse.LastFinishYCor = 0
 
-	modelResponse.FirstHalfHourTouchCount = int32(firstModel.TouchCount)
-	modelResponse.FirstHourTouchCount = int32(firstModel.TouchCount)
-	modelResponse.FirstTwoHourTouchCount = int32(firstModel.TouchCount)
-	modelResponse.FirstThreeHourTouchCount = int32(firstModel.TouchCount)
-	modelResponse.FirstSixHourTouchCount = int32(firstModel.TouchCount)
-	modelResponse.FirstTwelveHourTouchCount = int32(firstModel.TouchCount)
+	modelResponse.FirstFiveMinutesTouchCount = touchCount
+	modelResponse.FirstTenMinutesTouchCount = touchCount
+	modelResponse.FirstQuarterHourTouchCount = touchCount
+	modelResponse.FirstHalfHourTouchCount = touchCount
+	modelResponse.FirstHourTouchCount = touchCount
+	modelResponse.FirstTwoHourTouchCount = touchCount
+	modelResponse.FirstThreeHourTouchCount = touchCount
+	modelResponse.FirstSixHourTouchCount = touchCount
+	modelResponse.FirstTwelveHourTouchCount = touchCount
 
 	modelResponse.FirstMinusLastTouchCount = int16(firstModel.TouchCount)
 	modelResponse.FirstFingerId = byte(firstModel.FingerId)
 	modelResponse.PenultimateFingerId = 0
 	modelResponse.LastFingerId = 0
 
-	modelResponse.FirstDayClickCount = int32(firstModel.TouchCount)
+	modelResponse.FirstDayClickCount = touchCount
 	modelResponse.SecondDayClickCount = 0
 	modelResponse.ThirdDayClickCount = 0
 	modelResponse.FourthDayClickCount = 0
@@ -118,7 +137,7 @@ func (sc *screenClickManager) ConvertRawModelToResponseModel(data *[]byte) (v in
 	modelResponse.SeventhDayClickCount = 0
 
 	modelResponse.TotalClickDay = 1
-	modelResponse.TotalClickCount = int32(firstModel.TouchCount)
+	modelResponse.TotalClickCount = touchCount
 	modelResponse.TotalClickSessionCount = 1
 
 	modelResponse.TotalClickHour = 0
@@ -211,6 +230,10 @@ func (sc *screenClickManager) UpdateScreenClick(modelResponse *model.ScreenClick
 
 	oldModel.PenultimateFingerId = oldModel.LastFingerId
 	oldModel.LastFingerId = modelResponse.FirstFingerId
+
+	CalculateClickFiveMinutes(modelResponse, oldModel, oldModel.TotalClickMinute)
+	CalculateClickTenMinutes(modelResponse, oldModel, oldModel.TotalClickMinute)
+	CalculateClickQuarterHour(modelResponse, oldModel, oldModel.TotalClickMinute)
 	CalculateClickHalfHour(modelResponse, oldModel, oldModel.TotalClickMinute)
 	CalculateClickHour(modelResponse, oldModel, oldModel.TotalClickMinute)
 	CalculateClickTwoHour(modelResponse, oldModel, oldModel.TotalClickMinute)
@@ -247,6 +270,27 @@ func CalculateDailyAverageClickCount(oldModel *model.ScreenClickRespondModel) (c
 		return oldModel.DailyAvegareClickCount
 	}
 	return float32(oldModel.TotalClickCount) / float32(oldModel.TotalClickDay)
+}
+
+func CalculateClickFiveMinutes(modelResponse *model.ScreenClickRespondModel, oldModel *model.ScreenClickRespondModel, total_session_minute int32) {
+	switch {
+	case total_session_minute <= 5:
+		oldModel.FirstFiveMinutesTouchCount = oldModel.FirstFiveMinutesTouchCount + int32(modelResponse.FirstTouchCount)
+	}
+}
+
+func CalculateClickTenMinutes(modelResponse *model.ScreenClickRespondModel, oldModel *model.ScreenClickRespondModel, total_session_minute int32) {
+	switch {
+	case total_session_minute <= 10:
+		oldModel.FirstTenMinutesTouchCount = oldModel.FirstTenMinutesTouchCount + int32(modelResponse.FirstTouchCount)
+	}
+}
+
+func CalculateClickQuarterHour(modelResponse *model.ScreenClickRespondModel, oldModel *model.ScreenClickRespondModel, total_session_minute int32) {
+	switch {
+	case total_session_minute <= 15:
+		oldModel.FirstQuarterHourTouchCount = oldModel.FirstQuarterHourTouchCount + int32(modelResponse.FirstTouchCount)
+	}
 }
 
 func CalculateClickHalfHour(modelResponse *model.ScreenClickRespondModel, oldModel *model.ScreenClickRespondModel, total_session_minute int32) {
@@ -325,6 +369,22 @@ func CalculateClickCount(modelResponse *model.ScreenClickRespondModel, oldModel 
 		oldModel.FifthStartYCor = modelResponse.FirstStartYCor
 		oldModel.FifthFinishXCor = modelResponse.FirstFinishXCor
 		oldModel.FifthFinishYCor = modelResponse.FirstFinishYCor
+	case 6:
+		oldModel.SixthClickSessionHour = modelResponse.FirstClickSessionHour
+		oldModel.SixthClickSessionMinute = modelResponse.FirstClickSessionMinute
+		oldModel.SixthTouchCount = modelResponse.FirstTouchCount
+		oldModel.SixthStartXCor = modelResponse.FirstStartXCor
+		oldModel.SixthStartYCor = modelResponse.FirstStartYCor
+		oldModel.SixthFinishXCor = modelResponse.FirstFinishXCor
+		oldModel.SixthFinishYCor = modelResponse.FirstFinishYCor
+	case 7:
+		oldModel.SeventhClickSessionHour = modelResponse.FirstClickSessionHour
+		oldModel.SeventhClickSessionMinute = modelResponse.FirstClickSessionMinute
+		oldModel.SeventhTouchCount = modelResponse.FirstTouchCount
+		oldModel.SeventhStartXCor = modelResponse.FirstStartXCor
+		oldModel.SeventhStartYCor = modelResponse.FirstStartYCor
+		oldModel.SeventhFinishXCor = modelResponse.FirstFinishXCor
+		oldModel.SeventhFinishYCor = modelResponse.FirstFinishYCor
 	}
 }
 

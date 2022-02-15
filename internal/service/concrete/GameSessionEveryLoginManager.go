@@ -56,6 +56,12 @@ func (g *gameSessionEveryLoginManager) ConvertRawModelToResponseModel(data *[]by
 	modelResponse.FifthSessionHour = 0
 	modelResponse.FifthSessionDuration = 0
 	modelResponse.FifthSessionMinute = 0
+	modelResponse.SixthSessionHour = 0
+	modelResponse.SixthSessionDuration = 0
+	modelResponse.SixthSessionMinute = 0
+	modelResponse.SeventhSessionHour = 0
+	modelResponse.SeventhSessionDuration = 0
+	modelResponse.SeventhSessionMinute = 0
 	modelResponse.PenultimateSessionHour = 0
 	modelResponse.PenultimateSessionDuration = 0
 	modelResponse.PenultimateSessionMinute = 0
@@ -68,7 +74,12 @@ func (g *gameSessionEveryLoginManager) ConvertRawModelToResponseModel(data *[]by
 	modelResponse.LastSessionDuration = 0
 	modelResponse.LastSessionMinute = 0
 	modelResponse.LastDurationMinusPenultimateDuration = 0
-
+	modelResponse.FirstFiveMinutesTotalSessionCount     = 1
+	modelResponse.FirstFiveMinutesTotalSessionDuration = 1
+	modelResponse.FirstTenMinutesTotalSessionCount     = 1
+	modelResponse.FirstTenMinutesTotalSessionDuration  = 1
+	modelResponse.FirstQuarterHourTotalSessionCount    = 1
+	modelResponse.FirstQuarterHourTotalSessionDuration = 1
 	modelResponse.FirstHalfHourTotalSessionCount = 1
 	modelResponse.FirstHalfHourTotalSessionDuration = int16(firstModel.SessionTimeMinute)
 	modelResponse.FirstHourTotalSessionCount = 1
@@ -163,6 +174,8 @@ func (g *gameSessionEveryLoginManager) UpdateGameSession(modelResponse *model.Ga
 	CalculateThirdGameSession(modelResponse, oldModel)
 	CalculateFourthGameSession(modelResponse, oldModel)
 	CalculateFifthGameSession(modelResponse, oldModel)
+	CalculateSixthGameSession(modelResponse, oldModel)
+	CalculateSixthGameSession(modelResponse, oldModel)
 
 	CalculateFirstDayTotalSessionCountAndDuration(modelResponse, oldModel, oldModel.TotalSessionMinute)
 	CalculateSecondDayTotalSessionCountAndDuration(modelResponse, oldModel, oldModel.TotalSessionHour)
@@ -171,7 +184,10 @@ func (g *gameSessionEveryLoginManager) UpdateGameSession(modelResponse *model.Ga
 	CalculateFifthDayTotalSessionCountAndDuration(modelResponse, oldModel, oldModel.TotalSessionHour)
 	CalculateSixthDayTotalSessionCountAndDuration(modelResponse, oldModel, oldModel.TotalSessionHour)
 	CalculateSeventhDayTotalSessionCountAndDuration(modelResponse, oldModel, oldModel.TotalSessionHour)
-
+	
+	CalculateFirstFiveMinutesTotalSessionCountAndSessionDuration(modelResponse, oldModel, oldModel.TotalSessionMinute)
+	CalculateFirstTenMinutesTotalSessionCountAndSessionDuration(modelResponse, oldModel, oldModel.TotalSessionMinute)
+	CalculateFirstQuarterHourTotalSessionCountAndSessionDuration(modelResponse, oldModel, oldModel.TotalSessionMinute)
 	CalculateFirstHalfHourTotalSessionCountAndSessionDuration(modelResponse, oldModel, oldModel.TotalSessionMinute)
 	CalculateFirstHourTotalSessionCountAndDuration(modelResponse, oldModel, oldModel.TotalSessionMinute)
 	CalculateFirstTwoHourTotalSessionCountAndDuration(modelResponse, oldModel, oldModel.TotalSessionMinute)
@@ -226,6 +242,30 @@ func CalculateDailyAvegareSessionCountAndDuration(oldModel *model.GameSessionEve
 		return float32(oldModel.TotalSessionCount), float32(oldModel.TotalSessionDuration)
 	}
 	return float32(oldModel.TotalSessionCount) / float32(oldModel.TotalSessionDay), float32(oldModel.TotalSessionDuration) / float32(oldModel.TotalSessionDay)
+}
+
+func CalculateFirstFiveMinutesTotalSessionCountAndSessionDuration(modelResponse *model.GameSessionEveryLoginRespondModel, oldModel *model.GameSessionEveryLoginRespondModel, total_session_minute int32) {
+	switch {
+	case total_session_minute <= 5:
+		oldModel.FirstFiveMinutesTotalSessionCount = oldModel.FirstFiveMinutesTotalSessionCount + modelResponse.FirstDayTotalSessionCount
+		oldModel.FirstFiveMinutesTotalSessionDuration = oldModel.FirstFiveMinutesTotalSessionDuration + modelResponse.FirstDayTotalSessionDuration
+	}
+}
+
+func CalculateFirstTenMinutesTotalSessionCountAndSessionDuration(modelResponse *model.GameSessionEveryLoginRespondModel, oldModel *model.GameSessionEveryLoginRespondModel, total_session_minute int32) {
+	switch {
+	case total_session_minute <= 10:
+		oldModel.FirstTenMinutesTotalSessionCount = oldModel.FirstTenMinutesTotalSessionCount + modelResponse.FirstDayTotalSessionCount
+		oldModel.FirstTenMinutesTotalSessionDuration = oldModel.FirstTenMinutesTotalSessionDuration + modelResponse.FirstDayTotalSessionDuration
+	}
+}
+
+func CalculateFirstQuarterHourTotalSessionCountAndSessionDuration(modelResponse *model.GameSessionEveryLoginRespondModel, oldModel *model.GameSessionEveryLoginRespondModel, total_session_minute int32) {
+	switch {
+	case total_session_minute <= 15:
+		oldModel.FirstQuarterHourTotalSessionCount = oldModel.FirstQuarterHourTotalSessionCount + modelResponse.FirstDayTotalSessionCount
+		oldModel.FirstQuarterHourTotalSessionDuration = oldModel.FirstQuarterHourTotalSessionDuration + modelResponse.FirstDayTotalSessionDuration
+	}
 }
 
 func CalculateFirstHalfHourTotalSessionCountAndSessionDuration(modelResponse *model.GameSessionEveryLoginRespondModel, oldModel *model.GameSessionEveryLoginRespondModel, total_session_minute int32) {
@@ -365,6 +405,24 @@ func CalculateFifthGameSession(modelResponse *model.GameSessionEveryLoginRespond
 		oldModel.FifthSessionHour = modelResponse.FirstSessionHour
 		oldModel.FifthSessionDuration = modelResponse.FirstSessionDuration
 		oldModel.FifthSessionMinute = modelResponse.FirstSessionMinute
+	}
+}
+
+func CalculateSixthGameSession(modelResponse *model.GameSessionEveryLoginRespondModel, oldModel *model.GameSessionEveryLoginRespondModel) {
+	switch oldModel.TotalSessionCount {
+	case 6:
+		oldModel.SixthSessionHour = modelResponse.FirstSessionHour
+		oldModel.SixthSessionDuration = modelResponse.FirstSessionDuration
+		oldModel.SixthSessionMinute = modelResponse.FirstSessionMinute
+	}
+}
+
+func CalculateSeventhGameSession(modelResponse *model.GameSessionEveryLoginRespondModel, oldModel *model.GameSessionEveryLoginRespondModel) {
+	switch oldModel.TotalSessionCount {
+	case 7:
+		oldModel.SeventhSessionHour = modelResponse.FirstSessionHour
+		oldModel.SeventhSessionDuration = modelResponse.FirstSessionDuration
+		oldModel.SeventhSessionMinute = modelResponse.FirstSessionMinute
 	}
 }
 

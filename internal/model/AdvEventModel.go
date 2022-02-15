@@ -35,6 +35,14 @@ type AdvEventRespondModel struct {
 	FifthAdvHour                                       int16
 	FifthAdvMinute                                     int16
 	FifthAdvType                                       byte
+	SixthAdvYearOfDay                                  int16
+	SixthAdvHour                                       int16
+	SixthAdvMinute                                     int16
+	SixthAdvType                                       byte
+	SeventhAdvYearOfDay                                int16
+	SeventhAdvHour                                     int16
+	SeventhAdvMinute                                   int16
+	SeventhAdvType                                     byte
 	PenultimateAdvYearOfDay                            int16
 	PenultimateAdvHour                                 int16
 	PenultimateAdvMinute                               int16
@@ -44,6 +52,9 @@ type AdvEventRespondModel struct {
 	LastAdvClickHour                                   int16
 	LastAdvClickMinute                                 int16
 	LastAdvType                                        byte
+	FirstFiveMinutesAdvClickCount                      int16
+	FirstTenMinutesAdvClickCount                       int16
+	FirstQuarterHourAdvClickCount                      int16
 	FirstHalfHourAdvClickCount                         int16
 	FirstHourAdvClickCount                             int16
 	FirstTwoHourAdvClickCount                          int16

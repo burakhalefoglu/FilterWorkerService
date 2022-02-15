@@ -58,6 +58,8 @@ func (l *levelBaseSessionManager) ConvertRawModelToResponseModel(data *[]byte) (
 	modelResponse.SixLevelSessionDuration = 0
 	modelResponse.SevenLevelSessionLevelIndex = 0
 	modelResponse.SevenLevelSessionDuration = 0
+	modelResponse.FirstFiveMinutesTotalLevelBaseSessionCount = 1
+	modelResponse.FirstTenMinutesTotalLevelBaseSessionCount = 1
 	modelResponse.FirstQuarterHourTotalLevelBaseSessionCount = 1
 	modelResponse.FirstHalfHourTotalLevelBaseSessionCount = 1
 	modelResponse.FirstHourTotalLevelBaseSessionCount = 1
@@ -116,6 +118,8 @@ func (l *levelBaseSessionManager) UpdateLevelBaseSession(modelResponse *model.Le
 	oldModel.TotalLevelBaseSessionMinute = (((int32(modelResponse.FirstLevelSessionYearOfDay)+365*int32(modelResponse.FirstLevelSessionYear))*24+int32(modelResponse.FirstLevelSessionHour))*60 + int32(modelResponse.FirstLevelSessionMinute)) - (((int32(oldModel.FirstLevelSessionYearOfDay)+365*int32(oldModel.FirstLevelSessionYear))*24+int32(oldModel.FirstLevelSessionHour))*60 + int32(oldModel.FirstLevelSessionMinute))
 	oldModel.TotalLevelBaseSessionCount = modelResponse.TotalLevelBaseSessionCount + oldModel.TotalLevelBaseSessionCount
 	CalculateLevelIndexBaseSession(modelResponse, oldModel)
+	CalculateLevelBaseSessionFirstFiveMinutes(modelResponse, oldModel, oldModel.TotalLevelBaseSessionMinute)
+	CalculateLevelBaseSessionFirstTenMinutes(modelResponse, oldModel, oldModel.TotalLevelBaseSessionMinute)
 	CalculateLevelBaseSessionFirstQuarterHour(modelResponse, oldModel, oldModel.TotalLevelBaseSessionMinute)
 	CalculateLevelBaseSessionFirstHalfHour(modelResponse, oldModel, oldModel.TotalLevelBaseSessionMinute)
 	CalculateLevelBaseSessionFirstHour(modelResponse, oldModel, oldModel.TotalLevelBaseSessionMinute)
@@ -144,6 +148,20 @@ func (l *levelBaseSessionManager) UpdateLevelBaseSession(modelResponse *model.Le
 		return oldModel, false, logErr
 	}
 	return oldModel, true, nil
+}
+
+func CalculateLevelBaseSessionFirstFiveMinutes(modelResponse *model.LevelBaseSessionRespondModel, oldModel *model.LevelBaseSessionRespondModel, total_session_minute int32) {
+	switch {
+	case total_session_minute <= 5:
+		oldModel.FirstFiveMinutesTotalLevelBaseSessionCount = oldModel.FirstFiveMinutesTotalLevelBaseSessionCount + modelResponse.FirstFiveMinutesTotalLevelBaseSessionCount
+	}
+}
+
+func CalculateLevelBaseSessionFirstTenMinutes(modelResponse *model.LevelBaseSessionRespondModel, oldModel *model.LevelBaseSessionRespondModel, total_session_minute int32) {
+	switch {
+	case total_session_minute <= 10:
+		oldModel.FirstTenMinutesTotalLevelBaseSessionCount = oldModel.FirstTenMinutesTotalLevelBaseSessionCount + modelResponse.FirstTenMinutesTotalLevelBaseSessionCount
+	}
 }
 
 func CalculateLevelBaseSessionFirstQuarterHour(modelResponse *model.LevelBaseSessionRespondModel, oldModel *model.LevelBaseSessionRespondModel, total_session_minute int32) {

@@ -24,6 +24,12 @@ type GameSessionEveryLoginRespondModel struct {
 	FifthSessionHour                                            int16
 	FifthSessionDuration                                        int16
 	FifthSessionMinute                                          int16
+	SixthSessionHour                                            int16
+	SixthSessionDuration                                        int16
+	SixthSessionMinute                                          int16
+	SeventhSessionHour                                            int16
+	SeventhSessionDuration                                        int16
+	SeventhSessionMinute                                          int16
 	PenultimateSessionHour                                      int16
 	PenultimateSessionDuration                                  int16
 	PenultimateSessionMinute                                    int16
@@ -33,6 +39,12 @@ type GameSessionEveryLoginRespondModel struct {
 	LastSessionDuration                                         int16
 	LastSessionMinute                                           int16
 	LastDurationMinusPenultimateDuration                        int16
+	FirstFiveMinutesTotalSessionCount                              int16
+	FirstFiveMinutesTotalSessionDuration                           int16
+	FirstTenMinutesTotalSessionCount                              int16
+	FirstTenMinutesTotalSessionDuration                           int16
+	FirstQuarterHourTotalSessionCount                              int16
+	FirstQuarterHourTotalSessionDuration                           int16
 	FirstHalfHourTotalSessionCount                              int16
 	FirstHalfHourTotalSessionDuration                           int16
 	FirstHourTotalSessionCount                                  int16

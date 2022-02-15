@@ -73,6 +73,17 @@ func (sc *screenSwipeManager) ConvertRawModelToResponseModel(data *[]byte) (v in
 	modelResponse.FifthSwipeFinishXCor = 0
 	modelResponse.FifthSwipeFinishYCor = 0
 
+	modelResponse.SixthSwipeDirection = 0
+	modelResponse.SixthSwipeStartXCor = 0
+	modelResponse.SixthSwipeStartYCor = 0
+	modelResponse.SixthSwipeFinishXCor = 0
+	modelResponse.SixthSwipeFinishYCor = 0
+	modelResponse.SeventhSwipeDirection = 0
+	modelResponse.SeventhSwipeStartXCor = 0
+	modelResponse.SeventhSwipeStartYCor = 0
+	modelResponse.SeventhSwipeFinishXCor = 0
+	modelResponse.SeventhSwipeFinishYCor = 0
+
 	modelResponse.PenultimateSwipeDirection = 0
 	modelResponse.PenultimateSwipeStartXCor = 0
 	modelResponse.PenultimateSwipeStartYCor = 0
@@ -403,5 +414,17 @@ func CalculateSwipeNumber(modelResponse *model.ScreenSwipeRespondModel, oldModel
 		oldModel.FifthSwipeStartYCor = modelResponse.FirstSwipeStartYCor
 		oldModel.FifthSwipeFinishXCor = modelResponse.FirstSwipeFinishXCor
 		oldModel.FifthSwipeFinishYCor = modelResponse.FirstSwipeFinishYCor
+	case 6:
+		oldModel.SixthSwipeDirection = modelResponse.FistSwipeDirection
+		oldModel.SixthSwipeStartXCor = modelResponse.FirstSwipeStartXCor
+		oldModel.SixthSwipeStartYCor = modelResponse.FirstSwipeStartYCor
+		oldModel.SixthSwipeFinishXCor = modelResponse.FirstSwipeFinishXCor
+		oldModel.SixthSwipeFinishYCor = modelResponse.FirstSwipeFinishYCor
+	case 7:
+		oldModel.SeventhSwipeDirection = modelResponse.FistSwipeDirection
+		oldModel.SeventhSwipeStartXCor = modelResponse.FirstSwipeStartXCor
+		oldModel.SeventhSwipeStartYCor = modelResponse.FirstSwipeStartYCor
+		oldModel.SeventhSwipeFinishXCor = modelResponse.FirstSwipeFinishXCor
+		oldModel.SeventhSwipeFinishYCor = modelResponse.FirstSwipeFinishYCor
 	}
 }

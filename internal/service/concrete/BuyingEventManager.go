@@ -65,6 +65,14 @@ func (b *buyingEventManager) ConvertRawModelToResponseModel(data *[]byte) (v int
 	modelResponse.FifthBuyingYearOfDay = 0
 	modelResponse.FifthBuyingHour = 0
 	modelResponse.FifthBuyingMinute = 0
+	modelResponse.SixthBuyingYearOfDay     = 0
+	modelResponse.SixthBuyingHour          = 0
+	modelResponse.SixthBuyingMinute        = 0
+	modelResponse.SixthBuyingProductType   = 0
+	modelResponse.SeventhBuyingYearOfDay   = 0
+	modelResponse.SeventhBuyingHour        = 0
+	modelResponse.SeventhBuyingMinute      = 0
+	modelResponse.SeventhBuyingProductType = 0
 	modelResponse.FifthBuyingProductType = 0
 	modelResponse.PenultimateBuyingYearOfDay = 0
 	modelResponse.PenultimateBuyingHour = 0
@@ -134,6 +142,8 @@ func (b *buyingEventManager) UpdateBuyingEvent(modelResponse *model.BuyingEventR
 	CalculateThirdBuying(modelResponse, oldModel)
 	CalculateFourthBuying(modelResponse, oldModel)
 	CalculateFifthBuying(modelResponse, oldModel)
+	CalculateSixthBuying(modelResponse, oldModel)
+	CalculateSeventhBuying(modelResponse, oldModel)
 	CalculateFirstDayBuyingCount(modelResponse, oldModel, oldModel.TotalBuyingHour)
 	CalculateSecondDayBuyingCount(modelResponse, oldModel, oldModel.TotalBuyingHour)
 	CalculateThirdDayBuyingCount(modelResponse, oldModel, oldModel.TotalBuyingHour)
@@ -219,6 +229,26 @@ func CalculateFifthBuying(modelResponse *model.BuyingEventRespondModel, oldModel
 		oldModel.FifthBuyingHour = modelResponse.FirstBuyingHour
 		oldModel.FifthBuyingMinute = modelResponse.FourthBuyingMinute
 		oldModel.FifthBuyingProductType = modelResponse.FourthBuyingProductType
+	}
+}
+
+func CalculateSixthBuying(modelResponse *model.BuyingEventRespondModel, oldModel *model.BuyingEventRespondModel) {
+	switch oldModel.TotalBuyingCount {
+	case 6:
+		oldModel.SixthBuyingYearOfDay = modelResponse.FirstBuyingYearOfDay
+		oldModel.SixthBuyingHour = modelResponse.FirstBuyingHour
+		oldModel.SixthBuyingMinute = modelResponse.FourthBuyingMinute
+		oldModel.SixthBuyingProductType = modelResponse.FourthBuyingProductType
+	}
+}
+
+func CalculateSeventhBuying(modelResponse *model.BuyingEventRespondModel, oldModel *model.BuyingEventRespondModel) {
+	switch oldModel.TotalBuyingCount {
+	case 7:
+		oldModel.SeventhBuyingYearOfDay = modelResponse.FirstBuyingYearOfDay
+		oldModel.SeventhBuyingHour = modelResponse.FirstBuyingHour
+		oldModel.SeventhBuyingMinute = modelResponse.FourthBuyingMinute
+		oldModel.SeventhBuyingProductType = modelResponse.FourthBuyingProductType
 	}
 }
 

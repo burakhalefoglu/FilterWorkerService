@@ -39,6 +39,16 @@ type ScreenSwipeRespondModel struct {
 	FifthSwipeStartYCor            float32
 	FifthSwipeFinishXCor           float32
 	FifthSwipeFinishYCor           float32
+	SixthSwipeDirection            byte
+	SixthSwipeStartXCor            float32
+	SixthSwipeStartYCor            float32
+	SixthSwipeFinishXCor           float32
+	SixthSwipeFinishYCor           float32
+	SeventhSwipeDirection          byte
+	SeventhSwipeStartXCor          float32
+	SeventhSwipeStartYCor          float32
+	SeventhSwipeFinishXCor         float32
+	SeventhSwipeFinishYCor         float32
 	PenultimateSwipeDirection      byte
 	PenultimateSwipeStartXCor      float32
 	PenultimateSwipeStartYCor      float32
