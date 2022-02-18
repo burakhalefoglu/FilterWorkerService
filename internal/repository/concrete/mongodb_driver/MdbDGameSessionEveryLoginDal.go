@@ -19,7 +19,7 @@ func MdbDGameSessionEveryLoginDalConstructor() *mdbdDGameSessionEveryLoginDal {
 	return &mdbdDGameSessionEveryLoginDal{Client: mongodb.GetMongodbClient()}
 }
 
-func (m *mdbdDGameSessionEveryLoginDal) Add(data *model.GameSessionEveryLoginRespondModel) error {
+func (m *mdbdDGameSessionEveryLoginDal) Add(data *model.GameSessionResponseModel) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	collection := m.Client.Database("MLDatabase").Collection("gameSessionEveryLoginModels")
@@ -113,14 +113,14 @@ func (m *mdbdDGameSessionEveryLoginDal) Add(data *model.GameSessionEveryLoginRes
 	return nil
 }
 
-func (m *mdbdDGameSessionEveryLoginDal) GetGameSessionEveryLoginById(ClientId string) (*model.GameSessionEveryLoginRespondModel, error) {
+func (m *mdbdDGameSessionEveryLoginDal) GetGameSessionEveryLoginById(ClientId string) (*model.GameSessionResponseModel, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	collection := m.Client.Database("MLDatabase").Collection("GameSessionEveryLoginModel")
 	var result = collection.FindOne(ctx, bson.D{{
 		"ClientId", ClientId,
 	}})
-	var model = model.GameSessionEveryLoginRespondModel{}
+	var model = model.GameSessionResponseModel{}
 	if result.Err() != nil && result.Err().Error() == "mongo: no documents in result" {
 		return &model, errors.New("null data error")
 	}
@@ -134,7 +134,7 @@ func (m *mdbdDGameSessionEveryLoginDal) GetGameSessionEveryLoginById(ClientId st
 	return &model, nil
 }
 
-func (m *mdbdDGameSessionEveryLoginDal) UpdateGameSessionEveryLoginById(ClientId string, data *model.GameSessionEveryLoginRespondModel) error {
+func (m *mdbdDGameSessionEveryLoginDal) UpdateGameSessionEveryLoginById(ClientId string, data *model.GameSessionResponseModel) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	update := bson.D{{"$set", bson.D{

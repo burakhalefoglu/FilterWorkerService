@@ -19,7 +19,7 @@ func MdbDScreenSwipeDalConstructor() *mdbDScreenSwipeDal {
 	return &mdbDScreenSwipeDal{Client: mongodb.GetMongodbClient()}
 }
 
-func (m *mdbDScreenSwipeDal) Add(data *model.ScreenSwipeRespondModel) error {
+func (m *mdbDScreenSwipeDal) Add(data *model.ScreenSwipeResponseModel) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	collection := m.Client.Database("MLDatabase").Collection("screenSwipeModels")
@@ -159,14 +159,14 @@ func (m *mdbDScreenSwipeDal) Add(data *model.ScreenSwipeRespondModel) error {
 	return nil
 }
 
-func (m *mdbDScreenSwipeDal) GetScreenSwipeById(ClientId string) (*model.ScreenSwipeRespondModel, error) {
+func (m *mdbDScreenSwipeDal) GetScreenSwipeById(ClientId string) (*model.ScreenSwipeResponseModel, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	collection := m.Client.Database("MLDatabase").Collection("ScreenSwipeModel")
 	var result = collection.FindOne(ctx, bson.D{{
 		"ClientId", ClientId,
 	}})
-	var model = model.ScreenSwipeRespondModel{}
+	var model = model.ScreenSwipeResponseModel{}
 	if result.Err() != nil && result.Err().Error() == "mongo: no documents in result" {
 		return &model, errors.New("null data error")
 	}
@@ -180,7 +180,7 @@ func (m *mdbDScreenSwipeDal) GetScreenSwipeById(ClientId string) (*model.ScreenS
 	return &model, nil
 }
 
-func (m *mdbDScreenSwipeDal) UpdateScreenSwipeById(ClientId string, data *model.ScreenSwipeRespondModel) error {
+func (m *mdbDScreenSwipeDal) UpdateScreenSwipeById(ClientId string, data *model.ScreenSwipeResponseModel) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	update := bson.D{{"$set", bson.D{

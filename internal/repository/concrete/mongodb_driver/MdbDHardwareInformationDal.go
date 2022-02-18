@@ -18,7 +18,7 @@ func MdbDHardwareInformationDalConstructor() *mdbDHardwareInformationDal {
 	return &mdbDHardwareInformationDal{Client: mongodb.GetMongodbClient()}
 }
 
-func (m *mdbDHardwareInformationDal) Add(data *model.HardwareInformationResponseModel) error {
+func (m *mdbDHardwareInformationDal) Add(data *model.HardwareResponseModel) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	collection := m.Client.Database("MLDatabase").Collection("hardwareInformationModels")

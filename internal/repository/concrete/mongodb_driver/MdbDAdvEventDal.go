@@ -19,7 +19,7 @@ func MdbDAdvEventDalConstructor() *mdbDAdvEventDal {
 	return &mdbDAdvEventDal{Client: mongodb.GetMongodbClient()}
 }
 
-func (m *mdbDAdvEventDal) Add(data *model.AdvEventRespondModel) error {
+func (m *mdbDAdvEventDal) Add(data *model.AdvEventResponseModel) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -39,7 +39,7 @@ func (m *mdbDAdvEventDal) Add(data *model.AdvEventRespondModel) error {
 		{"FirstAdvYear", data.FirstAdvYear},
 		{"FirstWeekDay", data.FirstWeekDay},
 		{"FirstAdvClickHour", data.FirstAdvClickHour},
-		{"FirstADvClickMinute", data.FirstADvClickMinute},
+		{"FirstADvClickMinute", data.FirstAdvClickMinute},
 		{"FirstAdvType", data.FirstAdvType},
 		{"SecondAdvYearOfDay", data.SecondAdvYearOfDay},
 		{"SecondAdvHour", data.SecondAdvHour},
@@ -104,7 +104,7 @@ func (m *mdbDAdvEventDal) Add(data *model.AdvEventRespondModel) error {
 	return nil
 }
 
-func (m *mdbDAdvEventDal) GetAdvEventById(ClientId string) (*model.AdvEventRespondModel, error) {
+func (m *mdbDAdvEventDal) GetAdvEventById(ClientId string) (*model.AdvEventResponseModel, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -113,7 +113,7 @@ func (m *mdbDAdvEventDal) GetAdvEventById(ClientId string) (*model.AdvEventRespo
 		"ClientId", ClientId,
 	}})
 
-	var model = model.AdvEventRespondModel{}
+	var model = model.AdvEventResponseModel{}
 	if result.Err() != nil && result.Err().Error() == "mongo: no documents in result" {
 		return &model, errors.New("null data error")
 	}
@@ -127,7 +127,7 @@ func (m *mdbDAdvEventDal) GetAdvEventById(ClientId string) (*model.AdvEventRespo
 	return &model, nil
 }
 
-func (m *mdbDAdvEventDal) UpdateAdvEventById(ClientId string, data *model.AdvEventRespondModel) error {
+func (m *mdbDAdvEventDal) UpdateAdvEventById(ClientId string, data *model.AdvEventResponseModel) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	update := bson.D{{"$set", bson.D{
@@ -145,7 +145,7 @@ func (m *mdbDAdvEventDal) UpdateAdvEventById(ClientId string, data *model.AdvEve
 		{"FirstAdvYear", data.FirstAdvYear},
 		{"FirstWeekDay", data.FirstWeekDay},
 		{"FirstAdvClickHour", data.FirstAdvClickHour},
-		{"FirstADvClickMinute", data.FirstADvClickMinute},
+		{"FirstADvClickMinute", data.FirstAdvClickMinute},
 		{"FirstAdvType", data.FirstAdvType},
 		{"SecondAdvYearOfDay", data.SecondAdvYearOfDay},
 		{"SecondAdvHour", data.SecondAdvHour},

@@ -19,7 +19,7 @@ func MdbDScreenClickDalConstructor() *mdbDScreenClickDal {
 	return &mdbDScreenClickDal{Client: mongodb.GetMongodbClient()}
 }
 
-func (m *mdbDScreenClickDal) Add(data *model.ScreenClickRespondModel) error {
+func (m *mdbDScreenClickDal) Add(data *model.ScreenClickResponseModel) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	collection := m.Client.Database("MLDatabase").Collection("screenClickModels")
@@ -121,14 +121,14 @@ func (m *mdbDScreenClickDal) Add(data *model.ScreenClickRespondModel) error {
 	return nil
 }
 
-func (m *mdbDScreenClickDal) GetScreenClickById(ClientId string) (*model.ScreenClickRespondModel, error) {
+func (m *mdbDScreenClickDal) GetScreenClickById(ClientId string) (*model.ScreenClickResponseModel, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	collection := m.Client.Database("MLDatabase").Collection("ScreenClickModel")
 	var result = collection.FindOne(ctx, bson.D{{
 		"ClientId", ClientId,
 	}})
-	var model = model.ScreenClickRespondModel{}
+	var model = model.ScreenClickResponseModel{}
 	if result.Err() != nil && result.Err().Error() == "mongo: no documents in result" {
 		return &model, errors.New("null data error")
 	}
@@ -142,7 +142,7 @@ func (m *mdbDScreenClickDal) GetScreenClickById(ClientId string) (*model.ScreenC
 	return &model, nil
 }
 
-func (m *mdbDScreenClickDal) UpdateScreenClickById(ClientId string, data *model.ScreenClickRespondModel) error {
+func (m *mdbDScreenClickDal) UpdateScreenClickById(ClientId string, data *model.ScreenClickResponseModel) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	update := bson.D{{"$set", bson.D{

@@ -19,7 +19,7 @@ func MdbDBuyingEventDalConstructor() *mdbDBuyingEventDal {
 	return &mdbDBuyingEventDal{Client: mongodb.GetMongodbClient()}
 }
 
-func (m *mdbDBuyingEventDal) Add(data *model.BuyingEventRespondModel) error {
+func (m *mdbDBuyingEventDal) Add(data *model.BuyingEventResponseModel) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	collection := m.Client.Database("MLDatabase").Collection("buyingEventModels")
@@ -95,7 +95,7 @@ func (m *mdbDBuyingEventDal) Add(data *model.BuyingEventRespondModel) error {
 	return nil
 }
 
-func (m *mdbDBuyingEventDal) GetBuyingEventById(ClientId string) (*model.BuyingEventRespondModel, error) {
+func (m *mdbDBuyingEventDal) GetBuyingEventById(ClientId string) (*model.BuyingEventResponseModel, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	collection := m.Client.Database("MLDatabase").Collection("BuyingEventModel")
@@ -103,7 +103,7 @@ func (m *mdbDBuyingEventDal) GetBuyingEventById(ClientId string) (*model.BuyingE
 		"ClientId", ClientId,
 	}})
 
-	var model = model.BuyingEventRespondModel{}
+	var model = model.BuyingEventResponseModel{}
 	if result.Err() != nil && result.Err().Error() == "mongo: no documents in result" {
 		return &model, errors.New("null data error")
 	}
@@ -118,7 +118,7 @@ func (m *mdbDBuyingEventDal) GetBuyingEventById(ClientId string) (*model.BuyingE
 	return &model, nil
 }
 
-func (m *mdbDBuyingEventDal) UpdateBuyingEventById(ClientId string, data *model.BuyingEventRespondModel) error {
+func (m *mdbDBuyingEventDal) UpdateBuyingEventById(ClientId string, data *model.BuyingEventResponseModel) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
