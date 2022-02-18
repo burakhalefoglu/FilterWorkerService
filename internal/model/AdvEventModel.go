@@ -2,10 +2,11 @@ package model
 
 import "time"
 
-type AdvEventRespondModel struct {
-	ProjectId                                          string
-	ClientId                                           string
-	CustomerId                                         string
+type AdvEventResponseModel struct {
+	Id                                                 int64
+	ClientId                                           int64
+	ProjectId                                          int64
+	CustomerId                                         int64
 	LevelIndex                                         int16
 	TotalAdvDay                                        int32
 	TotalAdvCount                                      int32
@@ -17,7 +18,7 @@ type AdvEventRespondModel struct {
 	FirstAdvYear                                       int16
 	FirstWeekDay                                       int16
 	FirstAdvClickHour                                  int16
-	FirstADvClickMinute                                int16
+	FirstAdvClickMinute                                int16
 	FirstAdvType                                       byte
 	SecondAdvYearOfDay                                 int16
 	SecondAdvHour                                      int16
@@ -86,17 +87,20 @@ type AdvEventRespondModel struct {
 	AdvClick6To11HourCount                             int16
 	AdvClick12To17HourCount                            int16
 	AdvClick18To23HourCount                            int16
+	Status                                             bool
 }
 
 //IsdeadAndVideoClickCount                                  int16
 
-type AdvEventModel struct {
-	ProjectId   string
-	ClientId    string
-	CustomerId  string
-	LevelName   string
-	LevelIndex  int
-	AdvType     string
-	InMinutes   int
-	TrigerdTime time.Time
+type AdvEventDataModel struct {
+	Id            int64
+	ClientId      int64
+	ProjectId     int64
+	CustomerId    int64
+	LevelName     string
+	LevelIndex    int32
+	AdvType       string
+	InMinutes     float32
+	TriggeredTime time.Time
+	Status        bool
 }

@@ -2,10 +2,11 @@ package model
 
 import "time"
 
-type BuyingEventRespondModel struct {
-	ProjectId                    string
-	ClientId                     string
-	CustomerId                   string
+type BuyingEventResponseModel struct {
+	Id                           int64
+	ClientId                     int64
+	ProjectId                    int64
+	CustomerId                   int64
 	LevelIndex                   int16
 	TotalBuyingCount             int32
 	TotalBuyingDay               int32
@@ -70,6 +71,7 @@ type BuyingEventRespondModel struct {
 	Buying18To23HourCount        int16
 	BuyingDayAverageBuyingCount  float32
 	LevelBasedAverageBuyingCount float32
+	Status                       bool
 }
 
 // PenultimateDayBuyingCount    int16
@@ -79,12 +81,14 @@ type BuyingEventRespondModel struct {
 //IsDeadAndBuyingItemCount                               int16
 
 type BuyingEventModel struct {
-	ProjectId     string
-	ClientId      string
-	CustomerId    string
+	Id            int64
+	ClientId      int64
+	ProjectId     int64
+	CustomerId    int64
 	LevelName     string
-	LevelIndex    int
-	InWhatMinutes int
+	LevelIndex    int32
 	ProductType   string
-	TrigerdTime   time.Time
+	InMinutes     float32
+	TriggeredTime time.Time
+	Status        bool
 }

@@ -21,19 +21,20 @@ func LevelBaseSessionManagerConstructor() *levelBaseSessionManager {
 }
 
 func (l *levelBaseSessionManager) ConvertRawModelToResponseModel(data *[]byte) (v interface{}, s bool, m string) {
-	firstModel := model.LevelBaseSessionDataModel{}
+	firstModel := model.LevelBaseSessionModel{}
 	convertErr := (*l.IJsonParser).DecodeJson(data, &firstModel)
 	if convertErr != nil {
 		log.Fatal("LevelBaseSessionManager", "ConvertRawModelToResponseModel",
 			"byte array to LevelBaseSessionDataModel", "Json Parser Decode Err: ", convertErr.Error())
-		return &model.LevelBaseSessionRespondModel{}, false, convertErr.Error()
+		return &model.LevelBaseSessionResponseModel{}, false, convertErr.Error()
 	}
 	hour := int16(firstModel.SessionFinishTime.Hour())
 	yearOfDay := int16(firstModel.SessionFinishTime.YearDay())
 	year := int16(firstModel.SessionFinishTime.Year())
 	weekDay := int16(firstModel.SessionFinishTime.Weekday())
 	minute := int16(firstModel.SessionFinishTime.Minute())
-	modelResponse := model.LevelBaseSessionRespondModel{}
+	modelResponse := model.LevelBaseSessionResponseModel{}
+	modelResponse.Id = firstModel.Id
 	modelResponse.ProjectId = firstModel.ProjectId
 	modelResponse.ClientId = firstModel.ClientId
 	modelResponse.CustomerId = firstModel.CustomerId
@@ -110,8 +111,8 @@ func (l *levelBaseSessionManager) ConvertRawModelToResponseModel(data *[]byte) (
 	}
 }
 
-func (l *levelBaseSessionManager) UpdateLevelBaseSession(modelResponse *model.LevelBaseSessionRespondModel, oldModel *model.LevelBaseSessionRespondModel) (updatedModel *model.LevelBaseSessionRespondModel, s bool, m error) {
-
+func (l *levelBaseSessionManager) UpdateLevelBaseSession(modelResponse *model.LevelBaseSessionResponseModel, oldModel *model.LevelBaseSessionResponseModel) (updatedModel *model.LevelBaseSessionResponseModel, s bool, m error) {
+	oldModel.Id = modelResponse.Id
 	oldModel.ProjectId = modelResponse.ProjectId
 	oldModel.ClientId = modelResponse.ClientId
 	oldModel.CustomerId = modelResponse.CustomerId
@@ -150,77 +151,77 @@ func (l *levelBaseSessionManager) UpdateLevelBaseSession(modelResponse *model.Le
 	return oldModel, true, nil
 }
 
-func CalculateLevelBaseSessionFirstFiveMinutes(modelResponse *model.LevelBaseSessionRespondModel, oldModel *model.LevelBaseSessionRespondModel, total_session_minute int32) {
+func CalculateLevelBaseSessionFirstFiveMinutes(modelResponse *model.LevelBaseSessionResponseModel, oldModel *model.LevelBaseSessionResponseModel, total_session_minute int32) {
 	switch {
 	case total_session_minute <= 5:
 		oldModel.FirstFiveMinutesTotalLevelBaseSessionCount = oldModel.FirstFiveMinutesTotalLevelBaseSessionCount + modelResponse.FirstFiveMinutesTotalLevelBaseSessionCount
 	}
 }
 
-func CalculateLevelBaseSessionFirstTenMinutes(modelResponse *model.LevelBaseSessionRespondModel, oldModel *model.LevelBaseSessionRespondModel, total_session_minute int32) {
+func CalculateLevelBaseSessionFirstTenMinutes(modelResponse *model.LevelBaseSessionResponseModel, oldModel *model.LevelBaseSessionResponseModel, total_session_minute int32) {
 	switch {
 	case total_session_minute <= 10:
 		oldModel.FirstTenMinutesTotalLevelBaseSessionCount = oldModel.FirstTenMinutesTotalLevelBaseSessionCount + modelResponse.FirstTenMinutesTotalLevelBaseSessionCount
 	}
 }
 
-func CalculateLevelBaseSessionFirstQuarterHour(modelResponse *model.LevelBaseSessionRespondModel, oldModel *model.LevelBaseSessionRespondModel, total_session_minute int32) {
+func CalculateLevelBaseSessionFirstQuarterHour(modelResponse *model.LevelBaseSessionResponseModel, oldModel *model.LevelBaseSessionResponseModel, total_session_minute int32) {
 	switch {
 	case total_session_minute <= 15:
 		oldModel.FirstQuarterHourTotalLevelBaseSessionCount = oldModel.FirstQuarterHourTotalLevelBaseSessionCount + modelResponse.FirstQuarterHourTotalLevelBaseSessionCount
 	}
 }
 
-func CalculateLevelBaseSessionFirstHalfHour(modelResponse *model.LevelBaseSessionRespondModel, oldModel *model.LevelBaseSessionRespondModel, total_session_minute int32) {
+func CalculateLevelBaseSessionFirstHalfHour(modelResponse *model.LevelBaseSessionResponseModel, oldModel *model.LevelBaseSessionResponseModel, total_session_minute int32) {
 	switch {
 	case total_session_minute <= 30:
 		oldModel.FirstHalfHourTotalLevelBaseSessionCount = oldModel.FirstHalfHourTotalLevelBaseSessionCount + modelResponse.FirstHalfHourTotalLevelBaseSessionCount
 	}
 }
 
-func CalculateLevelBaseSessionFirstHour(modelResponse *model.LevelBaseSessionRespondModel, oldModel *model.LevelBaseSessionRespondModel, total_session_minute int32) {
+func CalculateLevelBaseSessionFirstHour(modelResponse *model.LevelBaseSessionResponseModel, oldModel *model.LevelBaseSessionResponseModel, total_session_minute int32) {
 	switch {
 	case total_session_minute <= 60:
 		oldModel.FirstHourTotalLevelBaseSessionCount = oldModel.FirstHourTotalLevelBaseSessionCount + modelResponse.FirstHourTotalLevelBaseSessionCount
 	}
 }
 
-func CalculateLevelBaseSessionFirstTwoHour(modelResponse *model.LevelBaseSessionRespondModel, oldModel *model.LevelBaseSessionRespondModel, total_session_minute int32) {
+func CalculateLevelBaseSessionFirstTwoHour(modelResponse *model.LevelBaseSessionResponseModel, oldModel *model.LevelBaseSessionResponseModel, total_session_minute int32) {
 	switch {
 	case total_session_minute <= 120:
 		oldModel.FirstTwoHourTotalLevelBaseSessionCount = oldModel.FirstTwoHourTotalLevelBaseSessionCount + modelResponse.FirstTwoHourTotalLevelBaseSessionCount
 	}
 }
 
-func CalculateLevelBaseSessionFirstThreeHour(modelResponse *model.LevelBaseSessionRespondModel, oldModel *model.LevelBaseSessionRespondModel, total_session_minute int32) {
+func CalculateLevelBaseSessionFirstThreeHour(modelResponse *model.LevelBaseSessionResponseModel, oldModel *model.LevelBaseSessionResponseModel, total_session_minute int32) {
 	switch {
 	case total_session_minute <= 180:
 		oldModel.FirstThreeHourTotalLevelBaseSessionCount = oldModel.FirstThreeHourTotalLevelBaseSessionCount + modelResponse.FirstThreeHourTotalLevelBaseSessionCount
 	}
 }
 
-func CalculateLevelBaseSessionFirstSixHour(modelResponse *model.LevelBaseSessionRespondModel, oldModel *model.LevelBaseSessionRespondModel, total_session_minute int32) {
+func CalculateLevelBaseSessionFirstSixHour(modelResponse *model.LevelBaseSessionResponseModel, oldModel *model.LevelBaseSessionResponseModel, total_session_minute int32) {
 	switch {
 	case total_session_minute <= 360:
 		oldModel.FirstSixHourTotalLevelBaseSessionCount = oldModel.FirstSixHourTotalLevelBaseSessionCount + modelResponse.FirstSixHourTotalLevelBaseSessionCount
 	}
 }
 
-func CalculateLevelBaseSessionFirstTwelveHour(modelResponse *model.LevelBaseSessionRespondModel, oldModel *model.LevelBaseSessionRespondModel, total_session_minute int32) {
+func CalculateLevelBaseSessionFirstTwelveHour(modelResponse *model.LevelBaseSessionResponseModel, oldModel *model.LevelBaseSessionResponseModel, total_session_minute int32) {
 	switch {
 	case total_session_minute <= 720:
 		oldModel.FirstTwelveHourTotalLevelBaseSessionCount = oldModel.FirstTwelveHourTotalLevelBaseSessionCount + modelResponse.FirstTwelveHourTotalLevelBaseSessionCount
 	}
 }
 
-func CalculateLevelBaseSessionFirstDay(modelResponse *model.LevelBaseSessionRespondModel, oldModel *model.LevelBaseSessionRespondModel, total_session_minute int32) {
+func CalculateLevelBaseSessionFirstDay(modelResponse *model.LevelBaseSessionResponseModel, oldModel *model.LevelBaseSessionResponseModel, total_session_minute int32) {
 	switch {
 	case total_session_minute <= 1440:
 		oldModel.FirstDayTotalLevelBaseSessionCount = oldModel.FirstDayTotalLevelBaseSessionCount + modelResponse.FirstDayTotalLevelBaseSessionCount
 	}
 }
 
-func CalculateLevelIndexBaseSession(modelResponse *model.LevelBaseSessionRespondModel, oldModel *model.LevelBaseSessionRespondModel) {
+func CalculateLevelIndexBaseSession(modelResponse *model.LevelBaseSessionResponseModel, oldModel *model.LevelBaseSessionResponseModel) {
 	switch oldModel.TotalLevelBaseSessionCount {
 	case 2:
 		oldModel.SecondLevelSessionLevelIndex = modelResponse.FirstLevelSessionLevelIndex

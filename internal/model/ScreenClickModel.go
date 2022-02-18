@@ -2,10 +2,11 @@ package model
 
 import "time"
 
-type ScreenClickRespondModel struct {
-	ProjectId                                        string
-	ClientId                                         string
-	CustomerId                                       string
+type ScreenClickResponseModel struct {
+	Id                                               int64
+	ClientId                                         int64
+	ProjectId                                        int64
+	CustomerId                                       int64
 	LevelIndex                                       int16
 	FirstClickSessionYearOfDay                       int16
 	FirstClickSessionYear                            int16
@@ -110,19 +111,22 @@ type ScreenClickRespondModel struct {
 	SessionBasedAvegareClickCount                    float32
 	DailyAvegareClickCount                           float32
 	LastTouchCountMinusSessionBasedAvegareClickCount float32
+	Status                                           bool
 }
 
 type ScreenClickModel struct {
-	ProjectId  string
-	ClientId   string
-	CustomerId string
-	StartXCor  float64
-	StartYCor  float64
-	FinishXCor float64
-	FinishYCor float64
-	TouchCount int
-	FingerId   int
-	LevelIndex int
+	Id         int64
+	ClientId   int64
+	ProjectId  int64
+	CustomerId int64
+	StartLocX  float32
+	StartLocY  float32
+	FinishLocX float32
+	FinishLocY float32
 	LevelName  string
-	CreationAt time.Time
+	LevelIndex int
+	TabCount   int
+	FingerId   int
+	CreatedAt  time.Time
+	Status     bool
 }

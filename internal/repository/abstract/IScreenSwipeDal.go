@@ -3,7 +3,7 @@ package abstract
 import "FilterWorkerService/internal/model"
 
 type IScreenSwipeDal interface {
-	Add(data *model.ScreenSwipeRespondModel) error
-	GetScreenSwipeById(ClientId string) (*model.ScreenSwipeRespondModel, error)
-	UpdateScreenSwipeById(ClientId string, data *model.ScreenSwipeRespondModel) error
+	Add(data *model.ScreenSwipeResponseModel) error
+	GetById(ClientId int64, ProjectId int64) (*model.ScreenSwipeResponseModel, error)
+	UpdateById(ClientId int64, ProjectId int64, data *model.ScreenSwipeResponseModel) error
 }

@@ -2,10 +2,11 @@ package model
 
 import "time"
 
-type LevelBaseSessionRespondModel struct {
-	ProjectId                                  string
-	ClientId                                   string
-	CustomerId                                 string
+type LevelBaseSessionResponseModel struct {
+	Id                                         int64
+	ClientId                                   int64
+	ProjectId                                  int64
+	CustomerId                                 int64
 	TotalLevelBaseSessionMinute                int32
 	TotalLevelBaseSessionCount                 int32
 	FirstLevelSessionLevelIndex                int16
@@ -28,7 +29,7 @@ type LevelBaseSessionRespondModel struct {
 	SevenLevelSessionLevelIndex                int16
 	SevenLevelSessionDuration                  int16
 	FirstFiveMinutesTotalLevelBaseSessionCount int16
-	FirstTenMinutesTotalLevelBaseSessionCount    int16
+	FirstTenMinutesTotalLevelBaseSessionCount  int16
 	FirstQuarterHourTotalLevelBaseSessionCount int16
 	FirstHalfHourTotalLevelBaseSessionCount    int16
 	FirstHourTotalLevelBaseSessionCount        int16
@@ -46,15 +47,18 @@ type LevelBaseSessionRespondModel struct {
 	LastLevelSessionWeekDay                    int16
 	LastLevelSessionHour                       int16
 	LastLevelSessionMinute                     int16
+	Status                                     bool
 }
 
-type LevelBaseSessionDataModel struct {
-	ProjectId         string
-	ClientId          string
-	CustomerId        string
+type LevelBaseSessionModel struct {
+	Id                int64
+	ClientId          int64
+	ProjectId         int64
+	CustomerId        int64
+	LevelName         string
+	LevelIndex        int
+	SessionTimeMinute float32
 	SessionStartTime  time.Time
 	SessionFinishTime time.Time
-	SessionTimeMinute int
-	LevelIndex        int
-	LevelName         string
+	Status            bool
 }

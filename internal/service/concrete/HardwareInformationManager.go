@@ -25,15 +25,16 @@ func HardwareInformationManagerConstructor() *hardwareInformationManager {
 
 func (h *hardwareInformationManager) AddHardwareInformation(data *[]byte) (v interface{}, s bool, m string) {
 	// Todo : 1 Model karşılanacak
-	firstmodel := model.HardwareInformationModel{}
+	firstmodel := model.HardwareModel{}
 	convertErr := (*h.IJsonParser).DecodeJson(data, &firstmodel)
 	if convertErr != nil {
 		log.Fatal("HardwareInformationManager", "AddHardwareInformation",
 			"byte array to HardwareInformationModel", "Json Parser Decode Err: ", convertErr.Error())
-		return &model.HardwareInformationResponseModel{}, false, convertErr.Error()
+		return &model.HardwareResponseModel{}, false, convertErr.Error()
 	}
 	// Todo: 2 Filtreler Buraya Yazılacak
-	modelResponse := model.HardwareInformationResponseModel{}
+	modelResponse := model.HardwareResponseModel{}
+	modelResponse.Id = firstmodel.Id
 	modelResponse.ClientId = firstmodel.ClientId
 	modelResponse.ProjectId = firstmodel.ProjectId
 	modelResponse.CustomerId = firstmodel.CustomerId

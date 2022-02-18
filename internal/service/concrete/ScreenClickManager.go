@@ -27,14 +27,15 @@ func (sc *screenClickManager) ConvertRawModelToResponseModel(data *[]byte) (v in
 	if convertErr != nil {
 		log.Fatal("ScreenClickManager", "ConvertRawModelToResponseModel",
 			"byte array to ScreenClickModel", "Json Parser Decode Err: ", convertErr.Error())
-		return &model.ScreenClickRespondModel{}, false, convertErr.Error()
+		return &model.ScreenClickResponseModel{}, false, convertErr.Error()
 	}
-	hour := int16(firstModel.CreationAt.Hour())
-	yearOfDay := int16(firstModel.CreationAt.YearDay())
-	year := int16(firstModel.CreationAt.Year())
-	minute := int16(firstModel.CreationAt.Minute())
-	touchCount := int32(firstModel.TouchCount)
-	modelResponse := model.ScreenClickRespondModel{}
+	hour := int16(firstModel.CreatedAt.Hour())
+	yearOfDay := int16(firstModel.CreatedAt.YearDay())
+	year := int16(firstModel.CreatedAt.Year())
+	minute := int16(firstModel.CreatedAt.Minute())
+	touchCount := int32(firstModel.TabCount)
+	modelResponse := model.ScreenClickResponseModel{}
+	modelResponse.Id = firstModel.Id
 	modelResponse.ProjectId = firstModel.ProjectId
 	modelResponse.ClientId = firstModel.ClientId
 	modelResponse.CustomerId = firstModel.CustomerId
@@ -43,7 +44,7 @@ func (sc *screenClickManager) ConvertRawModelToResponseModel(data *[]byte) (v in
 	modelResponse.FirstClickSessionYear = year
 	modelResponse.FirstClickSessionHour = hour
 	modelResponse.FirstClickSessionMinute = minute
-	modelResponse.FirstTouchCount = int16(firstModel.TouchCount)
+	modelResponse.FirstTouchCount = int16(firstModel.TabCount)
 	modelResponse.SecondClickSessionHour = 0
 	modelResponse.SecondClickSessionMinute = 0
 	modelResponse.SecondTouchCount = 0
@@ -73,10 +74,10 @@ func (sc *screenClickManager) ConvertRawModelToResponseModel(data *[]byte) (v in
 	modelResponse.LastClickSessionMinute = 0
 	modelResponse.LastTouchCount = 0
 
-	modelResponse.FirstStartXCor = float32(firstModel.StartXCor)
-	modelResponse.FirstStartYCor = float32(firstModel.StartYCor)
-	modelResponse.FirstFinishXCor = float32(firstModel.FinishXCor)
-	modelResponse.FirstFinishYCor = float32(firstModel.FinishYCor)
+	modelResponse.FirstStartXCor = float32(firstModel.StartLocX)
+	modelResponse.FirstStartYCor = float32(firstModel.StartLocY)
+	modelResponse.FirstFinishXCor = float32(firstModel.FinishLocX)
+	modelResponse.FirstFinishYCor = float32(firstModel.FinishLocY)
 	modelResponse.SecondStartXCor = 0
 	modelResponse.SecondStartYCor = 0
 	modelResponse.SecondFinishXCor = 0
@@ -123,7 +124,7 @@ func (sc *screenClickManager) ConvertRawModelToResponseModel(data *[]byte) (v in
 	modelResponse.FirstSixHourTouchCount = touchCount
 	modelResponse.FirstTwelveHourTouchCount = touchCount
 
-	modelResponse.FirstMinusLastTouchCount = int16(firstModel.TouchCount)
+	modelResponse.FirstMinusLastTouchCount = int16(touchCount)
 	modelResponse.FirstFingerId = byte(firstModel.FingerId)
 	modelResponse.PenultimateFingerId = 0
 	modelResponse.LastFingerId = 0
@@ -143,16 +144,16 @@ func (sc *screenClickManager) ConvertRawModelToResponseModel(data *[]byte) (v in
 	modelResponse.TotalClickHour = 0
 	modelResponse.TotalClickMinute = 1
 
-	modelResponse.TotalStartXCor = float32(firstModel.StartXCor)
-	modelResponse.TotalStartYCor = float32(firstModel.StartYCor)
-	modelResponse.TotalFinishXCor = float32(firstModel.FinishXCor)
-	modelResponse.TotalFinishYCor = float32(firstModel.FinishYCor)
-	modelResponse.SessionBasedAvegareStartXCor = float32(firstModel.StartXCor)
-	modelResponse.SessionBasedAvegareStartYCor = float32(firstModel.StartYCor)
-	modelResponse.SessionBasedAvegareFinishXCor = float32(firstModel.FinishXCor)
-	modelResponse.SessionBasedAvegareFinishYCor = float32(firstModel.FinishYCor)
-	modelResponse.SessionBasedAvegareClickCount = float32(firstModel.TouchCount)
-	modelResponse.DailyAvegareClickCount = float32(firstModel.TouchCount)
+	modelResponse.TotalStartXCor = float32(firstModel.StartLocX)
+	modelResponse.TotalStartYCor = float32(firstModel.StartLocY)
+	modelResponse.TotalFinishXCor = float32(firstModel.FinishLocX)
+	modelResponse.TotalFinishYCor = float32(firstModel.FinishLocY)
+	modelResponse.SessionBasedAvegareStartXCor = float32(firstModel.StartLocX)
+	modelResponse.SessionBasedAvegareStartYCor = float32(firstModel.StartLocY)
+	modelResponse.SessionBasedAvegareFinishXCor = float32(firstModel.FinishLocX)
+	modelResponse.SessionBasedAvegareFinishYCor = float32(firstModel.FinishLocY)
+	modelResponse.SessionBasedAvegareClickCount = float32(touchCount)
+	modelResponse.DailyAvegareClickCount = float32(touchCount)
 	modelResponse.LastTouchCountMinusSessionBasedAvegareClickCount = 0
 
 	defer log.Print("ScreenClickManager", "ConvertRawModelToResponseModel",
@@ -187,8 +188,9 @@ func (sc *screenClickManager) ConvertRawModelToResponseModel(data *[]byte) (v in
 	}
 }
 
-func (sc *screenClickManager) UpdateScreenClick(modelResponse *model.ScreenClickRespondModel, oldModel *model.ScreenClickRespondModel) (updatedModel *model.ScreenClickRespondModel, s bool, m error) {
+func (sc *screenClickManager) UpdateScreenClick(modelResponse *model.ScreenClickResponseModel, oldModel *model.ScreenClickResponseModel) (updatedModel *model.ScreenClickResponseModel, s bool, m error) {
 
+	oldModel.Id = modelResponse.Id
 	oldModel.ProjectId = modelResponse.ProjectId
 	oldModel.ClientId = modelResponse.ClientId
 	oldModel.CustomerId = modelResponse.CustomerId
@@ -264,7 +266,7 @@ func (sc *screenClickManager) UpdateScreenClick(modelResponse *model.ScreenClick
 	return oldModel, true, nil
 }
 
-func CalculateDailyAverageClickCount(oldModel *model.ScreenClickRespondModel) (count float32) {
+func CalculateDailyAverageClickCount(oldModel *model.ScreenClickResponseModel) (count float32) {
 	if oldModel.TotalClickDay == 0 {
 		oldModel.DailyAvegareClickCount = float32(oldModel.TotalClickCount)
 		return oldModel.DailyAvegareClickCount
@@ -272,70 +274,70 @@ func CalculateDailyAverageClickCount(oldModel *model.ScreenClickRespondModel) (c
 	return float32(oldModel.TotalClickCount) / float32(oldModel.TotalClickDay)
 }
 
-func CalculateClickFiveMinutes(modelResponse *model.ScreenClickRespondModel, oldModel *model.ScreenClickRespondModel, total_session_minute int32) {
+func CalculateClickFiveMinutes(modelResponse *model.ScreenClickResponseModel, oldModel *model.ScreenClickResponseModel, total_session_minute int32) {
 	switch {
 	case total_session_minute <= 5:
 		oldModel.FirstFiveMinutesTouchCount = oldModel.FirstFiveMinutesTouchCount + int32(modelResponse.FirstTouchCount)
 	}
 }
 
-func CalculateClickTenMinutes(modelResponse *model.ScreenClickRespondModel, oldModel *model.ScreenClickRespondModel, total_session_minute int32) {
+func CalculateClickTenMinutes(modelResponse *model.ScreenClickResponseModel, oldModel *model.ScreenClickResponseModel, total_session_minute int32) {
 	switch {
 	case total_session_minute <= 10:
 		oldModel.FirstTenMinutesTouchCount = oldModel.FirstTenMinutesTouchCount + int32(modelResponse.FirstTouchCount)
 	}
 }
 
-func CalculateClickQuarterHour(modelResponse *model.ScreenClickRespondModel, oldModel *model.ScreenClickRespondModel, total_session_minute int32) {
+func CalculateClickQuarterHour(modelResponse *model.ScreenClickResponseModel, oldModel *model.ScreenClickResponseModel, total_session_minute int32) {
 	switch {
 	case total_session_minute <= 15:
 		oldModel.FirstQuarterHourTouchCount = oldModel.FirstQuarterHourTouchCount + int32(modelResponse.FirstTouchCount)
 	}
 }
 
-func CalculateClickHalfHour(modelResponse *model.ScreenClickRespondModel, oldModel *model.ScreenClickRespondModel, total_session_minute int32) {
+func CalculateClickHalfHour(modelResponse *model.ScreenClickResponseModel, oldModel *model.ScreenClickResponseModel, total_session_minute int32) {
 	switch {
 	case total_session_minute <= 30:
 		oldModel.FirstHalfHourTouchCount = oldModel.FirstHalfHourTouchCount + int32(modelResponse.FirstTouchCount)
 	}
 }
 
-func CalculateClickHour(modelResponse *model.ScreenClickRespondModel, oldModel *model.ScreenClickRespondModel, total_session_minute int32) {
+func CalculateClickHour(modelResponse *model.ScreenClickResponseModel, oldModel *model.ScreenClickResponseModel, total_session_minute int32) {
 	switch {
 	case total_session_minute <= 60:
 		oldModel.FirstHourTouchCount = oldModel.FirstHourTouchCount + int32(modelResponse.FirstTouchCount)
 	}
 }
 
-func CalculateClickTwoHour(modelResponse *model.ScreenClickRespondModel, oldModel *model.ScreenClickRespondModel, total_session_minute int32) {
+func CalculateClickTwoHour(modelResponse *model.ScreenClickResponseModel, oldModel *model.ScreenClickResponseModel, total_session_minute int32) {
 	switch {
 	case total_session_minute <= 120:
 		oldModel.FirstTwoHourTouchCount = oldModel.FirstTwoHourTouchCount + int32(modelResponse.FirstTouchCount)
 	}
 }
 
-func CalculateClickThreeHour(modelResponse *model.ScreenClickRespondModel, oldModel *model.ScreenClickRespondModel, total_session_minute int32) {
+func CalculateClickThreeHour(modelResponse *model.ScreenClickResponseModel, oldModel *model.ScreenClickResponseModel, total_session_minute int32) {
 	switch {
 	case total_session_minute <= 180:
 		oldModel.FirstThreeHourTouchCount = oldModel.FirstThreeHourTouchCount + int32(modelResponse.FirstTouchCount)
 	}
 }
 
-func CalculateClickSixHour(modelResponse *model.ScreenClickRespondModel, oldModel *model.ScreenClickRespondModel, total_session_minute int32) {
+func CalculateClickSixHour(modelResponse *model.ScreenClickResponseModel, oldModel *model.ScreenClickResponseModel, total_session_minute int32) {
 	switch {
 	case total_session_minute <= 360:
 		oldModel.FirstSixHourTouchCount = oldModel.FirstSixHourTouchCount + int32(modelResponse.FirstTouchCount)
 	}
 }
 
-func CalculateClickTwelveHour(modelResponse *model.ScreenClickRespondModel, oldModel *model.ScreenClickRespondModel, total_session_minute int32) {
+func CalculateClickTwelveHour(modelResponse *model.ScreenClickResponseModel, oldModel *model.ScreenClickResponseModel, total_session_minute int32) {
 	switch {
 	case total_session_minute <= 720:
 		oldModel.FirstTwelveHourTouchCount = oldModel.FirstTwelveHourTouchCount + int32(modelResponse.FirstTouchCount)
 	}
 }
 
-func CalculateClickCount(modelResponse *model.ScreenClickRespondModel, oldModel *model.ScreenClickRespondModel) {
+func CalculateClickCount(modelResponse *model.ScreenClickResponseModel, oldModel *model.ScreenClickResponseModel) {
 	switch oldModel.TotalClickSessionCount {
 	case 2:
 		oldModel.SecondClickSessionHour = modelResponse.FirstClickSessionHour
@@ -388,43 +390,43 @@ func CalculateClickCount(modelResponse *model.ScreenClickRespondModel, oldModel 
 	}
 }
 
-func CalculateFirstDayClickCount(modelResponse *model.ScreenClickRespondModel, oldModel *model.ScreenClickRespondModel, total_session_minute int32) {
+func CalculateFirstDayClickCount(modelResponse *model.ScreenClickResponseModel, oldModel *model.ScreenClickResponseModel, total_session_minute int32) {
 	if total_session_minute <= 1440 {
 		oldModel.FirstDayClickCount = oldModel.FirstDayClickCount + modelResponse.FirstDayClickCount
 	}
 }
 
-func CalculateSecondDayClickCount(modelResponse *model.ScreenClickRespondModel, oldModel *model.ScreenClickRespondModel, total_session_hour int32) {
+func CalculateSecondDayClickCount(modelResponse *model.ScreenClickResponseModel, oldModel *model.ScreenClickResponseModel, total_session_hour int32) {
 	if total_session_hour <= 48 && total_session_hour > 24 {
 		oldModel.SecondDayClickCount = oldModel.SecondDayClickCount + modelResponse.FirstDayClickCount
 	}
 }
 
-func CalculateThirdDayClickCount(modelResponse *model.ScreenClickRespondModel, oldModel *model.ScreenClickRespondModel, total_session_hour int32) {
+func CalculateThirdDayClickCount(modelResponse *model.ScreenClickResponseModel, oldModel *model.ScreenClickResponseModel, total_session_hour int32) {
 	if total_session_hour <= 72 && total_session_hour > 48 {
 		oldModel.ThirdDayClickCount = oldModel.ThirdDayClickCount + modelResponse.FirstDayClickCount
 	}
 }
 
-func CalculateFourthDayClickCount(modelResponse *model.ScreenClickRespondModel, oldModel *model.ScreenClickRespondModel, total_session_hour int32) {
+func CalculateFourthDayClickCount(modelResponse *model.ScreenClickResponseModel, oldModel *model.ScreenClickResponseModel, total_session_hour int32) {
 	if total_session_hour <= 96 && total_session_hour > 72 {
 		oldModel.FourthDayClickCount = oldModel.FourthDayClickCount + modelResponse.FirstDayClickCount
 	}
 }
 
-func CalculateFifthDayClickCount(modelResponse *model.ScreenClickRespondModel, oldModel *model.ScreenClickRespondModel, total_session_hour int32) {
+func CalculateFifthDayClickCount(modelResponse *model.ScreenClickResponseModel, oldModel *model.ScreenClickResponseModel, total_session_hour int32) {
 	if total_session_hour <= 120 && total_session_hour > 96 {
 		oldModel.FifthDayClickCount = oldModel.FifthDayClickCount + modelResponse.FirstDayClickCount
 	}
 }
 
-func CalculateSixthDayClickCount(modelResponse *model.ScreenClickRespondModel, oldModel *model.ScreenClickRespondModel, total_session_hour int32) {
+func CalculateSixthDayClickCount(modelResponse *model.ScreenClickResponseModel, oldModel *model.ScreenClickResponseModel, total_session_hour int32) {
 	if total_session_hour <= 144 && total_session_hour > 120 {
 		oldModel.SixthDayClickCount = oldModel.SixthDayClickCount + modelResponse.FirstDayClickCount
 	}
 }
 
-func CalculateSeventhDayClickCount(modelResponse *model.ScreenClickRespondModel, oldModel *model.ScreenClickRespondModel, total_session_hour int32) {
+func CalculateSeventhDayClickCount(modelResponse *model.ScreenClickResponseModel, oldModel *model.ScreenClickResponseModel, total_session_hour int32) {
 	if total_session_hour <= 168 && total_session_hour > 144 {
 		oldModel.SeventhDayClickCount = oldModel.SeventhDayClickCount + modelResponse.FirstDayClickCount
 	}

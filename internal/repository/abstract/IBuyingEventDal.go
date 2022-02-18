@@ -3,7 +3,7 @@ package abstract
 import "FilterWorkerService/internal/model"
 
 type IBuyingEventDal interface {
-	Add(data *model.BuyingEventRespondModel) error
-	GetBuyingEventById(ClientId string) (*model.BuyingEventRespondModel, error)
-	UpdateBuyingEventById(ClientId string, data *model.BuyingEventRespondModel) error
+	Add(data *model.BuyingEventResponseModel) error
+	GetById(ClientId int64, ProjectId int64) (*model.BuyingEventResponseModel, error)
+	UpdateById(ClientId int64, ProjectId int64, data *model.BuyingEventResponseModel) error
 }

@@ -2,10 +2,11 @@ package model
 
 import "time"
 
-type GameSessionEveryLoginRespondModel struct {
-	ProjectId                                                   string
-	ClientId                                                    string
-	CustomerId                                                  string
+type GameSessionResponseModel struct {
+	Id                                                          int64
+	ClientId                                                    int64
+	ProjectId                                                   int64
+	CustomerId                                                  int64
 	FirstSessionYearOfDay                                       int16
 	FirstSessionYear                                            int16
 	FirstSessionWeekDay                                         int16
@@ -27,9 +28,9 @@ type GameSessionEveryLoginRespondModel struct {
 	SixthSessionHour                                            int16
 	SixthSessionDuration                                        int16
 	SixthSessionMinute                                          int16
-	SeventhSessionHour                                            int16
-	SeventhSessionDuration                                        int16
-	SeventhSessionMinute                                          int16
+	SeventhSessionHour                                          int16
+	SeventhSessionDuration                                      int16
+	SeventhSessionMinute                                        int16
 	PenultimateSessionHour                                      int16
 	PenultimateSessionDuration                                  int16
 	PenultimateSessionMinute                                    int16
@@ -39,12 +40,12 @@ type GameSessionEveryLoginRespondModel struct {
 	LastSessionDuration                                         int16
 	LastSessionMinute                                           int16
 	LastDurationMinusPenultimateDuration                        int16
-	FirstFiveMinutesTotalSessionCount                              int16
-	FirstFiveMinutesTotalSessionDuration                           int16
-	FirstTenMinutesTotalSessionCount                              int16
-	FirstTenMinutesTotalSessionDuration                           int16
-	FirstQuarterHourTotalSessionCount                              int16
-	FirstQuarterHourTotalSessionDuration                           int16
+	FirstFiveMinutesTotalSessionCount                           int16
+	FirstFiveMinutesTotalSessionDuration                        int16
+	FirstTenMinutesTotalSessionCount                            int16
+	FirstTenMinutesTotalSessionDuration                         int16
+	FirstQuarterHourTotalSessionCount                           int16
+	FirstQuarterHourTotalSessionDuration                        int16
 	FirstHalfHourTotalSessionCount                              int16
 	FirstHalfHourTotalSessionDuration                           int16
 	FirstHourTotalSessionCount                                  int16
@@ -98,13 +99,16 @@ type GameSessionEveryLoginRespondModel struct {
 	Session6To11HourCount                                       int16
 	Session12To17HourCount                                      int16
 	Session18To23HourCount                                      int16
+	Status                                                      bool
 }
 
-type GameSessionEveryLoginModel struct {
-	ProjectId         string
-	ClientId          string
-	CustomerId        string
+type GameSessionModel struct {
+	Id                int64
+	ClientId          int64
+	ProjectId         int64
+	CustomerId        int64
+	SessionTimeMinute float32
 	SessionStartTime  time.Time
 	SessionFinishTime time.Time
-	SessionTimeMinute int
+	Status            bool
 }

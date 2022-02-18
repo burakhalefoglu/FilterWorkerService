@@ -2,10 +2,11 @@ package model
 
 import "time"
 
-type ScreenSwipeRespondModel struct {
-	ProjectId                      string
-	ClientId                       string
-	CustomerId                     string
+type ScreenSwipeResponseModel struct {
+	Id                             int64
+	ClientId                       int64
+	ProjectId                      int64
+	CustomerId                     int64
 	LevelIndex                     int16
 	TotalSwipeSessionCount         int32
 	TotalSwipeHour                 int32
@@ -133,18 +134,21 @@ type ScreenSwipeRespondModel struct {
 	TotalSwipeStartYCor            float32
 	TotalSwipeFinishXCor           float32
 	TotalSwipeFinishYCor           float32
+	Status                         bool
 }
 
 type ScreenSwipeModel struct {
-	ProjectId       string
-	ClientId        string
-	CustomerId      string
-	SwipeDirection  int
-	SwipeStartXCor  float32
-	SwipeStartYCor  float32
-	SwipeFinishXCor float32
-	SwipeFinishYCor float32
-	CreationAt      time.Time
-	LevelIndex      int
-	LevelName       string
+	Id             int64
+	ClientId       int64
+	ProjectId      int64
+	CustomerId     int64
+	StartLocX      float32
+	StartLocY      float32
+	FinishLocX     float32
+	FinishLocY     float32
+	SwipeDirection int
+	LevelName      string
+	LevelIndex     int
+	CreatedAt      time.Time
+	Status         bool
 }

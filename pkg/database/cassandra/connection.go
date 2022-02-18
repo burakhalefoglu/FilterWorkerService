@@ -1,4 +1,4 @@
-package typeStandardizationConnection
+package cassandra
 
 import (
 	"os"
@@ -7,10 +7,10 @@ import (
 	logger "github.com/appneuroncompany/light-logger"
 	"github.com/appneuroncompany/light-logger/clogger"
 	"github.com/gocql/gocql"
-	"github.com/scylladb/gocqlx/v2"
 )
 
-func ConnectDatabase() (*gocqlx.Session, error) {
+func ConnectDatabase() *gocql.Session {
+
 	cluster := gocql.NewCluster(os.Getenv("CASSANDRA_HOST"))
 	cluster.ProtoVersion = 4
 	cluster.ConnectTimeout = time.Second * 5
@@ -29,26 +29,32 @@ func ConnectDatabase() (*gocqlx.Session, error) {
 		Username: os.Getenv("CASSANDRA_USER"),
 		Password: os.Getenv("CASSANDRA_PASS"),
 	}
-	session, err := gocqlx.WrapSession(cluster.CreateSession())
+	session, err := cluster.CreateSession()
 	if err != nil {
 		clogger.Error(&logger.Messages{
 			"connection err: ": err.Error(),
 		})
-		return nil, err
+		return nil
 	}
-	if err := session.ExecStmt(`CREATE KEYSPACE IF NOT EXISTS MLDatabase WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 3}`); err != nil {
+
+	if err = session.Query(`CREATE KEYSPACE IF NOT EXISTS MLDatabase WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 3}`).Exec(); err != nil {
 		clogger.Error(&logger.Messages{
 			"create keyspace err: ": err.Error(),
 		})
 	}
-	err = session.ExecStmt(`CREATE TABLE IF NOT EXISTS MLDatabase.typeStandardizationModels (
-		key text PRIMARY KEY,
-		value smallint)`)
-	if err != nil {
+
+	if err = session.Query("use MLDatabase").Exec(); err != nil {
 		clogger.Error(&logger.Messages{
-			"create typeStandardizationModels table err: ": err.Error(),
+			"keyspace selection err: ": err.Error(),
 		})
 	}
 
-	return &session, err
+	for _, q := range GetTableQueries() {
+		err = session.Query(q).Exec()
+		clogger.Error(&logger.Messages{
+			"create table err: ": err.Error(),
+		})
+	}
+
+	return session
 }
