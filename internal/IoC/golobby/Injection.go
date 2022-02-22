@@ -3,15 +3,17 @@ package golobby
 import (
 	"FilterWorkerService/internal/IoC"
 	repository "FilterWorkerService/internal/repository/abstract"
-	"FilterWorkerService/internal/repository/concrete/mongodb_driver"
+	"FilterWorkerService/internal/repository/concrete/cassandra_dal"
 	service "FilterWorkerService/internal/service/abstract"
 	"FilterWorkerService/internal/service/concrete"
 	cache "FilterWorkerService/pkg/Cache"
 	rediscachev8 "FilterWorkerService/pkg/Cache/Redis/RedisV8"
+	"FilterWorkerService/pkg/database/cassandra"
 	Ijsonparser "FilterWorkerService/pkg/jsonParser"
 	"FilterWorkerService/pkg/jsonParser/gojson"
 	IKafka "FilterWorkerService/pkg/kafka"
 	"FilterWorkerService/pkg/kafka/kafkago"
+
 	"github.com/golobby/container/v3"
 )
 
@@ -48,7 +50,8 @@ func (i *golobbyInjection) Inject() {
 
 func injectTypeStandardiseDal() {
 	if err := container.Singleton(func() repository.ITypeStandardizationDal {
-		return mongodb_driver.MdbDTypeStandardizationDalConstructor()
+		return cassandra_dal.NewCassTypeStandardizationDal(cassandra.TypeStandardizationModel)
+		//return mongodb_driver.MdbDTypeStandardizationDalConstructor()
 	}); err != nil {
 		panic(err)
 	}
@@ -71,7 +74,8 @@ func injectCacheService() {
 
 func injectAdvEventDal() {
 	if err := container.Singleton(func() repository.IAdvEventDal {
-		return mongodb_driver.MdbDAdvEventDalConstructor()
+		return cassandra_dal.NewCassAdvEventDal(cassandra.AdvEventResponseModel)
+		//return mongodb_driver.MdbDAdvEventDalConstructor()
 	}); err != nil {
 		panic(err)
 	}
@@ -95,7 +99,8 @@ func injectAdvEventService() {
 
 func injectBuyingEventDal() {
 	if err := container.Singleton(func() repository.IBuyingEventDal {
-		return mongodb_driver.MdbDBuyingEventDalConstructor()
+		return cassandra_dal.NewCassBuyingEventDal(cassandra.BuyingEventResponseModel)
+		//return mongodb_driver.MdbDBuyingEventDalConstructor()
 	}); err != nil {
 		panic(err)
 	}
@@ -118,56 +123,59 @@ func injectBuyingEventService() {
 }
 
 func injectGameSessionEveryLoginDal() {
-	if err := container.Singleton(func() repository.IGameSessionEveryLoginDal {
-		return mongodb_driver.MdbDGameSessionEveryLoginDalConstructor()
+	if err := container.Singleton(func() repository.IGameSessionDal {
+		return cassandra_dal.NewCassGameSessionDal(cassandra.GameSessionResponseModel)
+		//return mongodb_driver.MdbDGameSessionEveryLoginDalConstructor()
 	}); err != nil {
 		panic(err)
 	}
 
-	if err := container.Resolve(&IoC.GameSessionEveryLoginDal); err != nil {
+	if err := container.Resolve(&IoC.GameSessionDal); err != nil {
 		panic(err)
 	}
 }
 
 func injectGameSessionEveryLoginService() {
-	if err := container.Singleton(func() service.IGameSessionEveryLoginService {
-		return concrete.GameSessionEveryLoginManagerConstructor()
+	if err := container.Singleton(func() service.IGameSessionService {
+		return concrete.GameSessionManagerConstructor()
 	}); err != nil {
 		panic(err)
 	}
 
-	if err := container.Resolve(&IoC.GameSessionEveryLoginService); err != nil {
+	if err := container.Resolve(&IoC.GameSessionService); err != nil {
 		panic(err)
 	}
 }
 
 func injectHardwareInformationDal() {
-	if err := container.Singleton(func() repository.IHardwareInformationDal {
-		return mongodb_driver.MdbDHardwareInformationDalConstructor()
+	if err := container.Singleton(func() repository.IHardwareDal {
+		return cassandra_dal.NewCassHardwareDal(cassandra.HardwareResponseModel)
+		//return mongodb_driver.MdbDHardwareInformationDalConstructor()
 	}); err != nil {
 		panic(err)
 	}
 
-	if err := container.Resolve(&IoC.HardwareInformationDal); err != nil {
+	if err := container.Resolve(&IoC.HardwareDal); err != nil {
 		panic(err)
 	}
 }
 
 func injectHardwareInformationService() {
-	if err := container.Singleton(func() service.IHardwareInformationService {
-		return concrete.HardwareInformationManagerConstructor()
+	if err := container.Singleton(func() service.IHardwareService {
+		return concrete.HardwareManagerConstructor()
 	}); err != nil {
 		panic(err)
 	}
 
-	if err := container.Resolve(&IoC.HardwareInformationService); err != nil {
+	if err := container.Resolve(&IoC.HardwareService); err != nil {
 		panic(err)
 	}
 }
 
 func injectLevelBaseSessionDal() {
 	if err := container.Singleton(func() repository.ILevelBaseSessionDal {
-		return mongodb_driver.MdbDLevelBaseSessionDalConstructor()
+		return cassandra_dal.NewCassLevelBaseSessionDal(cassandra.LevelBaseSessionResponseModel)
+		//return mongodb_driver.MdbDLevelBaseSessionDalConstructor()
 	}); err != nil {
 		panic(err)
 	}
@@ -191,7 +199,8 @@ func injectLevelBaseSessionService() {
 
 func injectLocationDal() {
 	if err := container.Singleton(func() repository.ILocationDal {
-		return mongodb_driver.MdbDLocationDalConstructor()
+		return cassandra_dal.NewCassLocationDal(cassandra.LocationResponseModel)
+		//return mongodb_driver.MdbDLocationDalConstructor()
 	}); err != nil {
 		panic(err)
 	}
@@ -215,7 +224,8 @@ func injectLocationManagerService() {
 
 func injectScreenClickDal() {
 	if err := container.Singleton(func() repository.IScreenClickDal {
-		return mongodb_driver.MdbDScreenClickDalConstructor()
+		return cassandra_dal.NewCassScreenClickDal(cassandra.ScreenClickResponseModel)
+		//return mongodb_driver.MdbDScreenClickDalConstructor()
 	}); err != nil {
 		panic(err)
 	}
@@ -239,7 +249,8 @@ func injectScreenClickManagerService() {
 
 func injectScreenSwipeDal() {
 	if err := container.Singleton(func() repository.IScreenSwipeDal {
-		return mongodb_driver.MdbDScreenSwipeDalConstructor()
+		return cassandra_dal.NewCassScreenSwipeDal(cassandra.ScreenSwipeResponseModel)
+		//return mongodb_driver.MdbDScreenSwipeDalConstructor()
 	}); err != nil {
 		panic(err)
 	}

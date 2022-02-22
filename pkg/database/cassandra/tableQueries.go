@@ -87,7 +87,7 @@ var tableQueries = [9]string{
 		adv_click_12_to_17_hour_count smallint,
 		adv_click_18_to_23_hour_count smallint, 
 		status boolean, 
-		PRIMARY KEY(id))`,
+		PRIMARY KEY((client_id, project_id)))`,
 	`CREATE TABLE IF NOT EXISTS ClientDatabase.buying_event_models(
 		id bigint, 
 		client_id bigint, 
@@ -158,7 +158,7 @@ var tableQueries = [9]string{
 		buying_day_average_buying_count float,
 		level_based_average_buying_count float,
 		status boolean, 
-		PRIMARY KEY(id))`,
+		PRIMARY KEY((client_id, project_id)))`,
 	`CREATE TABLE IF NOT EXISTS ClientDatabase.game_session_models(
 		id bigint, 
 		client_id bigint, 
@@ -257,7 +257,7 @@ var tableQueries = [9]string{
 		session_12_to_17_hour_count smallint,                                     
 		session_18_to_23_hour_count smallint, 
 		status boolean, 
-		PRIMARY KEY(id))`,
+		PRIMARY KEY((client_id, project_id)))`,
 	`CREATE TABLE IF NOT EXISTS ClientDatabase.level_base_session_models(
 		id bigint, 
 		client_id bigint, 
@@ -304,7 +304,7 @@ var tableQueries = [9]string{
 		last_level_session_hour smallint,                     
 		last_level_session_minute smallint,
 		status boolean, 
-		PRIMARY KEY(id))`,
+		PRIMARY KEY((client_id, project_id)))`,
 	`CREATE TABLE IF NOT EXISTS ClientDatabase.hardware_models(
 		id bigint, 
 		client_id bigint, 
@@ -318,7 +318,7 @@ var tableQueries = [9]string{
 		processor_type smallint,    
 		system_memory_size smallint,
 		status boolean, 
-		PRIMARY KEY(id))`,
+		PRIMARY KEY((client_id, project_id)))`,
 	`CREATE TABLE IF NOT EXISTS ClientDatabase.screen_click_models(
 		id bigint, 
 		client_id bigint, 
@@ -426,7 +426,7 @@ var tableQueries = [9]string{
 		daily_avegare_click_count float,                         
 		last_touch_count_minus_session_based_avegare_click_count float, 
 		status boolean, 
-		PRIMARY KEY(id))`,
+		PRIMARY KEY((client_id, project_id)))`,
 	`CREATE TABLE IF NOT EXISTS ClientDatabase.screen_swipe_models(
 		id bigint, 
 		client_id bigint, 
@@ -560,7 +560,7 @@ var tableQueries = [9]string{
 		total_swipe_finish_x_cor float,         
 		total_swipe_finish_y_cor float,
 		status boolean, 
-		PRIMARY KEY(id))`,
+		PRIMARY KEY((client_id, project_id)))`,
 	`CREATE TABLE IF NOT EXISTS ClientDatabase.location_models(
 		id bigint, 
 		client_id bigint, 
@@ -572,7 +572,7 @@ var tableQueries = [9]string{
 		region smallint,  
 		org smallint, 
 		status boolean, 
-		PRIMARY KEY(id))`,
+		PRIMARY KEY((client_id, project_id)))`,
 	`CREATE TABLE IF NOT EXISTS ClientDatabase.type_standardization_models(
 		key text,
 		value smallint,

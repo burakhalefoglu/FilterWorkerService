@@ -3,29 +3,31 @@ package concrete
 import (
 	"FilterWorkerService/internal/IoC"
 	model "FilterWorkerService/internal/model"
-	IGameSessionEveryLoginDal "FilterWorkerService/internal/repository/abstract"
+	IGameSessionDal "FilterWorkerService/internal/repository/abstract"
 	IJsonParser "FilterWorkerService/pkg/jsonParser"
-	"log"
+	"fmt"
+
+	logger "github.com/appneuroncompany/light-logger"
+	"github.com/appneuroncompany/light-logger/clogger"
 )
 
-type gameSessionEveryLoginManager struct {
-	IGameSessionEveryLoginDal *IGameSessionEveryLoginDal.IGameSessionEveryLoginDal
-	IJsonParser               *IJsonParser.IJsonParser
+type gameSessionManager struct {
+	IGameSessionDal *IGameSessionDal.IGameSessionDal
+	IJsonParser     *IJsonParser.IJsonParser
 }
 
-func GameSessionEveryLoginManagerConstructor() *gameSessionEveryLoginManager {
-	return &gameSessionEveryLoginManager{
-		IGameSessionEveryLoginDal: &IoC.GameSessionEveryLoginDal,
-		IJsonParser:               &IoC.JsonParser,
+func GameSessionManagerConstructor() *gameSessionManager {
+	return &gameSessionManager{
+		IGameSessionDal: &IoC.GameSessionDal,
+		IJsonParser:     &IoC.JsonParser,
 	}
 }
 
-func (g *gameSessionEveryLoginManager) ConvertRawModelToResponseModel(data *[]byte) (v interface{}, s bool, m string) {
+func (g *gameSessionManager) ConvertRawModelToResponseModel(data *[]byte) (v interface{}, s bool, m string) {
 	firstModel := model.GameSessionModel{}
 	convertErr := (*g.IJsonParser).DecodeJson(data, &firstModel)
 	if convertErr != nil {
-		log.Fatal("GameSessionEveryLoginManager", "ConvertRawModelToResponseModel",
-			"byte array to GameSessionEveryLoginModel", "Json Parser Decode Err: ", convertErr.Error())
+		clogger.Error(&logger.Messages{"Byte array to GameSessionModel  GameSessionManager Json Parser Decode ERROR: ": convertErr.Error()})
 		return &model.GameSessionResponseModel{}, false, convertErr.Error()
 	}
 	hour := int16(firstModel.SessionFinishTime.Hour())
@@ -75,11 +77,11 @@ func (g *gameSessionEveryLoginManager) ConvertRawModelToResponseModel(data *[]by
 	modelResponse.LastSessionDuration = 0
 	modelResponse.LastSessionMinute = 0
 	modelResponse.LastDurationMinusPenultimateDuration = 0
-	modelResponse.FirstFiveMinutesTotalSessionCount     = 1
+	modelResponse.FirstFiveMinutesTotalSessionCount = 1
 	modelResponse.FirstFiveMinutesTotalSessionDuration = 1
-	modelResponse.FirstTenMinutesTotalSessionCount     = 1
-	modelResponse.FirstTenMinutesTotalSessionDuration  = 1
-	modelResponse.FirstQuarterHourTotalSessionCount    = 1
+	modelResponse.FirstTenMinutesTotalSessionCount = 1
+	modelResponse.FirstTenMinutesTotalSessionDuration = 1
+	modelResponse.FirstQuarterHourTotalSessionCount = 1
 	modelResponse.FirstQuarterHourTotalSessionDuration = 1
 	modelResponse.FirstHalfHourTotalSessionCount = 1
 	modelResponse.FirstHalfHourTotalSessionDuration = int16(firstModel.SessionTimeMinute)
@@ -128,40 +130,60 @@ func (g *gameSessionEveryLoginManager) ConvertRawModelToResponseModel(data *[]by
 	DetermineGameSessionHour(&modelResponse, hour)
 	DetermineGameSessionAmPm(&modelResponse, hour)
 
-	defer log.Print("GameSessionEveryLoginManager", "ConvertRawModelToResponseModel",
-		modelResponse.ClientId, modelResponse.ProjectId)
+	// defer log.Print("GameSessionEveryLoginManager", "ConvertRawModelToResponseModel",
+	// 	modelResponse.ClientId, modelResponse.ProjectId)
 
-	oldModel, err := (*g.IGameSessionEveryLoginDal).GetGameSessionEveryLoginById(modelResponse.ClientId)
-	if err != nil && err.Error() != "null data error" {
-		log.Fatal("GameSessionEveryLoginManager", "ConvertRawModelToResponseModel",
-			"GameSessionEveryLoginDal_GetGameSessionEveryLoginById", err.Error())
-	}
+	oldModel, err := (*g.IGameSessionDal).GetById(modelResponse.ClientId, modelResponse.ProjectId)
+	// if err != nil && err.Error() != "null data error" {
+	// 	log.Fatal("GameSessionEveryLoginManager", "ConvertRawModelToResponseModel",
+	// 		"GameSessionEveryLoginDal_GetGameSessionEveryLoginById", err.Error())
+	// }
 	switch {
-	case err != nil && err.Error() == "null data error":
 
-		logErr := (*g.IGameSessionEveryLoginDal).Add(&modelResponse)
+	case err != nil && err.Error() != "not found":
+		clogger.Error(&logger.Messages{
+			fmt.Sprintf("Get clientId: %d, projectId: %d game_session_data ERROR: ", modelResponse.ClientId, modelResponse.ProjectId): err.Error(),
+		})
+
+	case err != nil && err.Error() == "not found":
+
+		logErr := (*g.IGameSessionDal).Add(&modelResponse)
 		if logErr != nil {
-			log.Fatal("GameSessionEveryLoginManager", "ConvertRawModelToResponseModel",
-				"GameSessionEveryLoginDal_Add", logErr.Error())
+			clogger.Error(&logger.Messages{
+				fmt.Sprintf("Add clientId: %d, projectId: %d game_session_data ERROR: ", modelResponse.ClientId, modelResponse.ProjectId): logErr.Error(),
+			})
+
+			// log.Fatal("GameSessionEveryLoginManager", "ConvertRawModelToResponseModel",
+			// 	"GameSessionEveryLoginDal_Add", logErr.Error())
 			return &modelResponse, false, logErr.Error()
 		}
+		clogger.Info(&logger.Messages{
+			fmt.Sprintf("Add clientId: %d, projectId: %d game_session_data  : ", modelResponse.ClientId, modelResponse.ProjectId): "SUCCESS",
+		})
 		return &modelResponse, true, "Added"
 
 	case err == nil:
 		updatedModel, updateResult, updateErr := g.UpdateGameSession(&modelResponse, oldModel)
 		if updateErr != nil {
+			clogger.Error(&logger.Messages{
+				fmt.Sprintf("Update clientId: %d, projectId: %d game_session_data ERROR: ", modelResponse.ClientId, modelResponse.ProjectId): updateErr.Error(),
+			})
 			return updatedModel, updateResult, updateErr.Error()
 		}
+		clogger.Info(&logger.Messages{
+			fmt.Sprintf("Update clientId: %d, projectId: %d game_session_data  : ", modelResponse.ClientId, modelResponse.ProjectId): "SUCCESS",
+		})
 		return updatedModel, updateResult, "Updated"
 
 	default:
 
-		return &modelResponse, false, err.Error()
+		return nil, false, ""
 
 	}
+	return nil, false, ""
 }
 
-func (g *gameSessionEveryLoginManager) UpdateGameSession(modelResponse *model.GameSessionResponseModel, oldModel *model.GameSessionResponseModel) (updatedModel *model.GameSessionResponseModel, s bool, m error) {
+func (g *gameSessionManager) UpdateGameSession(modelResponse *model.GameSessionResponseModel, oldModel *model.GameSessionResponseModel) (updatedModel *model.GameSessionResponseModel, s bool, m error) {
 	oldModel.Id = modelResponse.Id
 	oldModel.ProjectId = modelResponse.ProjectId
 	oldModel.ClientId = modelResponse.ClientId
@@ -186,7 +208,7 @@ func (g *gameSessionEveryLoginManager) UpdateGameSession(modelResponse *model.Ga
 	CalculateFifthDayTotalSessionCountAndDuration(modelResponse, oldModel, oldModel.TotalSessionHour)
 	CalculateSixthDayTotalSessionCountAndDuration(modelResponse, oldModel, oldModel.TotalSessionHour)
 	CalculateSeventhDayTotalSessionCountAndDuration(modelResponse, oldModel, oldModel.TotalSessionHour)
-	
+
 	CalculateFirstFiveMinutesTotalSessionCountAndSessionDuration(modelResponse, oldModel, oldModel.TotalSessionMinute)
 	CalculateFirstTenMinutesTotalSessionCountAndSessionDuration(modelResponse, oldModel, oldModel.TotalSessionMinute)
 	CalculateFirstQuarterHourTotalSessionCountAndSessionDuration(modelResponse, oldModel, oldModel.TotalSessionMinute)
@@ -228,12 +250,13 @@ func (g *gameSessionEveryLoginManager) UpdateGameSession(modelResponse *model.Ga
 	oldModel.Session12To17HourCount = oldModel.Session12To17HourCount + modelResponse.Session12To17HourCount
 	oldModel.Session18To23HourCount = oldModel.Session18To23HourCount + modelResponse.Session18To23HourCount
 
-	defer log.Print("GameSessionEveryLoginManager", "UpdateLevelBaseSession",
-		oldModel.ClientId, oldModel.ProjectId)
-	logErr := (*g.IGameSessionEveryLoginDal).UpdateGameSessionEveryLoginById(oldModel.ClientId, oldModel)
+	// defer log.Print("GameSessionEveryLoginManager", "UpdateLevelBaseSession",
+	// 	oldModel.ClientId, oldModel.ProjectId)
+	logErr := (*g.IGameSessionDal).UpdateById(oldModel.ClientId, oldModel.ProjectId, oldModel)
 	if logErr != nil {
-		log.Fatal("GameSessionEveryLoginManager", "UpdateGameSession",
-			"GameSessionEveryLoginDal_UpdateGameSessionEveryLoginById", logErr.Error())
+
+		// log.Fatal("GameSessionEveryLoginManager", "UpdateGameSession",
+		// 	"GameSessionEveryLoginDal_UpdateGameSessionEveryLoginById", logErr.Error())
 		return oldModel, false, logErr
 	}
 	return oldModel, true, nil

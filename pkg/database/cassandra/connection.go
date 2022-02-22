@@ -43,11 +43,11 @@ func ConnectDatabase() *gocql.Session {
 		})
 	}
 
-	if err = session.Query("use MLDatabase").Exec(); err != nil {
-		clogger.Error(&logger.Messages{
-			"keyspace selection err: ": err.Error(),
-		})
-	}
+	// if err = session.Query("use MLDatabase").Exec(); err != nil {
+	// 	clogger.Error(&logger.Messages{
+	// 		"keyspace selection err: ": err.Error(),
+	// 	})
+	// }
 
 	for _, q := range GetTableQueries() {
 		err = session.Query(q).Exec()

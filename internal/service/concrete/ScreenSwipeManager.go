@@ -5,7 +5,10 @@ import (
 	model "FilterWorkerService/internal/model"
 	IScreenSwipeDal "FilterWorkerService/internal/repository/abstract"
 	IJsonParser "FilterWorkerService/pkg/jsonParser"
-	"log"
+	"fmt"
+
+	logger "github.com/appneuroncompany/light-logger"
+	"github.com/appneuroncompany/light-logger/clogger"
 )
 
 type screenSwipeManager struct {
@@ -24,8 +27,7 @@ func (sc *screenSwipeManager) ConvertRawModelToResponseModel(data *[]byte) (v in
 	firstModel := model.ScreenSwipeModel{}
 	convertErr := (*sc.IJsonParser).DecodeJson(data, &firstModel)
 	if convertErr != nil {
-		log.Fatal("ScreenSwipeManager", "ConvertRawModelToResponseModel",
-			"byte array to ScreenSwipeModel", "Json Parser Decode Err: ", convertErr.Error())
+		clogger.Error(&logger.Messages{"Byte array to ScreenSwipeModel  ScreenSwipeManager Json Parser Decode ERROR: ": convertErr.Error()})
 		return &model.ScreenSwipeResponseModel{}, false, convertErr.Error()
 	}
 	hour := int16(firstModel.CreatedAt.Hour())
@@ -174,36 +176,53 @@ func (sc *screenSwipeManager) ConvertRawModelToResponseModel(data *[]byte) (v in
 	modelResponse.TotalSwipeFinishXCor = firstModel.FinishLocX
 	modelResponse.TotalSwipeFinishYCor = firstModel.FinishLocY
 
-	defer log.Print("ScreenSwipeManager", "ConvertRawModelToResponseModel",
-		modelResponse.ClientId, modelResponse.ProjectId)
-	oldModel, err := (*sc.IScreenSwipeDal).GetScreenSwipeById(modelResponse.ClientId)
-	if err != nil && err.Error() != "null data error" {
-		log.Fatal("ScreenSwipeManager", "ConvertRawModelToResponseModel",
-			"ScreenSwipeDal_GetScreenSwipeById", err.Error())
-	}
+	// defer log.Print("ScreenSwipeManager", "ConvertRawModelToResponseModel",
+	// 	modelResponse.ClientId, modelResponse.ProjectId)
+	oldModel, err := (*sc.IScreenSwipeDal).GetById(modelResponse.ClientId, modelResponse.ProjectId)
+	// if err != nil && err.Error() != "null data error" {
+	// 	log.Fatal("ScreenSwipeManager", "ConvertRawModelToResponseModel",
+	// 		"ScreenSwipeDal_GetScreenSwipeById", err.Error())
+	// }
 	switch {
-	case err != nil && err.Error() == "null data error":
+
+	case err != nil && err.Error() != "not found":
+		clogger.Error(&logger.Messages{
+			fmt.Sprintf("Get clientId: %d, projectId: %d screen_swipe_data ERROR: ", modelResponse.ClientId, modelResponse.ProjectId): err.Error(),
+		})
+
+	case err != nil && err.Error() == "not found":
 
 		logErr := (*sc.IScreenSwipeDal).Add(&modelResponse)
 		if logErr != nil {
-			log.Fatal("ScreenSwipeManager", "ConvertRawModelToResponseModel",
-				"ScreenSwipeDal_Add", logErr.Error())
+			clogger.Error(&logger.Messages{
+				fmt.Sprintf("Add clientId: %d, projectId: %d screen_swipe_data ERROR: ", modelResponse.ClientId, modelResponse.ProjectId): logErr.Error(),
+			})
 			return &modelResponse, false, logErr.Error()
 		}
+		clogger.Info(&logger.Messages{
+			fmt.Sprintf("Add clientId: %d, projectId: %d screen_swipe_data  : ", modelResponse.ClientId, modelResponse.ProjectId): "SUCCESS",
+		})
 		return &modelResponse, true, "Added"
 
 	case err == nil:
 		oldModel, updateResult, updateErr := sc.UpdateScreenSwipe(&modelResponse, oldModel)
 		if updateErr != nil {
+			clogger.Error(&logger.Messages{
+				fmt.Sprintf("Update clientId: %d, projectId: %d screen_swipe_data ERROR: ", modelResponse.ClientId, modelResponse.ProjectId): updateErr.Error(),
+			})
 			return oldModel, updateResult, updateErr.Error()
 		}
+		clogger.Info(&logger.Messages{
+			fmt.Sprintf("Update clientId: %d, projectId: %d screen_swipe_data  : ", modelResponse.ClientId, modelResponse.ProjectId): "SUCCESS",
+		})
 		return oldModel, updateResult, "Updated"
 
 	default:
 
-		return oldModel, false, err.Error()
+		return nil, false, ""
 
 	}
+	return nil, false, ""
 }
 
 func (sc *screenSwipeManager) UpdateScreenSwipe(modelResponse *model.ScreenSwipeResponseModel, oldModel *model.ScreenSwipeResponseModel) (updatedModel *model.ScreenSwipeResponseModel, s bool, m error) {
@@ -255,12 +274,12 @@ func (sc *screenSwipeManager) UpdateScreenSwipe(modelResponse *model.ScreenSwipe
 	oldModel.TotalSwipeFinishXCor = modelResponse.TotalSwipeFinishXCor + oldModel.TotalSwipeFinishXCor
 	oldModel.TotalSwipeFinishYCor = modelResponse.TotalSwipeFinishYCor + oldModel.TotalSwipeFinishYCor
 
-	defer log.Print("ScreenSwipeManager", "UpdateScreenSwipe",
-		oldModel.ClientId, oldModel.ProjectId)
-	logErr := (*sc.IScreenSwipeDal).UpdateScreenSwipeById(oldModel.ClientId, oldModel)
+	// defer log.Print("ScreenSwipeManager", "UpdateScreenSwipe",
+	// 	oldModel.ClientId, oldModel.ProjectId)
+	logErr := (*sc.IScreenSwipeDal).UpdateById(oldModel.ClientId, oldModel.ProjectId, oldModel)
 	if logErr != nil {
-		log.Fatal("ScreenSwipeManager", "UpdateScreenSwipe",
-			"ScreenSwipeDal_UpdateScreenSwipeById", logErr.Error())
+		// log.Fatal("ScreenSwipeManager", "UpdateScreenSwipe",
+		// 	"ScreenSwipeDal_UpdateScreenSwipeById", logErr.Error())
 		return oldModel, false, logErr
 	}
 	return oldModel, true, nil

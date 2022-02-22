@@ -9,28 +9,28 @@ import (
 )
 
 type kafkaController struct {
-	Kafka                        *Kafka.IKafka
-	AdvEventService              *service.IAdvEventService
-	BuyingEventService           *service.IBuyingEventService
-	GameSessionEveryLoginService *service.IGameSessionEveryLoginService
-	HardwareInformationService   *service.IHardwareInformationService
-	LevelBaseSessionService      *service.ILevelBaseSessionService
-	LocationService              *service.ILocationService
-	ScreenClickService           *service.IScreenClickService
-	ScreenSwipeService           *service.IScreenSwipeService
+	Kafka                   *Kafka.IKafka
+	AdvEventService         *service.IAdvEventService
+	BuyingEventService      *service.IBuyingEventService
+	GameSessionService      *service.IGameSessionService
+	HardwareService         *service.IHardwareService
+	LevelBaseSessionService *service.ILevelBaseSessionService
+	LocationService         *service.ILocationService
+	ScreenClickService      *service.IScreenClickService
+	ScreenSwipeService      *service.IScreenSwipeService
 }
 
 func KafkaControllerConstructor() *kafkaController {
 	return &kafkaController{
-		Kafka:                        &IoC.Kafka,
-		AdvEventService:              &IoC.AdvEventService,
-		BuyingEventService:           &IoC.BuyingEventService,
-		GameSessionEveryLoginService: &IoC.GameSessionEveryLoginService,
-		HardwareInformationService:   &IoC.HardwareInformationService,
-		LevelBaseSessionService:      &IoC.LevelBaseSessionService,
-		LocationService:              &IoC.LocationService,
-		ScreenClickService:           &IoC.ScreenClickService,
-		ScreenSwipeService:           &IoC.ScreenSwipeService,
+		Kafka:                   &IoC.Kafka,
+		AdvEventService:         &IoC.AdvEventService,
+		BuyingEventService:      &IoC.BuyingEventService,
+		GameSessionService:      &IoC.GameSessionService,
+		HardwareService:         &IoC.HardwareService,
+		LevelBaseSessionService: &IoC.LevelBaseSessionService,
+		LocationService:         &IoC.LocationService,
+		ScreenClickService:      &IoC.ScreenClickService,
+		ScreenSwipeService:      &IoC.ScreenSwipeService,
 	}
 }
 
@@ -48,15 +48,15 @@ func (k *kafkaController) StartListen(waitGroup *sync.WaitGroup) {
 		waitGroup,
 		(*k.BuyingEventService).ConvertRawModelToResponseModel)
 
-	go (*k.Kafka).Consume("GameSessionEveryLoginDataModel",
-		"GameSessionEveryLoginDataModel_Filter_ConsumerGroup",
+	go (*k.Kafka).Consume("GameSessionDataModel",
+		"GameSessionDataModel_Filter_ConsumerGroup",
 		waitGroup,
-		(*k.GameSessionEveryLoginService).ConvertRawModelToResponseModel)
+		(*k.GameSessionService).ConvertRawModelToResponseModel)
 
-	go (*k.Kafka).Consume("HardwareInformationModel",
-		"HardwareInformationModel_Filter_ConsumerGroup",
+	go (*k.Kafka).Consume("HardwareModel",
+		"HardwareModel_Filter_ConsumerGroup",
 		waitGroup,
-		(*k.HardwareInformationService).AddHardwareInformation)
+		(*k.HardwareService).ConvertRawModelToResponseModel)
 
 	go (*k.Kafka).Consume("LevelBaseSessionDataModel",
 		"LevelBaseSessionDataModel_Filter_ConsumerGroup",
@@ -66,7 +66,7 @@ func (k *kafkaController) StartListen(waitGroup *sync.WaitGroup) {
 	go (*k.Kafka).Consume("LocationDataModel",
 		"LocationDataModel_Filter_ConsumerGroup",
 		waitGroup,
-		(*k.LocationService).AddLocation)
+		(*k.LocationService).ConvertRawModelToResponseModel)
 
 	go (*k.Kafka).Consume("ScreenClickDataModel",
 		"ScreenClickDataModel_Filter_ConsumerGroup",

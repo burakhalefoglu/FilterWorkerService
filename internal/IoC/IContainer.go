@@ -20,10 +20,10 @@ var AdvEventDal repository.IAdvEventDal
 var AdvEventService service.IAdvEventService
 var BuyingEventDal repository.IBuyingEventDal
 var BuyingEventService service.IBuyingEventService
-var GameSessionEveryLoginDal repository.IGameSessionEveryLoginDal
-var GameSessionEveryLoginService service.IGameSessionEveryLoginService
-var HardwareInformationDal repository.IHardwareInformationDal
-var HardwareInformationService service.IHardwareInformationService
+var GameSessionDal repository.IGameSessionDal
+var GameSessionService service.IGameSessionService
+var HardwareDal repository.IHardwareDal
+var HardwareService service.IHardwareService
 var LevelBaseSessionDal repository.ILevelBaseSessionDal
 var LevelBaseSessionService service.ILevelBaseSessionService
 var LocationDal repository.ILocationDal

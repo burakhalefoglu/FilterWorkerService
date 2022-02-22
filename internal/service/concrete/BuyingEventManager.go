@@ -6,7 +6,10 @@ import (
 	IBuyingEventDal "FilterWorkerService/internal/repository/abstract"
 	ICacheService "FilterWorkerService/internal/service/abstract"
 	IJsonParser "FilterWorkerService/pkg/jsonParser"
-	"log"
+	"fmt"
+
+	logger "github.com/appneuroncompany/light-logger"
+	"github.com/appneuroncompany/light-logger/clogger"
 )
 
 type buyingEventManager struct {
@@ -27,8 +30,9 @@ func (b *buyingEventManager) ConvertRawModelToResponseModel(data *[]byte) (v int
 	firstModel := model.BuyingEventModel{}
 	convertErr := (*b.IJsonParser).DecodeJson(data, &firstModel)
 	if convertErr != nil {
-		log.Fatal("BuyingEventManager", "ConvertRawModelToResponseModel",
-			"byte array to BuyingEventModel", "Json Parser Decode Err: ", convertErr.Error())
+		clogger.Error(&logger.Messages{"Byte array to BuyingEventModel  BuyingEventManager Json Parser Decode ERROR: ": convertErr.Error()})
+		// log.Fatal("BuyingEventManager", "ConvertRawModelToResponseModel",
+		// 	"byte array to BuyingEventModel", "Json Parser Decode Err: ", convertErr.Error())
 		return &model.BuyingEventResponseModel{}, false, convertErr.Error()
 	}
 	hour := int16(firstModel.TriggeredTime.Hour())
@@ -66,13 +70,13 @@ func (b *buyingEventManager) ConvertRawModelToResponseModel(data *[]byte) (v int
 	modelResponse.FifthBuyingYearOfDay = 0
 	modelResponse.FifthBuyingHour = 0
 	modelResponse.FifthBuyingMinute = 0
-	modelResponse.SixthBuyingYearOfDay     = 0
-	modelResponse.SixthBuyingHour          = 0
-	modelResponse.SixthBuyingMinute        = 0
-	modelResponse.SixthBuyingProductType   = 0
-	modelResponse.SeventhBuyingYearOfDay   = 0
-	modelResponse.SeventhBuyingHour        = 0
-	modelResponse.SeventhBuyingMinute      = 0
+	modelResponse.SixthBuyingYearOfDay = 0
+	modelResponse.SixthBuyingHour = 0
+	modelResponse.SixthBuyingMinute = 0
+	modelResponse.SixthBuyingProductType = 0
+	modelResponse.SeventhBuyingYearOfDay = 0
+	modelResponse.SeventhBuyingHour = 0
+	modelResponse.SeventhBuyingMinute = 0
 	modelResponse.SeventhBuyingProductType = 0
 	modelResponse.FifthBuyingProductType = 0
 	modelResponse.PenultimateBuyingYearOfDay = 0
@@ -97,36 +101,55 @@ func (b *buyingEventManager) ConvertRawModelToResponseModel(data *[]byte) (v int
 	modelResponse.BuyingDayAverageBuyingCount = 1
 	CalculateBuyingLevelBasedAvgBuyingCount(&modelResponse)
 
-	defer log.Print("BuyingEventManager", "ConvertRawModelToResponseModel",
-		modelResponse.ClientId, modelResponse.ProjectId)
-	oldModel, err := (*b.IBuyingEventDal).GetBuyingEventById(modelResponse.ClientId)
-	if err != nil && err.Error() != "null data error" {
-		log.Fatal("BuyingEventManager", "ConvertRawModelToResponseModel",
-			"BuyingEventDal_GetBuyingEventById", err.Error())
-	}
+	// defer log.Print("BuyingEventManager", "ConvertRawModelToResponseModel",
+	// 	modelResponse.ClientId, modelResponse.ProjectId)
+	oldModel, err := (*b.IBuyingEventDal).GetById(modelResponse.ClientId, modelResponse.ProjectId)
+	// if err != nil && err.Error() != "null data error" {
+	// 	log.Fatal("BuyingEventManager", "ConvertRawModelToResponseModel",
+	// 		"BuyingEventDal_GetBuyingEventById", err.Error())
+	// }
 	switch {
-	case err != nil && err.Error() == "null data error":
+
+	case err != nil && err.Error() != "not found":
+		clogger.Error(&logger.Messages{
+			fmt.Sprintf("Get clientId: %d, projectId: %d buying_event_data ERROR: ", modelResponse.ClientId, modelResponse.ProjectId): err.Error(),
+		})
+
+	case err != nil && err.Error() == "not found":
 
 		logErr := (*b.IBuyingEventDal).Add(&modelResponse)
 		if logErr != nil {
-			log.Fatal("BuyingEventManager", "ConvertRawModelToResponseModel",
-				"BuyingEventDal_Add", logErr.Error())
+			clogger.Error(&logger.Messages{
+				fmt.Sprintf("Add clientId: %d, projectId: %d buying_event_data ERROR: ", modelResponse.ClientId, modelResponse.ProjectId): logErr.Error(),
+			})
+
 			return nil, false, logErr.Error()
 		}
+		clogger.Info(&logger.Messages{
+			fmt.Sprintf("Add clientId: %d, projectId: %d buying_event_data  : ", modelResponse.ClientId, modelResponse.ProjectId): "SUCCESS",
+		})
 		return &modelResponse, true, "Added"
 
 	case err == nil:
 		updModel, updateResult, updateErr := b.UpdateBuyingEvent(&modelResponse, oldModel)
 		if updateErr != nil {
+
+			clogger.Error(&logger.Messages{
+				fmt.Sprintf("Update clientId: %d, projectId: %d buying_event_data ERROR: ", modelResponse.ClientId, modelResponse.ProjectId): updateErr.Error(),
+			})
 			return nil, updateResult, updateErr.Error()
 		}
+		clogger.Info(&logger.Messages{
+			fmt.Sprintf("Update clientId: %d, projectId: %d buying_event_data  : ", modelResponse.ClientId, modelResponse.ProjectId): "SUCCESS",
+		})
 		return updModel, updateResult, "Updated"
 
 	default:
 
-		return nil, false, err.Error()
+		return nil, false, ""
 
 	}
+	return nil, false, ""
 
 }
 
@@ -182,12 +205,10 @@ func (b *buyingEventManager) UpdateBuyingEvent(modelResponse *model.BuyingEventR
 	oldModel.BuyingDayAverageBuyingCount = float32(oldModel.TotalBuyingCount) / float32(oldModel.TotalBuyingDay)
 	CalculateBuyingLevelBasedAvgBuyingCount(oldModel)
 
-	defer log.Print("BuyingEventManager", "UpdateBuyingEvent",
-		oldModel.ClientId, oldModel.ProjectId)
-	logErr := (*b.IBuyingEventDal).UpdateBuyingEventById(oldModel.ClientId, oldModel)
+	// defer log.Print("BuyingEventManager", "UpdateBuyingEvent",
+	// 	oldModel.ClientId, oldModel.ProjectId)
+	logErr := (*b.IBuyingEventDal).UpdateById(oldModel.ClientId, oldModel.ProjectId, oldModel)
 	if logErr != nil {
-		log.Fatal("BuyingEventManager", "UpdateBuyingEvent",
-			"BuyingEventDal_UpdateBuyingEventById", logErr.Error())
 		return oldModel, false, logErr
 	}
 	return oldModel, true, nil

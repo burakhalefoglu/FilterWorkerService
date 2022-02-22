@@ -5,7 +5,11 @@ import (
 	model "FilterWorkerService/internal/model"
 	ILevelBaseSessionDal "FilterWorkerService/internal/repository/abstract"
 	IJsonParser "FilterWorkerService/pkg/jsonParser"
+	"fmt"
 	"log"
+
+	logger "github.com/appneuroncompany/light-logger"
+	"github.com/appneuroncompany/light-logger/clogger"
 )
 
 type levelBaseSessionManager struct {
@@ -24,8 +28,11 @@ func (l *levelBaseSessionManager) ConvertRawModelToResponseModel(data *[]byte) (
 	firstModel := model.LevelBaseSessionModel{}
 	convertErr := (*l.IJsonParser).DecodeJson(data, &firstModel)
 	if convertErr != nil {
-		log.Fatal("LevelBaseSessionManager", "ConvertRawModelToResponseModel",
-			"byte array to LevelBaseSessionDataModel", "Json Parser Decode Err: ", convertErr.Error())
+		clogger.Error(&logger.Messages{
+			"Byte array to LevelBaseSessionModel LevelBaseSessionManager Json Parser Decode Err: ": convertErr.Error(),
+		})
+		// log.Fatal("LevelBaseSessionManager", "ConvertRawModelToResponseModel",
+		// 	"byte array to LevelBaseSessionDataModel", "Json Parser Decode Err: ", convertErr.Error())
 		return &model.LevelBaseSessionResponseModel{}, false, convertErr.Error()
 	}
 	hour := int16(firstModel.SessionFinishTime.Hour())
@@ -81,34 +88,48 @@ func (l *levelBaseSessionManager) ConvertRawModelToResponseModel(data *[]byte) (
 	defer log.Print("LevelBaseSessionManager", "ConvertRawModelToResponseModel",
 		modelResponse.ClientId, modelResponse.ProjectId)
 
-	oldModel, err := (*l.ILevelBaseSessionDal).GetLevelBaseSessionById(modelResponse.ClientId)
+	oldModel, err := (*l.ILevelBaseSessionDal).GetById(modelResponse.ClientId, modelResponse.ProjectId)
 	if err != nil && err.Error() != "null data error" {
 		log.Fatal("LevelBaseSessionManager", "ConvertRawModelToResponseModel",
 			"LevelBaseSessionDal_GetLevelBaseSessionById", err.Error())
 	}
 	switch {
-	case err != nil && err.Error() == "null data error":
+
+	case err != nil && err.Error() != "not found":
+		clogger.Error(&logger.Messages{
+			fmt.Sprintf("Get clientId: %d, projectId: %d level_base_session_data ERROR: ", modelResponse.ClientId, modelResponse.ProjectId): err.Error(),
+		})
+		
+	case err != nil && err.Error() == "not found":
 
 		logErr := (*l.ILevelBaseSessionDal).Add(&modelResponse)
 		if logErr != nil {
-			log.Fatal("LevelBaseSessionManager", "ConvertRawModelToResponseModel",
-				"LevelBaseSessionDal_Add", logErr.Error())
+			clogger.Error(&logger.Messages{
+				fmt.Sprintf("Add clientId: %d, projectId: %d level_base_session_data ERROR: ", modelResponse.ClientId, modelResponse.ProjectId): logErr.Error(),
+			})
 			return &modelResponse, false, logErr.Error()
 		}
+		clogger.Info(&logger.Messages{
+			fmt.Sprintf("Add clientId: %d, projectId: %d level_base_session_data  : ", modelResponse.ClientId, modelResponse.ProjectId): "SUCCESS",
+		})
 		return &modelResponse, true, "Added"
 
 	case err == nil:
 		updatedModel, updateResult, updateErr := l.UpdateLevelBaseSession(&modelResponse, oldModel)
 		if updateErr != nil {
+			clogger.Error(&logger.Messages{
+				fmt.Sprintf("Update clientId: %d, projectId: %d level_base_session_data ERROR: ", modelResponse.ClientId, modelResponse.ProjectId): updateErr.Error(),
+		})
 			return updatedModel, updateResult, updateErr.Error()
 		}
+		clogger.Info(&logger.Messages{
+			fmt.Sprintf("Update clientId: %d, projectId: %d level_base_session_data  : ", modelResponse.ClientId, modelResponse.ProjectId): "SUCCESS",
+		})
 		return updatedModel, updateResult, "Updated"
-
 	default:
-
-		return &modelResponse, false, err.Error()
-
+		return nil, false, ""
 	}
+	return nil, false, ""
 }
 
 func (l *levelBaseSessionManager) UpdateLevelBaseSession(modelResponse *model.LevelBaseSessionResponseModel, oldModel *model.LevelBaseSessionResponseModel) (updatedModel *model.LevelBaseSessionResponseModel, s bool, m error) {
@@ -140,12 +161,12 @@ func (l *levelBaseSessionManager) UpdateLevelBaseSession(modelResponse *model.Le
 	oldModel.LastLevelSessionHour = modelResponse.FirstLevelSessionHour
 	oldModel.LastLevelSessionMinute = modelResponse.FirstLevelSessionMinute
 
-	defer log.Print("LevelBaseSessionManager", "UpdateLevelBaseSession",
-		oldModel.ClientId, oldModel.ProjectId)
-	logErr := (*l.ILevelBaseSessionDal).UpdateLevelBaseSessionById(oldModel.ClientId, oldModel)
+	// defer log.Print("LevelBaseSessionManager", "UpdateLevelBaseSession",
+	// 	oldModel.ClientId, oldModel.ProjectId)
+	logErr := (*l.ILevelBaseSessionDal).UpdateById(oldModel.ClientId,oldModel.ProjectId, oldModel)
 	if logErr != nil {
-		log.Fatal("LevelBaseSessionManager", "UpdateLevelBaseSession",
-			"LevelBaseSessionDal_UpdateLevelBaseSessionById", logErr.Error())
+		// log.Fatal("LevelBaseSessionManager", "UpdateLevelBaseSession",
+		// 	"LevelBaseSessionDal_UpdateLevelBaseSessionById", logErr.Error())
 		return oldModel, false, logErr
 	}
 	return oldModel, true, nil

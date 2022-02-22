@@ -4,9 +4,12 @@ import (
 	"FilterWorkerService/internal/IoC"
 	model "FilterWorkerService/internal/model"
 	IScreenClickDal "FilterWorkerService/internal/repository/abstract"
-	"log"
+	"fmt"
 
 	IJsonParser "FilterWorkerService/pkg/jsonParser"
+
+	logger "github.com/appneuroncompany/light-logger"
+	"github.com/appneuroncompany/light-logger/clogger"
 )
 
 type screenClickManager struct {
@@ -25,8 +28,7 @@ func (sc *screenClickManager) ConvertRawModelToResponseModel(data *[]byte) (v in
 	firstModel := model.ScreenClickModel{}
 	convertErr := (*sc.IJsonParser).DecodeJson(data, &firstModel)
 	if convertErr != nil {
-		log.Fatal("ScreenClickManager", "ConvertRawModelToResponseModel",
-			"byte array to ScreenClickModel", "Json Parser Decode Err: ", convertErr.Error())
+		clogger.Error(&logger.Messages{"Byte array to ScreenClickModel  ScreenClickManager Json Parser Decode ERROR: ": convertErr.Error()})
 		return &model.ScreenClickResponseModel{}, false, convertErr.Error()
 	}
 	hour := int16(firstModel.CreatedAt.Hour())
@@ -156,36 +158,54 @@ func (sc *screenClickManager) ConvertRawModelToResponseModel(data *[]byte) (v in
 	modelResponse.DailyAvegareClickCount = float32(touchCount)
 	modelResponse.LastTouchCountMinusSessionBasedAvegareClickCount = 0
 
-	defer log.Print("ScreenClickManager", "ConvertRawModelToResponseModel",
-		modelResponse.ClientId, modelResponse.ProjectId)
-	oldModel, err := (*sc.IScreenClickDal).GetScreenClickById(modelResponse.ClientId)
-	if err != nil && err.Error() != "null data error" {
-		log.Fatal("ScreenClickManager", "ConvertRawModelToResponseModel",
-			"ScreenClickDal_GetScreenClickById", err.Error())
-	}
+	// defer log.Print("ScreenClickManager", "ConvertRawModelToResponseModel",
+	// 	modelResponse.ClientId, modelResponse.ProjectId)
+
+	oldModel, err := (*sc.IScreenClickDal).GetById(modelResponse.ClientId, modelResponse.ProjectId)
+	// if err != nil && err.Error() != "null data error" {
+	// 	log.Fatal("ScreenClickManager", "ConvertRawModelToResponseModel",
+	// 		"ScreenClickDal_GetScreenClickById", err.Error())
+	// }
 	switch {
-	case err != nil && err.Error() == "null data error":
+
+	case err != nil && err.Error() != "not found":
+		clogger.Error(&logger.Messages{
+			fmt.Sprintf("Get clientId: %d, projectId: %d screen_click_data ERROR: ", modelResponse.ClientId, modelResponse.ProjectId): err.Error(),
+		})
+
+	case err != nil && err.Error() == "not found":
 
 		logErr := (*sc.IScreenClickDal).Add(&modelResponse)
 		if logErr != nil {
-			log.Fatal("ScreenClickManager", "ConvertRawModelToResponseModel",
-				"ScreenClickDal_Add", logErr.Error())
+			clogger.Error(&logger.Messages{
+				fmt.Sprintf("Add clientId: %d, projectId: %d screen_click_data ERROR: ", modelResponse.ClientId, modelResponse.ProjectId): logErr.Error(),
+			})
 			return &modelResponse, false, logErr.Error()
 		}
+		clogger.Info(&logger.Messages{
+			fmt.Sprintf("Add clientId: %d, projectId: %d screen_click_data  : ", modelResponse.ClientId, modelResponse.ProjectId): "SUCCESS",
+		})
 		return &modelResponse, true, "Added"
 
 	case err == nil:
 		updModel, updateResult, updateErr := sc.UpdateScreenClick(&modelResponse, oldModel)
 		if updateErr != nil {
+			clogger.Error(&logger.Messages{
+				fmt.Sprintf("Update clientId: %d, projectId: %d screen_click_data ERROR: ", modelResponse.ClientId, modelResponse.ProjectId): updateErr.Error(),
+			})
 			return updModel, updateResult, updateErr.Error()
 		}
+		clogger.Info(&logger.Messages{
+			fmt.Sprintf("Update clientId: %d, projectId: %d screen_click_data  : ", modelResponse.ClientId, modelResponse.ProjectId): "SUCCESS",
+		})
 		return updModel, updateResult, "Updated"
 
 	default:
 
-		return &modelResponse, false, err.Error()
+		return nil, false, ""
 
 	}
+	return nil, false, ""
 }
 
 func (sc *screenClickManager) UpdateScreenClick(modelResponse *model.ScreenClickResponseModel, oldModel *model.ScreenClickResponseModel) (updatedModel *model.ScreenClickResponseModel, s bool, m error) {
@@ -255,12 +275,12 @@ func (sc *screenClickManager) UpdateScreenClick(modelResponse *model.ScreenClick
 	oldModel.DailyAvegareClickCount = CalculateDailyAverageClickCount(oldModel)
 	oldModel.LastTouchCountMinusSessionBasedAvegareClickCount = float32(oldModel.LastTouchCount) - float32(oldModel.SessionBasedAvegareClickCount)
 
-	defer log.Fatal("ScreenClickManager", "UpdateScreenClick",
-		oldModel.ClientId, oldModel.ProjectId)
-	logErr := (*sc.IScreenClickDal).UpdateScreenClickById(oldModel.ClientId, oldModel)
+	// defer log.Fatal("ScreenClickManager", "UpdateScreenClick",
+	// 	oldModel.ClientId, oldModel.ProjectId)
+	logErr := (*sc.IScreenClickDal).UpdateById(oldModel.ClientId, oldModel.ProjectId, oldModel)
 	if logErr != nil {
-		log.Fatal("ScreenClickManager", "UpdateScreenClick",
-			"ScreenClickDal_UpdateScreenClickById", logErr.Error())
+		// log.Fatal("ScreenClickManager", "UpdateScreenClick",
+		// 	"ScreenClickDal_UpdateScreenClickById", logErr.Error())
 		return oldModel, false, logErr
 	}
 	return oldModel, true, nil

@@ -5,8 +5,6 @@ import (
 	"FilterWorkerService/pkg/database/cassandra"
 	"fmt"
 
-	//logger "github.com/appneuroncompany/light-logger"
-	//"github.com/appneuroncompany/light-logger/clogger"
 	"github.com/gocql/gocql"
 )
 
@@ -22,7 +20,7 @@ func NewCassBuyingEventDal(Table string) *cassBuyingEventDal {
 
 
 func (m *cassBuyingEventDal) Add(data *model.BuyingEventResponseModel) error {
-	if err := m.Client.Query(fmt.Sprintf("INSERT INTO %s (id, client_id, project_id, customer_id, level_index, total_buying_count ,total_buying_day, total_buying_hour, first_buying_year_of_day, first_buying_year,  first_buying_hour,  first_buying_minute , first_buying_product_type, second_buying_year_of_day, second_buying_hour,  second_buying_minute, second_buying_product_type, third_buying_year_of_day, third_buying_hour ,third_buying_minute ,third_buying_product_type ,fourth_buying_year_of_day ,fourth_buying_hour ,fourth_buying_minute ,fourth_buying_product_type ,fifth_buying_year_of_day ,fifth_buying_hour ,fifth_buying_minute ,fifth_buying_product_type ,sixth_buying_year_of_day ,sixth_buying_hour ,sixth_buying_minute ,sixth_buying_product_type, seventh_buying_year_of_day ,seventh_buying_hour ,seventh_buying_minute ,seventh_buying_product_type ,penultimate_buying_year_of_day ,penultimate_buying_hour ,penultimate_buying_minute ,penultimate_buying_product_type ,last_buying_year_of_day ,last_buying_year ,last_buying_hour ,last_buying_minute ,last_buying_product_type ,first_day_buying_count ,second_day_buying_count ,third_day_buying_count ,fourth_day_buying_count ,fifth_day_buying_count ,sixth_day_buying_count ,seventh_day_buying_count ,sunday_buying_count ,monday_buying_count ,tuesday_buying_count ,wednesday_buying_count ,thursday_buying_count ,friday_buying_count ,saturday_buying_count ,am_buying_count ,pm_buying_count ,buying_0_to_5_hour_count ,buying_6_to_11_hour_count ,buying_12_to_17_hour_count ,buying_18_to_23_hour_count ,buying_day_average_buying_count ,level_based_average_buying_count, status) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", m.Table),
+	if err := m.Client.Query(fmt.Sprintf("INSERT INTO MLDatabase.%s(id, client_id, project_id, customer_id, level_index, total_buying_count ,total_buying_day, total_buying_hour, first_buying_year_of_day, first_buying_year,  first_buying_hour,  first_buying_minute , first_buying_product_type, second_buying_year_of_day, second_buying_hour,  second_buying_minute, second_buying_product_type, third_buying_year_of_day, third_buying_hour ,third_buying_minute ,third_buying_product_type ,fourth_buying_year_of_day ,fourth_buying_hour ,fourth_buying_minute ,fourth_buying_product_type ,fifth_buying_year_of_day ,fifth_buying_hour ,fifth_buying_minute ,fifth_buying_product_type ,sixth_buying_year_of_day ,sixth_buying_hour ,sixth_buying_minute ,sixth_buying_product_type, seventh_buying_year_of_day ,seventh_buying_hour ,seventh_buying_minute ,seventh_buying_product_type ,penultimate_buying_year_of_day ,penultimate_buying_hour ,penultimate_buying_minute ,penultimate_buying_product_type ,last_buying_year_of_day ,last_buying_year ,last_buying_hour ,last_buying_minute ,last_buying_product_type ,first_day_buying_count ,second_day_buying_count ,third_day_buying_count ,fourth_day_buying_count ,fifth_day_buying_count ,sixth_day_buying_count ,seventh_day_buying_count ,sunday_buying_count ,monday_buying_count ,tuesday_buying_count ,wednesday_buying_count ,thursday_buying_count ,friday_buying_count ,saturday_buying_count ,am_buying_count ,pm_buying_count ,buying_0_to_5_hour_count ,buying_6_to_11_hour_count ,buying_12_to_17_hour_count ,buying_18_to_23_hour_count ,buying_day_average_buying_count ,level_based_average_buying_count, status) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", m.Table),
 		data.Id, data.ClientId, data.ProjectId, data.CustomerId, data.LevelIndex, data.TotalBuyingCount,
 		data.TotalBuyingDay, data.TotalBuyingHour, data.FirstBuyingYearOfDay, data.FirstBuyingYear,
 		data.FirstBuyingHour, data.FirstBuyingMinute, data.FirstBuyingProductType,
@@ -41,20 +39,16 @@ func (m *cassBuyingEventDal) Add(data *model.BuyingEventResponseModel) error {
 		data.AmBuyingCount, data.PmBuyingCount, data.Buying0To5HourCount, data.Buying6To11HourCount, 
 		data.Buying12To17HourCount, data.Buying18To23HourCount, data.BuyingDayAverageBuyingCount, 
 		data.LevelBasedAverageBuyingCount, data.Status).Exec(); err != nil {
-		// clogger.Error(&logger.Messages{
-		// 	"Insert adv_event_data err: ": err.Error(),
-		// })
+	
 		return err
 	}
-	// clogger.Info(&logger.Messages{
-	// 	"Insert adv_event_data  : ": "SUCCESS",
-	// })
+
 	return nil
 }
 
 func (m *cassBuyingEventDal) GetById(ClientId int64, ProjectId int64) (*model.BuyingEventResponseModel, error) {
 	data := &model.BuyingEventResponseModel{}
-	if err := m.Client.Query(fmt.Sprintf("SELECT * FROM %s WHERE client_id = ? AND project_id = ? LIMIT 1", m.Table),
+	if err := m.Client.Query(fmt.Sprintf("SELECT * FROM MLDatabase.%s WHERE client_id = ? AND project_id = ? LIMIT 1", m.Table),
 		ClientId, ProjectId).Scan(&data.Id, &data.ClientId, &data.ProjectId, &data.CustomerId, &data.LevelIndex, 
 			&data.TotalBuyingCount, &data.TotalBuyingDay, &data.TotalBuyingHour, &data.FirstBuyingYearOfDay, 
 			&data.FirstBuyingYear,&data.FirstBuyingHour, &data.FirstBuyingMinute, &data.FirstBuyingProductType,
@@ -73,19 +67,15 @@ func (m *cassBuyingEventDal) GetById(ClientId int64, ProjectId int64) (*model.Bu
 			&data.SaturdayBuyingCount, &data.AmBuyingCount, &data.PmBuyingCount, &data.Buying0To5HourCount, 
 			&data.Buying6To11HourCount, &data.Buying12To17HourCount, &data.Buying18To23HourCount, 
 			&data.BuyingDayAverageBuyingCount, &data.LevelBasedAverageBuyingCount, &data.Status); err != nil {
-		// clogger.Error(&logger.Messages{
-		// 	"Get adv_event_data err: ": err.Error(),
-		// })
+	
 		return nil, err
 	}
-	// clogger.Info(&logger.Messages{
-	// 	"Get adv_event_data  : ": "SUCCESS",
-	// })
+
 	return data, nil
 }
 
 func (m *cassBuyingEventDal) UpdateById(ClientId int64, ProjectId int64, data *model.BuyingEventResponseModel) error {
-	if err := m.Client.Query(fmt.Sprintf("UPDATE %s SET id=?, customer_id=?, level_index=?, total_buying_count=? ,total_buying_day=?, total_buying_hour=?, first_buying_year_of_day=?, first_buying_year=?,  first_buying_hour=?,  first_buying_minute=? , first_buying_product_type=?, second_buying_year_of_day=?, second_buying_hour=?,  second_buying_minute=?, second_buying_product_type=?, third_buying_year_of_day=?, third_buying_hour=? ,third_buying_minute=? ,third_buying_product_type=? ,fourth_buying_year_of_day=? ,fourth_buying_hour=? ,fourth_buying_minute=? ,fourth_buying_product_type=? ,fifth_buying_year_of_day=? ,fifth_buying_hour=? ,fifth_buying_minute=? ,fifth_buying_product_type=? ,sixth_buying_year_of_day=? ,sixth_buying_hour=? ,sixth_buying_minute=? ,sixth_buying_product_type=?, seventh_buying_year_of_day=? ,seventh_buying_hour=? ,seventh_buying_minute=? ,seventh_buying_product_type=? ,penultimate_buying_year_of_day=? ,penultimate_buying_hour=? ,penultimate_buying_minute=? ,penultimate_buying_product_type=? ,last_buying_year_of_day=? ,last_buying_year=? ,last_buying_hour=? ,last_buying_minute=? ,last_buying_product_type=? ,first_day_buying_count=? ,second_day_buying_count=? ,third_day_buying_count=? ,fourth_day_buying_count=? ,fifth_day_buying_count=? ,sixth_day_buying_count=? ,seventh_day_buying_count=? ,sunday_buying_count=? ,monday_buying_count=? ,tuesday_buying_count=? ,wednesday_buying_count=? ,thursday_buying_count=? ,friday_buying_count=? ,saturday_buying_count=? ,am_buying_count=? ,pm_buying_count=? ,buying_0_to_5_hour_count=? ,buying_6_to_11_hour_count=? ,buying_12_to_17_hour_count=? ,buying_18_to_23_hour_count=? ,buying_day_average_buying_count=? ,level_based_average_buying_count=?, status=? WHERE client_id = %d AND project_id = %d", m.Table, ClientId, ProjectId),
+	if err := m.Client.Query(fmt.Sprintf("UPDATE MLDatabase.%s SET id=?, customer_id=?, level_index=?, total_buying_count=? ,total_buying_day=?, total_buying_hour=?, first_buying_year_of_day=?, first_buying_year=?,  first_buying_hour=?,  first_buying_minute=? , first_buying_product_type=?, second_buying_year_of_day=?, second_buying_hour=?,  second_buying_minute=?, second_buying_product_type=?, third_buying_year_of_day=?, third_buying_hour=? ,third_buying_minute=? ,third_buying_product_type=? ,fourth_buying_year_of_day=? ,fourth_buying_hour=? ,fourth_buying_minute=? ,fourth_buying_product_type=? ,fifth_buying_year_of_day=? ,fifth_buying_hour=? ,fifth_buying_minute=? ,fifth_buying_product_type=? ,sixth_buying_year_of_day=? ,sixth_buying_hour=? ,sixth_buying_minute=? ,sixth_buying_product_type=?, seventh_buying_year_of_day=? ,seventh_buying_hour=? ,seventh_buying_minute=? ,seventh_buying_product_type=? ,penultimate_buying_year_of_day=? ,penultimate_buying_hour=? ,penultimate_buying_minute=? ,penultimate_buying_product_type=? ,last_buying_year_of_day=? ,last_buying_year=? ,last_buying_hour=? ,last_buying_minute=? ,last_buying_product_type=? ,first_day_buying_count=? ,second_day_buying_count=? ,third_day_buying_count=? ,fourth_day_buying_count=? ,fifth_day_buying_count=? ,sixth_day_buying_count=? ,seventh_day_buying_count=? ,sunday_buying_count=? ,monday_buying_count=? ,tuesday_buying_count=? ,wednesday_buying_count=? ,thursday_buying_count=? ,friday_buying_count=? ,saturday_buying_count=? ,am_buying_count=? ,pm_buying_count=? ,buying_0_to_5_hour_count=? ,buying_6_to_11_hour_count=? ,buying_12_to_17_hour_count=? ,buying_18_to_23_hour_count=? ,buying_day_average_buying_count=? ,level_based_average_buying_count=?, status=? WHERE client_id = ? AND project_id = ?", m.Table),
 	data.Id, data.ClientId, data.ProjectId, data.CustomerId, data.LevelIndex, data.TotalBuyingCount,
 	data.TotalBuyingDay, data.TotalBuyingHour, data.FirstBuyingYearOfDay, data.FirstBuyingYear,
 	data.FirstBuyingHour, data.FirstBuyingMinute, data.FirstBuyingProductType,
@@ -103,7 +93,7 @@ func (m *cassBuyingEventDal) UpdateById(ClientId int64, ProjectId int64, data *m
 	data.WednesdayBuyingCount, data.ThursdayBuyingCount, data.FridayBuyingCount, data.SaturdayBuyingCount, 
 	data.AmBuyingCount, data.PmBuyingCount, data.Buying0To5HourCount, data.Buying6To11HourCount, 
 	data.Buying12To17HourCount, data.Buying18To23HourCount, data.BuyingDayAverageBuyingCount, 
-	data.LevelBasedAverageBuyingCount, data.Status).Exec(); err != nil {
+	data.LevelBasedAverageBuyingCount, data.Status, ClientId, ProjectId).Exec(); err != nil {
 
 		return err
 	}

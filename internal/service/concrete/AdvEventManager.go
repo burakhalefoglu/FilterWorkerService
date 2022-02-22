@@ -7,7 +7,6 @@ import (
 	ICacheService "FilterWorkerService/internal/service/abstract"
 	IJsonParser "FilterWorkerService/pkg/jsonParser"
 	"fmt"
-	"log"
 
 	logger "github.com/appneuroncompany/light-logger"
 	"github.com/appneuroncompany/light-logger/clogger"
@@ -31,7 +30,7 @@ func (a *advEventManager) ConvertRawModelToResponseModel(data *[]byte) (v interf
 	convertErr := (*a.IJsonParser).DecodeJson(data, &firstModel)
 	if convertErr != nil {
 		clogger.Error(&logger.Messages{
-			"AdvEventManager ConvertRawModelToResponseModel Json Parser Decode Err: ": convertErr.Error(),
+			"Byte array to AdvEventModel AdvEventManager Json Parser Decode Err: ": convertErr.Error(),
 		})
 		// log.Fatal("AdvEventManager", "ConvertRawModelToResponseModel",
 		// 	"byte array to AdvEventModel", "Json Parser Decode Err: ", convertErr.Error())
@@ -123,42 +122,51 @@ func (a *advEventManager) ConvertRawModelToResponseModel(data *[]byte) (v interf
 	DetermineAdvHour(&modelResponse, hour)
 	DetermineAdvAmPm(&modelResponse, hour)
 
-	// defer log.Print("AdvEventManager", "ConvertRawModelToResponseModel",
-	// 	modelResponse.ClientId, modelResponse.ProjectId)
 
+	
 	oldModel, err := (*a.IAdvEventDal).GetById(modelResponse.ClientId, modelResponse.ProjectId)
-	if err != nil && err.Error() != "null data error" {
-		log.Fatal("AdvEventManager", "ConvertRawModelToResponseModel",
-			"AdvEventDal_GetAdvEventById", err.Error())
-	}
+	
+
 	switch {
-	case err != nil && err.Error() == "null data error":
+	
+	case err != nil && err.Error() != "not found":
+		clogger.Error(&logger.Messages{
+			fmt.Sprintf("Get clientId: %d, projectId: %d adv_event_data ERROR: ", modelResponse.ClientId, modelResponse.ProjectId): err.Error(),
+		})
+
+	case err != nil && err.Error() == "not found":
 
 		logErr := (*a.IAdvEventDal).Add(&modelResponse)
 		if logErr != nil {
 			clogger.Error(&logger.Messages{
-			"Add adv_event_data err: ": logErr.Error(),
+				fmt.Sprintf("Add clientId: %d, projectId: %d adv_event_data ERROR: ", modelResponse.ClientId, modelResponse.ProjectId): logErr.Error(),
 		})
-			// log.Fatal("AdvEventManager", "ConvertRawModelToResponseModel",
-			// 	"AdvEventDal_Add", logErr.Error())
+	
 			return nil, false, logErr.Error()
 		}
 		clogger.Info(&logger.Messages{
-			"Add adv_event_data  : ": "SUCCESS",
+			fmt.Sprintf("Add clientId: %d, projectId: %d adv_event_data  : ", modelResponse.ClientId, modelResponse.ProjectId): "SUCCESS",
 		})
 		return &modelResponse, true, "Added"
 
 	case err == nil:
 		updatedModel, updateResult, updateErr := a.UpdateAdvEvent(&modelResponse, oldModel)
 		if updateErr != nil {
+			clogger.Error(&logger.Messages{
+				fmt.Sprintf("Update clientId: %d, projectId: %d adv_event_data ERROR: ", modelResponse.ClientId, modelResponse.ProjectId): updateErr.Error(),
+		})
 			return nil, updateResult, "Update went wrong!"
 		}
+		clogger.Info(&logger.Messages{
+			fmt.Sprintf("Update clientId: %d, projectId: %d adv_event_data  : ", modelResponse.ClientId, modelResponse.ProjectId): "SUCCESS",
+		})
 		return updatedModel, updateResult, "Updated"
 
 	default:
-		return nil, false, err.Error()
+		return nil, false, ""
 	}
-
+	
+	return nil, false, ""
 }
 
 func (a *advEventManager) UpdateAdvEvent(modelResponse *model.AdvEventResponseModel,
@@ -230,22 +238,12 @@ func (a *advEventManager) UpdateAdvEvent(modelResponse *model.AdvEventResponseMo
 	oldModel.AmAdvClickCount = oldModel.AmAdvClickCount + modelResponse.AmAdvClickCount
 	oldModel.PmAdvClickCount = oldModel.PmAdvClickCount + modelResponse.PmAdvClickCount
 
-	// defer log.Print("AdvEventManager", "UpdateAdvEvent",
-	// 	oldModel.ClientId, oldModel.ProjectId)
 		
 	logErr := (*a.IAdvEventDal).UpdateById(oldModel.ClientId, oldModel.ProjectId, oldModel)
 	if logErr != nil {
-
-		clogger.Error(&logger.Messages{
-			"Update adv_event_data err: ": logErr.Error(),
-		})
-		// log.Fatal("AdvEventManager", "UpdateAdvEvent",
-		// 	"AdvEventDal_UpdateAdvEventById", logErr.Error())
+		
 		return oldModel, false, logErr
 	}
-	clogger.Info(&logger.Messages{
-		fmt.Sprintf("Update %d %d adv_event_data  : ",oldModel.ClientId, oldModel.ProjectId): "SUCCESS",
-	})
 	return oldModel, true, nil
 }
 
