@@ -51,7 +51,6 @@ func (i *golobbyInjection) Inject() {
 func injectTypeStandardiseDal() {
 	if err := container.Singleton(func() repository.ITypeStandardizationDal {
 		return cassandra_dal.NewCassTypeStandardizationDal(cassandra.TypeStandardizationModel)
-		//return mongodb_driver.MdbDTypeStandardizationDalConstructor()
 	}); err != nil {
 		panic(err)
 	}
@@ -75,7 +74,6 @@ func injectCacheService() {
 func injectAdvEventDal() {
 	if err := container.Singleton(func() repository.IAdvEventDal {
 		return cassandra_dal.NewCassAdvEventDal(cassandra.AdvEventResponseModel)
-		//return mongodb_driver.MdbDAdvEventDalConstructor()
 	}); err != nil {
 		panic(err)
 	}
@@ -100,7 +98,6 @@ func injectAdvEventService() {
 func injectBuyingEventDal() {
 	if err := container.Singleton(func() repository.IBuyingEventDal {
 		return cassandra_dal.NewCassBuyingEventDal(cassandra.BuyingEventResponseModel)
-		//return mongodb_driver.MdbDBuyingEventDalConstructor()
 	}); err != nil {
 		panic(err)
 	}
@@ -125,7 +122,6 @@ func injectBuyingEventService() {
 func injectGameSessionEveryLoginDal() {
 	if err := container.Singleton(func() repository.IGameSessionDal {
 		return cassandra_dal.NewCassGameSessionDal(cassandra.GameSessionResponseModel)
-		//return mongodb_driver.MdbDGameSessionEveryLoginDalConstructor()
 	}); err != nil {
 		panic(err)
 	}
@@ -150,7 +146,6 @@ func injectGameSessionEveryLoginService() {
 func injectHardwareInformationDal() {
 	if err := container.Singleton(func() repository.IHardwareDal {
 		return cassandra_dal.NewCassHardwareDal(cassandra.HardwareResponseModel)
-		//return mongodb_driver.MdbDHardwareInformationDalConstructor()
 	}); err != nil {
 		panic(err)
 	}
@@ -175,7 +170,6 @@ func injectHardwareInformationService() {
 func injectLevelBaseSessionDal() {
 	if err := container.Singleton(func() repository.ILevelBaseSessionDal {
 		return cassandra_dal.NewCassLevelBaseSessionDal(cassandra.LevelBaseSessionResponseModel)
-		//return mongodb_driver.MdbDLevelBaseSessionDalConstructor()
 	}); err != nil {
 		panic(err)
 	}
@@ -200,7 +194,6 @@ func injectLevelBaseSessionService() {
 func injectLocationDal() {
 	if err := container.Singleton(func() repository.ILocationDal {
 		return cassandra_dal.NewCassLocationDal(cassandra.LocationResponseModel)
-		//return mongodb_driver.MdbDLocationDalConstructor()
 	}); err != nil {
 		panic(err)
 	}
@@ -225,7 +218,6 @@ func injectLocationManagerService() {
 func injectScreenClickDal() {
 	if err := container.Singleton(func() repository.IScreenClickDal {
 		return cassandra_dal.NewCassScreenClickDal(cassandra.ScreenClickResponseModel)
-		//return mongodb_driver.MdbDScreenClickDalConstructor()
 	}); err != nil {
 		panic(err)
 	}
@@ -250,7 +242,6 @@ func injectScreenClickManagerService() {
 func injectScreenSwipeDal() {
 	if err := container.Singleton(func() repository.IScreenSwipeDal {
 		return cassandra_dal.NewCassScreenSwipeDal(cassandra.ScreenSwipeResponseModel)
-		//return mongodb_driver.MdbDScreenSwipeDalConstructor()
 	}); err != nil {
 		panic(err)
 	}

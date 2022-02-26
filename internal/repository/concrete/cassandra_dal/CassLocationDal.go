@@ -38,7 +38,7 @@ func (m *cassLocationDal) Add(data *model.LocationResponseModel) error {
 
 func (m *cassLocationDal) GetById(ClientId int64, ProjectId int64) (*model.LocationResponseModel, error) {
 	data := &model.LocationResponseModel{}
-	if err := m.Client.Query(fmt.Sprintf("SELECT * FROM MLDatabase.%s WHERE client_id = ? AND project_id = ? LIMIT 1", m.Table),
+	if err := m.Client.Query(fmt.Sprintf("SELECT id , client_id , project_id , customer_id , continent ,country , city ,region ,  org , status FROM MLDatabase.%s WHERE client_id = ? AND project_id = ? LIMIT 1", m.Table),
 		ClientId, ProjectId).Scan(&data.Id, &data.ClientId, &data.ProjectId, &data.CustomerId,
 		&data.Continent,
 		&data.Country,

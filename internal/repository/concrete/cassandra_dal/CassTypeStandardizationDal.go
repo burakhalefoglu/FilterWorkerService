@@ -28,24 +28,23 @@ func (m *cassTypeStandardizationDal) Add(tableName string, data *model.TypeStand
 
 func (m *cassTypeStandardizationDal) GetByKey(tableName string, key string) (*model.TypeStandardizationModel, error) {
 	data := &model.TypeStandardizationModel{}
-	if err := m.Client.Query(fmt.Sprintf("SELECT * FROM MLDatabase.%s WHERE key = ? LIMIT 1", tableName),
-		key).Scan(&data.Value); err != nil {
+	if err := m.Client.Query(fmt.Sprintf("SELECT key, value FROM MLDatabase.%s WHERE key = ? LIMIT 1", tableName),
+		key).Scan(&data.Key, &data.Value); err != nil {
 		return nil, err
 	}
 	return data, nil
 }
 
 func (m *cassTypeStandardizationDal) GetAll(tableName string) (*[]model.TypeStandardizationModel, error) {
+	var data model.TypeStandardizationModel
 	var models []model.TypeStandardizationModel
-	c := map[string]interface{}{}
- 
-	iter := m.Client.Query(fmt.Sprintf("SELECT * FROM MLDatabase.%s", tableName)).Iter()
-	for iter.MapScan(c) {
-		models = append(models, model.TypeStandardizationModel{
-			Key:   c["key"].(string),
-			Value: c["value"].(int16),
-		})
-		c = map[string]interface{}{}
+	
+	iter := m.Client.Query(fmt.Sprintf("SELECT key, value FROM MLDatabase.%s", tableName)).Iter()
+	for iter.Scan(&data.Key, &data.Value) {
+		models = append(models, data)
+	}
+	if err := iter.Close(); err != nil {
+		return nil, err
 	}
 	return &models, nil
 }

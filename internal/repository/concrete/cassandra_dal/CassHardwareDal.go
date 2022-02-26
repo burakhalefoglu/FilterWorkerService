@@ -38,7 +38,7 @@ func (m *cassHardwareDal) Add(data *model.HardwareResponseModel) error {
 
 func (m *cassHardwareDal) GetById(ClientId int64, ProjectId int64) (*model.HardwareResponseModel, error) {
 	data := &model.HardwareResponseModel{}
-	if err := m.Client.Query(fmt.Sprintf("SELECT * FROM MLDatabase.%s WHERE client_id = ? AND project_id = ? LIMIT 1", m.Table),
+	if err := m.Client.Query(fmt.Sprintf("SELECT id , client_id , project_id , customer_id , device_type ,graphics_device_type ,graphics_memory_size ,operating_system , processor_count ,processor_type , system_memory_size ,status FROM MLDatabase.%s WHERE client_id = ? AND project_id = ? LIMIT 1", m.Table),
 		ClientId, ProjectId).Scan(&data.Id, &data.ClientId, &data.ProjectId, &data.CustomerId,
 		&data.DeviceType,
 		&data.GraphicsDeviceType,
