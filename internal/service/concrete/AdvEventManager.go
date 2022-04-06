@@ -8,7 +8,6 @@ import (
 	IJsonParser "FilterWorkerService/pkg/jsonParser"
 	"fmt"
 
-	logger "github.com/appneuroncompany/light-logger"
 	"github.com/appneuroncompany/light-logger/clogger"
 )
 
@@ -25,16 +24,16 @@ func AdvEventManagerConstructor() *advEventManager {
 	}
 }
 
-func (a *advEventManager) ConvertRawModelToResponseModel(data *[]byte) (v interface{}, s bool, m string) {
+func (a *advEventManager) ConvertRawModelToResponseModel(data *[]byte) (s bool, m string) {
 	firstModel := model.AdvEventDataModel{}
 	convertErr := (*a.IJsonParser).DecodeJson(data, &firstModel)
 	if convertErr != nil {
-		clogger.Error(&logger.Messages{
+		clogger.Error(&map[string]interface{}{
 			"Byte array to AdvEventModel AdvEventManager Json Parser Decode Err: ": convertErr.Error(),
 		})
 		// log.Fatal("AdvEventManager", "ConvertRawModelToResponseModel",
 		// 	"byte array to AdvEventModel", "Json Parser Decode Err: ", convertErr.Error())
-		return nil, false, convertErr.Error()
+		return false, convertErr.Error()
 	}
 	hour := int16(firstModel.TriggeredTime.Hour())
 	day := int16(firstModel.TriggeredTime.Weekday())
@@ -77,14 +76,14 @@ func (a *advEventManager) ConvertRawModelToResponseModel(data *[]byte) (v interf
 	modelResponse.FifthAdvHour = 0
 	modelResponse.FifthAdvMinute = 0
 	modelResponse.FifthAdvType = 0
-	modelResponse.SixthAdvYearOfDay   = 0
-	modelResponse.SixthAdvHour        = 0
-	modelResponse.SixthAdvMinute      = 0
-	modelResponse.SixthAdvType        = 0
+	modelResponse.SixthAdvYearOfDay = 0
+	modelResponse.SixthAdvHour = 0
+	modelResponse.SixthAdvMinute = 0
+	modelResponse.SixthAdvType = 0
 	modelResponse.SeventhAdvYearOfDay = 0
-	modelResponse.SeventhAdvHour      = 0
-	modelResponse.SeventhAdvMinute    = 0
-	modelResponse.SeventhAdvType      = 0
+	modelResponse.SeventhAdvHour = 0
+	modelResponse.SeventhAdvMinute = 0
+	modelResponse.SeventhAdvType = 0
 	modelResponse.PenultimateAdvYearOfDay = 0
 	modelResponse.PenultimateAdvHour = 0
 	modelResponse.PenultimateAdvMinute = 0
@@ -95,8 +94,8 @@ func (a *advEventManager) ConvertRawModelToResponseModel(data *[]byte) (v interf
 	modelResponse.LastAdvClickMinute = 0
 	modelResponse.LastAdvType = 0
 
-	modelResponse.FirstFiveMinutesAdvClickCount  = 1
-	modelResponse.FirstTenMinutesAdvClickCount  = 1
+	modelResponse.FirstFiveMinutesAdvClickCount = 1
+	modelResponse.FirstTenMinutesAdvClickCount = 1
 	modelResponse.FirstQuarterHourAdvClickCount = 1
 	modelResponse.FirstHalfHourAdvClickCount = 1
 	modelResponse.FirstHourAdvClickCount = 1
@@ -122,15 +121,12 @@ func (a *advEventManager) ConvertRawModelToResponseModel(data *[]byte) (v interf
 	DetermineAdvHour(&modelResponse, hour)
 	DetermineAdvAmPm(&modelResponse, hour)
 
-
-	
 	oldModel, err := (*a.IAdvEventDal).GetById(modelResponse.ClientId, modelResponse.ProjectId)
-	
 
 	switch {
-	
+
 	case err != nil && err.Error() != "not found":
-		clogger.Error(&logger.Messages{
+		clogger.Error(&map[string]interface{}{
 			fmt.Sprintf("Get clientId: %d, projectId: %d adv_event_data ERROR: ", modelResponse.ClientId, modelResponse.ProjectId): err.Error(),
 		})
 
@@ -138,35 +134,35 @@ func (a *advEventManager) ConvertRawModelToResponseModel(data *[]byte) (v interf
 
 		logErr := (*a.IAdvEventDal).Add(&modelResponse)
 		if logErr != nil {
-			clogger.Error(&logger.Messages{
+			clogger.Error(&map[string]interface{}{
 				fmt.Sprintf("Add clientId: %d, projectId: %d adv_event_data ERROR: ", modelResponse.ClientId, modelResponse.ProjectId): logErr.Error(),
-		})
-	
-			return nil, false, logErr.Error()
+			})
+
+			return false, logErr.Error()
 		}
-		clogger.Info(&logger.Messages{
+		clogger.Info(&map[string]interface{}{
 			fmt.Sprintf("Add clientId: %d, projectId: %d adv_event_data  : ", modelResponse.ClientId, modelResponse.ProjectId): "SUCCESS",
 		})
-		return &modelResponse, true, "Added"
+		return true, "Added"
 
 	case err == nil:
-		updatedModel, updateResult, updateErr := a.UpdateAdvEvent(&modelResponse, oldModel)
+		_, updateResult, updateErr := a.UpdateAdvEvent(&modelResponse, oldModel)
 		if updateErr != nil {
-			clogger.Error(&logger.Messages{
+			clogger.Error(&map[string]interface{}{
 				fmt.Sprintf("Update clientId: %d, projectId: %d adv_event_data ERROR: ", modelResponse.ClientId, modelResponse.ProjectId): updateErr.Error(),
-		})
-			return nil, updateResult, "Update went wrong!"
+			})
+			return updateResult, "Update went wrong!"
 		}
-		clogger.Info(&logger.Messages{
+		clogger.Info(&map[string]interface{}{
 			fmt.Sprintf("Update clientId: %d, projectId: %d adv_event_data  : ", modelResponse.ClientId, modelResponse.ProjectId): "SUCCESS",
 		})
-		return updatedModel, updateResult, "Updated"
+		return updateResult, "Updated"
 
 	default:
-		return nil, false, ""
+		return false, ""
 	}
-	
-	return nil, false, ""
+
+	return false, ""
 }
 
 func (a *advEventManager) UpdateAdvEvent(modelResponse *model.AdvEventResponseModel,
@@ -201,10 +197,10 @@ func (a *advEventManager) UpdateAdvEvent(modelResponse *model.AdvEventResponseMo
 	oldModel.LastAdvClickHour = modelResponse.FirstAdvClickHour
 	oldModel.LastAdvClickMinute = modelResponse.FirstAdvClickMinute
 	oldModel.LastAdvType = modelResponse.FirstAdvType
-	
+
 	CalculateFirstFiveMinutesTotalAdvCount(modelResponse, oldModel, oldModel.TotalAdvMinute)
 	CalculateFirstTenMinutesTotalAdvCount(modelResponse, oldModel, oldModel.TotalAdvMinute)
-	CalculateFirstQuarterHourTotalAdvCount(modelResponse, oldModel,oldModel.TotalAdvMinute)
+	CalculateFirstQuarterHourTotalAdvCount(modelResponse, oldModel, oldModel.TotalAdvMinute)
 	CalculateFirstHalfHourTotalAdvCount(modelResponse, oldModel, oldModel.TotalAdvMinute)
 	CalculateFirstHourTotalAdvCount(modelResponse, oldModel, oldModel.TotalAdvMinute)
 	CalculateFirstTwoHourTotalAdvCount(modelResponse, oldModel, oldModel.TotalAdvMinute)
@@ -238,10 +234,9 @@ func (a *advEventManager) UpdateAdvEvent(modelResponse *model.AdvEventResponseMo
 	oldModel.AmAdvClickCount = oldModel.AmAdvClickCount + modelResponse.AmAdvClickCount
 	oldModel.PmAdvClickCount = oldModel.PmAdvClickCount + modelResponse.PmAdvClickCount
 
-		
 	logErr := (*a.IAdvEventDal).UpdateById(oldModel.ClientId, oldModel.ProjectId, oldModel)
 	if logErr != nil {
-		
+
 		return oldModel, false, logErr
 	}
 	return oldModel, true, nil

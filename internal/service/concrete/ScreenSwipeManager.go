@@ -7,7 +7,6 @@ import (
 	IJsonParser "FilterWorkerService/pkg/jsonParser"
 	"fmt"
 
-	logger "github.com/appneuroncompany/light-logger"
 	"github.com/appneuroncompany/light-logger/clogger"
 )
 
@@ -23,12 +22,12 @@ func ScreenSwipeManagerConstructor() *screenSwipeManager {
 	}
 }
 
-func (sc *screenSwipeManager) ConvertRawModelToResponseModel(data *[]byte) (v interface{}, s bool, m string) {
+func (sc *screenSwipeManager) ConvertRawModelToResponseModel(data *[]byte) (s bool, m string) {
 	firstModel := model.ScreenSwipeModel{}
 	convertErr := (*sc.IJsonParser).DecodeJson(data, &firstModel)
 	if convertErr != nil {
-		clogger.Error(&logger.Messages{"Byte array to ScreenSwipeModel  ScreenSwipeManager Json Parser Decode ERROR: ": convertErr.Error()})
-		return &model.ScreenSwipeResponseModel{}, false, convertErr.Error()
+		clogger.Error(&map[string]interface{}{"Byte array to ScreenSwipeModel  ScreenSwipeManager Json Parser Decode ERROR: ": convertErr.Error()})
+		return false, convertErr.Error()
 	}
 	hour := int16(firstModel.CreatedAt.Hour())
 	yearOfDay := int16(firstModel.CreatedAt.YearDay())
@@ -186,7 +185,7 @@ func (sc *screenSwipeManager) ConvertRawModelToResponseModel(data *[]byte) (v in
 	switch {
 
 	case err != nil && err.Error() != "not found":
-		clogger.Error(&logger.Messages{
+		clogger.Error(&map[string]interface{}{
 			fmt.Sprintf("Get clientId: %d, projectId: %d screen_swipe_data ERROR: ", modelResponse.ClientId, modelResponse.ProjectId): err.Error(),
 		})
 
@@ -194,35 +193,35 @@ func (sc *screenSwipeManager) ConvertRawModelToResponseModel(data *[]byte) (v in
 
 		logErr := (*sc.IScreenSwipeDal).Add(&modelResponse)
 		if logErr != nil {
-			clogger.Error(&logger.Messages{
+			clogger.Error(&map[string]interface{}{
 				fmt.Sprintf("Add clientId: %d, projectId: %d screen_swipe_data ERROR: ", modelResponse.ClientId, modelResponse.ProjectId): logErr.Error(),
 			})
-			return &modelResponse, false, logErr.Error()
+			return false, logErr.Error()
 		}
-		clogger.Info(&logger.Messages{
+		clogger.Info(&map[string]interface{}{
 			fmt.Sprintf("Add clientId: %d, projectId: %d screen_swipe_data  : ", modelResponse.ClientId, modelResponse.ProjectId): "SUCCESS",
 		})
-		return &modelResponse, true, "Added"
+		return true, "Added"
 
 	case err == nil:
-		oldModel, updateResult, updateErr := sc.UpdateScreenSwipe(&modelResponse, oldModel)
+		_, updateResult, updateErr := sc.UpdateScreenSwipe(&modelResponse, oldModel)
 		if updateErr != nil {
-			clogger.Error(&logger.Messages{
+			clogger.Error(&map[string]interface{}{
 				fmt.Sprintf("Update clientId: %d, projectId: %d screen_swipe_data ERROR: ", modelResponse.ClientId, modelResponse.ProjectId): updateErr.Error(),
 			})
-			return oldModel, updateResult, updateErr.Error()
+			return updateResult, updateErr.Error()
 		}
-		clogger.Info(&logger.Messages{
+		clogger.Info(&map[string]interface{}{
 			fmt.Sprintf("Update clientId: %d, projectId: %d screen_swipe_data  : ", modelResponse.ClientId, modelResponse.ProjectId): "SUCCESS",
 		})
-		return oldModel, updateResult, "Updated"
+		return updateResult, "Updated"
 
 	default:
 
-		return nil, false, ""
+		return false, ""
 
 	}
-	return nil, false, ""
+	return false, ""
 }
 
 func (sc *screenSwipeManager) UpdateScreenSwipe(modelResponse *model.ScreenSwipeResponseModel, oldModel *model.ScreenSwipeResponseModel) (updatedModel *model.ScreenSwipeResponseModel, s bool, m error) {

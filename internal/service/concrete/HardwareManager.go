@@ -8,7 +8,6 @@ import (
 	IJsonParser "FilterWorkerService/pkg/jsonParser"
 	"fmt"
 
-	logger "github.com/appneuroncompany/light-logger"
 	"github.com/appneuroncompany/light-logger/clogger"
 )
 
@@ -26,16 +25,16 @@ func HardwareManagerConstructor() *hardwareManager {
 	}
 }
 
-func (h *hardwareManager) ConvertRawModelToResponseModel(data *[]byte) (v interface{}, s bool, m string) {
+func (h *hardwareManager) ConvertRawModelToResponseModel(data *[]byte) (s bool, m string) {
 	// Todo : 1 Model karşılanacak
 	firstmodel := model.HardwareModel{}
 	convertErr := (*h.IJsonParser).DecodeJson(data, &firstmodel)
 	if convertErr != nil {
-		clogger.Error(&logger.Messages{"Byte array to HardwareModel  HardwareManager Json Parser Decode ERROR: ": convertErr.Error()})
+		clogger.Error(&map[string]interface{}{"Byte array to HardwareModel  HardwareManager Json Parser Decode ERROR: ": convertErr.Error()})
 
 		// log.Fatal("HardwareInformationManager", "AddHardwareInformation",
 		// 	"byte array to HardwareInformationModel", "Json Parser Decode Err: ", convertErr.Error())
-		return &model.HardwareResponseModel{}, false, convertErr.Error()
+		return false, convertErr.Error()
 	}
 	// Todo: 2 Filtreler Buraya Yazılacak
 	modelResponse := model.HardwareResponseModel{}
@@ -58,7 +57,7 @@ func (h *hardwareManager) ConvertRawModelToResponseModel(data *[]byte) (v interf
 	switch {
 
 	case err != nil && err.Error() != "not found":
-		clogger.Error(&logger.Messages{
+		clogger.Error(&map[string]interface{}{
 			fmt.Sprintf("Get clientId: %d, projectId: %d hardware_data ERROR: ", modelResponse.ClientId, modelResponse.ProjectId): err.Error(),
 		})
 
@@ -66,35 +65,35 @@ func (h *hardwareManager) ConvertRawModelToResponseModel(data *[]byte) (v interf
 
 		logErr := (*h.IHardwareDal).Add(&modelResponse)
 		if logErr != nil {
-			clogger.Error(&logger.Messages{
+			clogger.Error(&map[string]interface{}{
 				fmt.Sprintf("Add clientId: %d, projectId: %d hardware_data ERROR: ", modelResponse.ClientId, modelResponse.ProjectId): logErr.Error(),
 			})
-			return &modelResponse, false, logErr.Error()
+			return false, logErr.Error()
 		}
-		clogger.Info(&logger.Messages{
+		clogger.Info(&map[string]interface{}{
 			fmt.Sprintf("Add clientId: %d, projectId: %d hardware_data  : ", modelResponse.ClientId, modelResponse.ProjectId): "SUCCESS",
 		})
-		return &modelResponse, true, "Added"
+		return true, "Added"
 
 	case err == nil:
-		updatedModel, updateResult, updateErr := h.UpdateHardware(&modelResponse, oldModel)
+		_, updateResult, updateErr := h.UpdateHardware(&modelResponse, oldModel)
 		if updateErr != nil {
-			clogger.Error(&logger.Messages{
+			clogger.Error(&map[string]interface{}{
 				fmt.Sprintf("Update clientId: %d, projectId: %d game_session_data ERROR: ", modelResponse.ClientId, modelResponse.ProjectId): updateErr.Error(),
 			})
-			return updatedModel, updateResult, updateErr.Error()
+			return updateResult, updateErr.Error()
 		}
-		clogger.Info(&logger.Messages{
+		clogger.Info(&map[string]interface{}{
 			fmt.Sprintf("Update clientId: %d, projectId: %d game_session_data  : ", modelResponse.ClientId, modelResponse.ProjectId): "SUCCESS",
 		})
-		return updatedModel, updateResult, "Updated"
+		return updateResult, "Updated"
 
 	default:
 
-		return &modelResponse, false, ""
+		return false, ""
 
 	}
-	return &modelResponse, true, ""
+	return true, ""
 }
 
 func (g *hardwareManager) UpdateHardware(modelResponse *model.HardwareResponseModel, oldModel *model.HardwareResponseModel) (updatedModel *model.HardwareResponseModel, s bool, m error) {

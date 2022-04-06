@@ -9,7 +9,6 @@ import (
 
 	"strconv"
 
-	logger "github.com/appneuroncompany/light-logger"
 	"github.com/appneuroncompany/light-logger/clogger"
 )
 
@@ -35,7 +34,7 @@ func (c *CacheManager) ManageCache(tableName string, key string) (v int16, s boo
 		//Bilgi yok ise veri tabanına sor
 		m, getErr := (*c.ITypeStandardizationDal).GetByKey(tableName, key)
 		if getErr != nil {
-			clogger.Error(&logger.Messages{
+			clogger.Error(&map[string]interface{}{
 				"ITypeStandardizationDal_GetByKey CacheManager ManageCache ERROR: ": getErr.Error(),
 			})
 
@@ -50,7 +49,7 @@ func (c *CacheManager) ManageCache(tableName string, key string) (v int16, s boo
 			_, err := (*c.Cache).Set(m.Key, m.Value, 10)
 			if err != nil {
 
-				clogger.Error(&logger.Messages{
+				clogger.Error(&map[string]interface{}{
 					"Cache_Set CacheManager ManageCache ERROR: ": err.Error(),
 				})
 				// log.Fatal("CacheManager",
@@ -62,7 +61,7 @@ func (c *CacheManager) ManageCache(tableName string, key string) (v int16, s boo
 		//bilgi yok ise yenisini yarat ve cache'i güncelle
 		var max, maxErr = (*c.ITypeStandardizationDal).GetMaxByValue(tableName)
 		if maxErr != nil {
-			clogger.Error(&logger.Messages{
+			clogger.Error(&map[string]interface{}{
 				"ITypeStandardizationDal_GetMaxByValue CacheManager ManageCache ERROR: ": maxErr.Error(),
 			})
 
@@ -77,7 +76,7 @@ func (c *CacheManager) ManageCache(tableName string, key string) (v int16, s boo
 			Value: max + 1,
 		}); err != nil {
 
-			clogger.Error(&logger.Messages{
+			clogger.Error(&map[string]interface{}{
 				"ITypeStandardizationDal_Add CacheManager ManageCache ERROR: ": err.Error(),
 			})
 			// log.Fatal("CacheManager",
@@ -89,7 +88,7 @@ func (c *CacheManager) ManageCache(tableName string, key string) (v int16, s boo
 	}
 
 	if err != nil {
-		clogger.Error(&logger.Messages{
+		clogger.Error(&map[string]interface{}{
 			"CacheManager ManageCache ERROR: ": err.Error(),
 		})
 		// log.Fatal("CacheManager",
@@ -101,7 +100,7 @@ func (c *CacheManager) ManageCache(tableName string, key string) (v int16, s boo
 	i, logErr := strconv.Atoi(value)
 	if logErr != nil {
 
-		clogger.Error(&logger.Messages{
+		clogger.Error(&map[string]interface{}{
 			"CacheManager ManageCache ERROR: ": logErr.Error(),
 		})
 		// log.Fatal("CacheManager",

@@ -8,7 +8,6 @@ import (
 	IJsonParser "FilterWorkerService/pkg/jsonParser"
 	"fmt"
 
-	logger "github.com/appneuroncompany/light-logger"
 	"github.com/appneuroncompany/light-logger/clogger"
 )
 
@@ -26,14 +25,14 @@ func BuyingEventManagerConstructor() *buyingEventManager {
 	}
 }
 
-func (b *buyingEventManager) ConvertRawModelToResponseModel(data *[]byte) (v interface{}, s bool, m string) {
+func (b *buyingEventManager) ConvertRawModelToResponseModel(data *[]byte) (s bool, m string) {
 	firstModel := model.BuyingEventModel{}
 	convertErr := (*b.IJsonParser).DecodeJson(data, &firstModel)
 	if convertErr != nil {
-		clogger.Error(&logger.Messages{"Byte array to BuyingEventModel  BuyingEventManager Json Parser Decode ERROR: ": convertErr.Error()})
+		clogger.Error(&map[string]interface{}{"Byte array to BuyingEventModel  BuyingEventManager Json Parser Decode ERROR: ": convertErr.Error()})
 		// log.Fatal("BuyingEventManager", "ConvertRawModelToResponseModel",
 		// 	"byte array to BuyingEventModel", "Json Parser Decode Err: ", convertErr.Error())
-		return &model.BuyingEventResponseModel{}, false, convertErr.Error()
+		return false, convertErr.Error()
 	}
 	hour := int16(firstModel.TriggeredTime.Hour())
 	day := int16(firstModel.TriggeredTime.Weekday())
@@ -111,7 +110,7 @@ func (b *buyingEventManager) ConvertRawModelToResponseModel(data *[]byte) (v int
 	switch {
 
 	case err != nil && err.Error() != "not found":
-		clogger.Error(&logger.Messages{
+		clogger.Error(&map[string]interface{}{
 			fmt.Sprintf("Get clientId: %d, projectId: %d buying_event_data ERROR: ", modelResponse.ClientId, modelResponse.ProjectId): err.Error(),
 		})
 
@@ -119,37 +118,37 @@ func (b *buyingEventManager) ConvertRawModelToResponseModel(data *[]byte) (v int
 
 		logErr := (*b.IBuyingEventDal).Add(&modelResponse)
 		if logErr != nil {
-			clogger.Error(&logger.Messages{
+			clogger.Error(&map[string]interface{}{
 				fmt.Sprintf("Add clientId: %d, projectId: %d buying_event_data ERROR: ", modelResponse.ClientId, modelResponse.ProjectId): logErr.Error(),
 			})
 
-			return nil, false, logErr.Error()
+			return false, logErr.Error()
 		}
-		clogger.Info(&logger.Messages{
+		clogger.Info(&map[string]interface{}{
 			fmt.Sprintf("Add clientId: %d, projectId: %d buying_event_data  : ", modelResponse.ClientId, modelResponse.ProjectId): "SUCCESS",
 		})
-		return &modelResponse, true, "Added"
+		return true, "Added"
 
 	case err == nil:
-		updModel, updateResult, updateErr := b.UpdateBuyingEvent(&modelResponse, oldModel)
+		_, updateResult, updateErr := b.UpdateBuyingEvent(&modelResponse, oldModel)
 		if updateErr != nil {
 
-			clogger.Error(&logger.Messages{
+			clogger.Error(&map[string]interface{}{
 				fmt.Sprintf("Update clientId: %d, projectId: %d buying_event_data ERROR: ", modelResponse.ClientId, modelResponse.ProjectId): updateErr.Error(),
 			})
-			return nil, updateResult, updateErr.Error()
+			return updateResult, updateErr.Error()
 		}
-		clogger.Info(&logger.Messages{
+		clogger.Info(&map[string]interface{}{
 			fmt.Sprintf("Update clientId: %d, projectId: %d buying_event_data  : ", modelResponse.ClientId, modelResponse.ProjectId): "SUCCESS",
 		})
-		return updModel, updateResult, "Updated"
+		return updateResult, "Updated"
 
 	default:
 
-		return nil, false, ""
+		return false, ""
 
 	}
-	return nil, false, ""
+	return false, ""
 
 }
 

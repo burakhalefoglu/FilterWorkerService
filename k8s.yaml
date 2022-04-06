@@ -19,19 +19,17 @@ spec:
       labels:
         app: filter-worker
     spec:
-      nodeSelector:
-        dedicated: spot
       containers:
         - name: filter-worker
           image: CONTAINER_IMAGE
           imagePullPolicy: Always
           resources:
             requests:
-              memory: "50M"
-              cpu: "0.01"
+              cpu: "125m"
+              memory: "500Mi"
             limits:
-              memory: "100M"
-              cpu: "0.02"
+              cpu: "125m"
+              memory: "500Mi"
           env:
             - name: REDIS_HOST
               valueFrom:
@@ -48,26 +46,21 @@ spec:
                 configMapKeyRef:
                   name: worker-app-config
                   key: kafka-host
-            - name: LOGSTASH_HOST
+            - name: CASSANDRA_HOST
               valueFrom:
                 configMapKeyRef:
                   name: worker-app-config
-                  key: logstash-host
-            - name: MONGODB_HOST
+                  key: cass-host
+            - name: CASSANDRA_USER
               valueFrom:
                 configMapKeyRef:
                   name: worker-app-config
-                  key: mongo-host
-            - name: MONGODB_USER
-              valueFrom:
-                configMapKeyRef:
-                  name: worker-app-config
-                  key: mongodb-ml-db-user
-            - name: MONGODB_PASS
+                  key: cass-user
+            - name: CASSANDRA_PASS
               valueFrom:
                 secretKeyRef:
                   name: worker-app-secret
-                  key: mongodb-ml-db-pass
+                  key: cass-password
           livenessProbe:
             exec:
               command:

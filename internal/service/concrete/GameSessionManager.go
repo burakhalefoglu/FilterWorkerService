@@ -7,7 +7,6 @@ import (
 	IJsonParser "FilterWorkerService/pkg/jsonParser"
 	"fmt"
 
-	logger "github.com/appneuroncompany/light-logger"
 	"github.com/appneuroncompany/light-logger/clogger"
 )
 
@@ -23,12 +22,12 @@ func GameSessionManagerConstructor() *gameSessionManager {
 	}
 }
 
-func (g *gameSessionManager) ConvertRawModelToResponseModel(data *[]byte) (v interface{}, s bool, m string) {
+func (g *gameSessionManager) ConvertRawModelToResponseModel(data *[]byte) (s bool, m string) {
 	firstModel := model.GameSessionModel{}
 	convertErr := (*g.IJsonParser).DecodeJson(data, &firstModel)
 	if convertErr != nil {
-		clogger.Error(&logger.Messages{"Byte array to GameSessionModel  GameSessionManager Json Parser Decode ERROR: ": convertErr.Error()})
-		return &model.GameSessionResponseModel{}, false, convertErr.Error()
+		clogger.Error(&map[string]interface{}{"Byte array to GameSessionModel  GameSessionManager Json Parser Decode ERROR: ": convertErr.Error()})
+		return false, convertErr.Error()
 	}
 	hour := int16(firstModel.SessionFinishTime.Hour())
 	yearOfDay := int16(firstModel.SessionFinishTime.YearDay())
@@ -141,7 +140,7 @@ func (g *gameSessionManager) ConvertRawModelToResponseModel(data *[]byte) (v int
 	switch {
 
 	case err != nil && err.Error() != "not found":
-		clogger.Error(&logger.Messages{
+		clogger.Error(&map[string]interface{}{
 			fmt.Sprintf("Get clientId: %d, projectId: %d game_session_data ERROR: ", modelResponse.ClientId, modelResponse.ProjectId): err.Error(),
 		})
 
@@ -149,38 +148,38 @@ func (g *gameSessionManager) ConvertRawModelToResponseModel(data *[]byte) (v int
 
 		logErr := (*g.IGameSessionDal).Add(&modelResponse)
 		if logErr != nil {
-			clogger.Error(&logger.Messages{
+			clogger.Error(&map[string]interface{}{
 				fmt.Sprintf("Add clientId: %d, projectId: %d game_session_data ERROR: ", modelResponse.ClientId, modelResponse.ProjectId): logErr.Error(),
 			})
 
 			// log.Fatal("GameSessionEveryLoginManager", "ConvertRawModelToResponseModel",
 			// 	"GameSessionEveryLoginDal_Add", logErr.Error())
-			return &modelResponse, false, logErr.Error()
+			return false, logErr.Error()
 		}
-		clogger.Info(&logger.Messages{
+		clogger.Info(&map[string]interface{}{
 			fmt.Sprintf("Add clientId: %d, projectId: %d game_session_data  : ", modelResponse.ClientId, modelResponse.ProjectId): "SUCCESS",
 		})
-		return &modelResponse, true, "Added"
+		return true, "Added"
 
 	case err == nil:
-		updatedModel, updateResult, updateErr := g.UpdateGameSession(&modelResponse, oldModel)
+		_, updateResult, updateErr := g.UpdateGameSession(&modelResponse, oldModel)
 		if updateErr != nil {
-			clogger.Error(&logger.Messages{
+			clogger.Error(&map[string]interface{}{
 				fmt.Sprintf("Update clientId: %d, projectId: %d game_session_data ERROR: ", modelResponse.ClientId, modelResponse.ProjectId): updateErr.Error(),
 			})
-			return updatedModel, updateResult, updateErr.Error()
+			return updateResult, updateErr.Error()
 		}
-		clogger.Info(&logger.Messages{
+		clogger.Info(&map[string]interface{}{
 			fmt.Sprintf("Update clientId: %d, projectId: %d game_session_data  : ", modelResponse.ClientId, modelResponse.ProjectId): "SUCCESS",
 		})
-		return updatedModel, updateResult, "Updated"
+		return updateResult, "Updated"
 
 	default:
 
-		return nil, false, ""
+		return false, ""
 
 	}
-	return nil, false, ""
+	return false, ""
 }
 
 func (g *gameSessionManager) UpdateGameSession(modelResponse *model.GameSessionResponseModel, oldModel *model.GameSessionResponseModel) (updatedModel *model.GameSessionResponseModel, s bool, m error) {

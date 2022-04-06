@@ -266,7 +266,7 @@ func injectScreenSwipeManagerService() {
 func injectKafka() {
 
 	if err := container.Singleton(func() IKafka.IKafka {
-		return kafkago.KafkaGoConstructor( /*&IoC.Logger*/ )
+		return kafkago.KafkaGoConstructor()
 	}); err != nil {
 		panic(err)
 	}

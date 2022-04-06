@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"log"
 
-	logger "github.com/appneuroncompany/light-logger"
 	"github.com/appneuroncompany/light-logger/clogger"
 )
 
@@ -24,16 +23,16 @@ func LevelBaseSessionManagerConstructor() *levelBaseSessionManager {
 	}
 }
 
-func (l *levelBaseSessionManager) ConvertRawModelToResponseModel(data *[]byte) (v interface{}, s bool, m string) {
+func (l *levelBaseSessionManager) ConvertRawModelToResponseModel(data *[]byte) (s bool, m string) {
 	firstModel := model.LevelBaseSessionModel{}
 	convertErr := (*l.IJsonParser).DecodeJson(data, &firstModel)
 	if convertErr != nil {
-		clogger.Error(&logger.Messages{
+		clogger.Error(&map[string]interface{}{
 			"Byte array to LevelBaseSessionModel LevelBaseSessionManager Json Parser Decode Err: ": convertErr.Error(),
 		})
 		// log.Fatal("LevelBaseSessionManager", "ConvertRawModelToResponseModel",
 		// 	"byte array to LevelBaseSessionDataModel", "Json Parser Decode Err: ", convertErr.Error())
-		return &model.LevelBaseSessionResponseModel{}, false, convertErr.Error()
+		return false, convertErr.Error()
 	}
 	hour := int16(firstModel.SessionFinishTime.Hour())
 	yearOfDay := int16(firstModel.SessionFinishTime.YearDay())
@@ -96,40 +95,40 @@ func (l *levelBaseSessionManager) ConvertRawModelToResponseModel(data *[]byte) (
 	switch {
 
 	case err != nil && err.Error() != "not found":
-		clogger.Error(&logger.Messages{
+		clogger.Error(&map[string]interface{}{
 			fmt.Sprintf("Get clientId: %d, projectId: %d level_base_session_data ERROR: ", modelResponse.ClientId, modelResponse.ProjectId): err.Error(),
 		})
-		
+
 	case err != nil && err.Error() == "not found":
 
 		logErr := (*l.ILevelBaseSessionDal).Add(&modelResponse)
 		if logErr != nil {
-			clogger.Error(&logger.Messages{
+			clogger.Error(&map[string]interface{}{
 				fmt.Sprintf("Add clientId: %d, projectId: %d level_base_session_data ERROR: ", modelResponse.ClientId, modelResponse.ProjectId): logErr.Error(),
 			})
-			return &modelResponse, false, logErr.Error()
+			return false, logErr.Error()
 		}
-		clogger.Info(&logger.Messages{
+		clogger.Info(&map[string]interface{}{
 			fmt.Sprintf("Add clientId: %d, projectId: %d level_base_session_data  : ", modelResponse.ClientId, modelResponse.ProjectId): "SUCCESS",
 		})
-		return &modelResponse, true, "Added"
+		return true, "Added"
 
 	case err == nil:
-		updatedModel, updateResult, updateErr := l.UpdateLevelBaseSession(&modelResponse, oldModel)
+		_, updateResult, updateErr := l.UpdateLevelBaseSession(&modelResponse, oldModel)
 		if updateErr != nil {
-			clogger.Error(&logger.Messages{
+			clogger.Error(&map[string]interface{}{
 				fmt.Sprintf("Update clientId: %d, projectId: %d level_base_session_data ERROR: ", modelResponse.ClientId, modelResponse.ProjectId): updateErr.Error(),
-		})
-			return updatedModel, updateResult, updateErr.Error()
+			})
+			return updateResult, updateErr.Error()
 		}
-		clogger.Info(&logger.Messages{
+		clogger.Info(&map[string]interface{}{
 			fmt.Sprintf("Update clientId: %d, projectId: %d level_base_session_data  : ", modelResponse.ClientId, modelResponse.ProjectId): "SUCCESS",
 		})
-		return updatedModel, updateResult, "Updated"
+		return updateResult, "Updated"
 	default:
-		return nil, false, ""
+		return false, ""
 	}
-	return nil, false, ""
+	return false, ""
 }
 
 func (l *levelBaseSessionManager) UpdateLevelBaseSession(modelResponse *model.LevelBaseSessionResponseModel, oldModel *model.LevelBaseSessionResponseModel) (updatedModel *model.LevelBaseSessionResponseModel, s bool, m error) {
@@ -163,7 +162,7 @@ func (l *levelBaseSessionManager) UpdateLevelBaseSession(modelResponse *model.Le
 
 	// defer log.Print("LevelBaseSessionManager", "UpdateLevelBaseSession",
 	// 	oldModel.ClientId, oldModel.ProjectId)
-	logErr := (*l.ILevelBaseSessionDal).UpdateById(oldModel.ClientId,oldModel.ProjectId, oldModel)
+	logErr := (*l.ILevelBaseSessionDal).UpdateById(oldModel.ClientId, oldModel.ProjectId, oldModel)
 	if logErr != nil {
 		// log.Fatal("LevelBaseSessionManager", "UpdateLevelBaseSession",
 		// 	"LevelBaseSessionDal_UpdateLevelBaseSessionById", logErr.Error())

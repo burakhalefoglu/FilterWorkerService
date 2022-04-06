@@ -8,7 +8,6 @@ import (
 
 	IJsonParser "FilterWorkerService/pkg/jsonParser"
 
-	logger "github.com/appneuroncompany/light-logger"
 	"github.com/appneuroncompany/light-logger/clogger"
 )
 
@@ -24,12 +23,12 @@ func ScreenClickManagerConstructor() *screenClickManager {
 	}
 }
 
-func (sc *screenClickManager) ConvertRawModelToResponseModel(data *[]byte) (v interface{}, s bool, m string) {
+func (sc *screenClickManager) ConvertRawModelToResponseModel(data *[]byte) (s bool, m string) {
 	firstModel := model.ScreenClickModel{}
 	convertErr := (*sc.IJsonParser).DecodeJson(data, &firstModel)
 	if convertErr != nil {
-		clogger.Error(&logger.Messages{"Byte array to ScreenClickModel  ScreenClickManager Json Parser Decode ERROR: ": convertErr.Error()})
-		return &model.ScreenClickResponseModel{}, false, convertErr.Error()
+		clogger.Error(&map[string]interface{}{"Byte array to ScreenClickModel  ScreenClickManager Json Parser Decode ERROR: ": convertErr.Error()})
+		return false, convertErr.Error()
 	}
 	hour := int16(firstModel.CreatedAt.Hour())
 	yearOfDay := int16(firstModel.CreatedAt.YearDay())
@@ -169,7 +168,7 @@ func (sc *screenClickManager) ConvertRawModelToResponseModel(data *[]byte) (v in
 	switch {
 
 	case err != nil && err.Error() != "not found":
-		clogger.Error(&logger.Messages{
+		clogger.Error(&map[string]interface{}{
 			fmt.Sprintf("Get clientId: %d, projectId: %d screen_click_data ERROR: ", modelResponse.ClientId, modelResponse.ProjectId): err.Error(),
 		})
 
@@ -177,35 +176,35 @@ func (sc *screenClickManager) ConvertRawModelToResponseModel(data *[]byte) (v in
 
 		logErr := (*sc.IScreenClickDal).Add(&modelResponse)
 		if logErr != nil {
-			clogger.Error(&logger.Messages{
+			clogger.Error(&map[string]interface{}{
 				fmt.Sprintf("Add clientId: %d, projectId: %d screen_click_data ERROR: ", modelResponse.ClientId, modelResponse.ProjectId): logErr.Error(),
 			})
-			return &modelResponse, false, logErr.Error()
+			return false, logErr.Error()
 		}
-		clogger.Info(&logger.Messages{
+		clogger.Info(&map[string]interface{}{
 			fmt.Sprintf("Add clientId: %d, projectId: %d screen_click_data  : ", modelResponse.ClientId, modelResponse.ProjectId): "SUCCESS",
 		})
-		return &modelResponse, true, "Added"
+		return true, "Added"
 
 	case err == nil:
-		updModel, updateResult, updateErr := sc.UpdateScreenClick(&modelResponse, oldModel)
+		_, updateResult, updateErr := sc.UpdateScreenClick(&modelResponse, oldModel)
 		if updateErr != nil {
-			clogger.Error(&logger.Messages{
+			clogger.Error(&map[string]interface{}{
 				fmt.Sprintf("Update clientId: %d, projectId: %d screen_click_data ERROR: ", modelResponse.ClientId, modelResponse.ProjectId): updateErr.Error(),
 			})
-			return updModel, updateResult, updateErr.Error()
+			return updateResult, updateErr.Error()
 		}
-		clogger.Info(&logger.Messages{
+		clogger.Info(&map[string]interface{}{
 			fmt.Sprintf("Update clientId: %d, projectId: %d screen_click_data  : ", modelResponse.ClientId, modelResponse.ProjectId): "SUCCESS",
 		})
-		return updModel, updateResult, "Updated"
+		return updateResult, "Updated"
 
 	default:
 
-		return nil, false, ""
+		return false, ""
 
 	}
-	return nil, false, ""
+	return false, ""
 }
 
 func (sc *screenClickManager) UpdateScreenClick(modelResponse *model.ScreenClickResponseModel, oldModel *model.ScreenClickResponseModel) (updatedModel *model.ScreenClickResponseModel, s bool, m error) {

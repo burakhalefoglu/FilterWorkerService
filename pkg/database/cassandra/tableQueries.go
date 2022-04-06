@@ -1,7 +1,7 @@
 package cassandra
 
 var tableQueries = [9]string{
-	`CREATE TABLE IF NOT EXISTS ClientDatabase.adv_event_models(
+	`CREATE TABLE IF NOT EXISTS MLDatabase.adv_event_models(
 		id bigint, 
 		client_id bigint, 
 		project_id bigint, 
@@ -88,7 +88,7 @@ var tableQueries = [9]string{
 		adv_click_18_to_23_hour_count smallint, 
 		status boolean, 
 		PRIMARY KEY((client_id, project_id)))`,
-	`CREATE TABLE IF NOT EXISTS ClientDatabase.buying_event_models(
+	`CREATE TABLE IF NOT EXISTS MLDatabase.buying_event_models(
 		id bigint, 
 		client_id bigint, 
 		project_id bigint, 
@@ -159,7 +159,7 @@ var tableQueries = [9]string{
 		level_based_average_buying_count float,
 		status boolean, 
 		PRIMARY KEY((client_id, project_id)))`,
-	`CREATE TABLE IF NOT EXISTS ClientDatabase.game_session_models(
+	`CREATE TABLE IF NOT EXISTS MLDatabase.game_session_models(
 		id bigint, 
 		client_id bigint, 
 		project_id bigint, 
@@ -258,7 +258,7 @@ var tableQueries = [9]string{
 		session_18_to_23_hour_count smallint, 
 		status boolean, 
 		PRIMARY KEY((client_id, project_id)))`,
-	`CREATE TABLE IF NOT EXISTS ClientDatabase.level_base_session_models(
+	`CREATE TABLE IF NOT EXISTS MLDatabase.level_base_session_models(
 		id bigint, 
 		client_id bigint, 
 		project_id bigint, 
@@ -305,7 +305,7 @@ var tableQueries = [9]string{
 		last_level_session_minute smallint,
 		status boolean, 
 		PRIMARY KEY((client_id, project_id)))`,
-	`CREATE TABLE IF NOT EXISTS ClientDatabase.hardware_models(
+	`CREATE TABLE IF NOT EXISTS MLDatabase.hardware_models(
 		id bigint, 
 		client_id bigint, 
 		project_id bigint, 
@@ -319,7 +319,7 @@ var tableQueries = [9]string{
 		system_memory_size smallint,
 		status boolean, 
 		PRIMARY KEY((client_id, project_id)))`,
-	`CREATE TABLE IF NOT EXISTS ClientDatabase.screen_click_models(
+	`CREATE TABLE IF NOT EXISTS MLDatabase.screen_click_models(
 		id bigint, 
 		client_id bigint, 
 		project_id bigint, 
@@ -427,7 +427,7 @@ var tableQueries = [9]string{
 		last_touch_count_minus_session_based_avegare_click_count float, 
 		status boolean, 
 		PRIMARY KEY((client_id, project_id)))`,
-	`CREATE TABLE IF NOT EXISTS ClientDatabase.screen_swipe_models(
+	`CREATE TABLE IF NOT EXISTS MLDatabase.screen_swipe_models(
 		id bigint, 
 		client_id bigint, 
 		project_id bigint, 
@@ -561,7 +561,7 @@ var tableQueries = [9]string{
 		total_swipe_finish_y_cor float,
 		status boolean, 
 		PRIMARY KEY((client_id, project_id)))`,
-	`CREATE TABLE IF NOT EXISTS ClientDatabase.location_models(
+	`CREATE TABLE IF NOT EXISTS MLDatabase.location_models(
 		id bigint, 
 		client_id bigint, 
 		project_id bigint, 
@@ -573,7 +573,7 @@ var tableQueries = [9]string{
 		org smallint, 
 		status boolean, 
 		PRIMARY KEY((client_id, project_id)))`,
-	`CREATE TABLE IF NOT EXISTS ClientDatabase.type_standardization_models(
+	`CREATE TABLE IF NOT EXISTS MLDatabase.type_standardization_models(
 		key text,
 		value smallint,
 		PRIMARY KEY(key))`,

@@ -4,7 +4,6 @@ import (
 	"os"
 	"time"
 
-	logger "github.com/appneuroncompany/light-logger"
 	"github.com/appneuroncompany/light-logger/clogger"
 	"github.com/gocql/gocql"
 )
@@ -31,24 +30,26 @@ func ConnectDatabase() *gocql.Session {
 	}
 	session, err := cluster.CreateSession()
 	if err != nil {
-		clogger.Error(&logger.Messages{
+		clogger.Error(&map[string]interface{}{
 			"connection err: ": err.Error(),
 		})
 		return nil
 	}
 
 	if err = session.Query(`CREATE KEYSPACE IF NOT EXISTS MLDatabase WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 3}`).Exec(); err != nil {
-		clogger.Error(&logger.Messages{
+		clogger.Error(&map[string]interface{}{
 			"create keyspace err: ": err.Error(),
 		})
 	}
 
-
 	for _, q := range GetTableQueries() {
 		err = session.Query(q).Exec()
-		clogger.Error(&logger.Messages{
-			"create table err: ": err.Error(),
-		})
+		if err != nil {
+			clogger.Error(&map[string]interface{}{
+				"create table err: ": err.Error(),
+			})
+		}
+
 	}
 
 	return session
