@@ -44,7 +44,7 @@ func (g *gameSessionManager) ConvertRawModelToResponseModel(data *[]byte) (s boo
 	modelResponse.FirstSessionYear = year
 	modelResponse.FirstSessionWeekDay = weekDay
 	modelResponse.FirstSessionHour = hour
-	modelResponse.FirstSessionDuration = int16(firstModel.SessionTimeMinute)
+	modelResponse.FirstSessionDuration = int16(firstModel.SessionTime)
 	modelResponse.FirstSessionMinute = minute
 	modelResponse.SecondSessionHour = 0
 	modelResponse.SecondSessionDuration = 0
@@ -83,26 +83,26 @@ func (g *gameSessionManager) ConvertRawModelToResponseModel(data *[]byte) (s boo
 	modelResponse.FirstQuarterHourTotalSessionCount = 1
 	modelResponse.FirstQuarterHourTotalSessionDuration = 1
 	modelResponse.FirstHalfHourTotalSessionCount = 1
-	modelResponse.FirstHalfHourTotalSessionDuration = int16(firstModel.SessionTimeMinute)
+	modelResponse.FirstHalfHourTotalSessionDuration = int16(firstModel.SessionTime)
 	modelResponse.FirstHourTotalSessionCount = 1
-	modelResponse.FirstHourTotalSessionDuration = int16(firstModel.SessionTimeMinute)
+	modelResponse.FirstHourTotalSessionDuration = int16(firstModel.SessionTime)
 	modelResponse.FirstTwoHourTotalSessionCount = 1
-	modelResponse.FirstTwoHourTotalSessionDuration = int16(firstModel.SessionTimeMinute)
+	modelResponse.FirstTwoHourTotalSessionDuration = int16(firstModel.SessionTime)
 	modelResponse.FirstThreeHourTotalSessionCount = 1
-	modelResponse.FirstThreeHourTotalSessionDuration = int16(firstModel.SessionTimeMinute)
+	modelResponse.FirstThreeHourTotalSessionDuration = int16(firstModel.SessionTime)
 	modelResponse.FirstSixHourTotalSessionCount = 1
-	modelResponse.FirstSixHourTotalSessionDuration = int16(firstModel.SessionTimeMinute)
+	modelResponse.FirstSixHourTotalSessionDuration = int16(firstModel.SessionTime)
 	modelResponse.FirstTwelveHourTotalSessionCount = 1
-	modelResponse.FirstTwelveHourTotalSessionDuration = int16(firstModel.SessionTimeMinute)
+	modelResponse.FirstTwelveHourTotalSessionDuration = int16(firstModel.SessionTime)
 
 	modelResponse.TotalSessionDay = 1
-	modelResponse.TotalSessionDuration = int32(firstModel.SessionTimeMinute)
+	modelResponse.TotalSessionDuration = int32(firstModel.SessionTime)
 	modelResponse.TotalSessionCount = 1
 	modelResponse.TotalSessionHour = 1
-	modelResponse.TotalSessionMinute = int32(firstModel.SessionTimeMinute)
+	modelResponse.TotalSessionMinute = int32(firstModel.SessionTime)
 
 	modelResponse.FirstDayTotalSessionCount = 1
-	modelResponse.FirstDayTotalSessionDuration = int16(firstModel.SessionTimeMinute)
+	modelResponse.FirstDayTotalSessionDuration = int16(firstModel.SessionTime)
 	modelResponse.SecondDayTotalSessionCount = 0
 	modelResponse.SecondDayTotalSessionDuration = 0
 	modelResponse.ThirdDayTotalSessionCount = 0
@@ -116,15 +116,15 @@ func (g *gameSessionManager) ConvertRawModelToResponseModel(data *[]byte) (s boo
 	modelResponse.SeventhDayTotalSessionCount = 0
 	modelResponse.SeventhDayTotalSessionDuration = 0
 
-	modelResponse.MinSessionDuration = int16(firstModel.SessionTimeMinute)
-	modelResponse.MaxSessionDuration = int16(firstModel.SessionTimeMinute)
+	modelResponse.MinSessionDuration = int16(firstModel.SessionTime)
+	modelResponse.MaxSessionDuration = int16(firstModel.SessionTime)
 	modelResponse.DailyAvegareSessionCount = 1
-	modelResponse.DailyAverageSessionDuration = float32(firstModel.SessionTimeMinute)
-	modelResponse.SessionBasedAvegareSessionDuration = float32(firstModel.SessionTimeMinute)
+	modelResponse.DailyAverageSessionDuration = float32(firstModel.SessionTime)
+	modelResponse.SessionBasedAvegareSessionDuration = float32(firstModel.SessionTime)
 	modelResponse.DailyAvegareSessionCountMinusFirstDaySessionCount = 0
 	modelResponse.DailyAvegareSessionDurationMinusFirstDaySessionDuration = 0
 	modelResponse.SessionBasedAvegareSessionDurationMinusFirstSessionDuration = 0
-	modelResponse.SessionBasedAvegareSessionDurationMinusLastSessionDuration = float32(firstModel.SessionTimeMinute)
+	modelResponse.SessionBasedAvegareSessionDurationMinusLastSessionDuration = float32(firstModel.SessionTime)
 	DetermineGameSessionDay(&modelResponse, weekDay)
 	DetermineGameSessionHour(&modelResponse, hour)
 	DetermineGameSessionAmPm(&modelResponse, hour)
