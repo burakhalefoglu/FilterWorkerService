@@ -11,11 +11,14 @@ import (
 	"sync"
 	"time"
 
+	logger "github.com/appneuroncompany/light-logger"
+
 	"github.com/joho/godotenv"
 )
 
 func main() {
 	defer helper.DeleteHealthFile()
+	logger.Log.App = "FilterWorkerService"
 	runtime.MemProfileRate = 0
 	err := godotenv.Load()
 	if err != nil {
